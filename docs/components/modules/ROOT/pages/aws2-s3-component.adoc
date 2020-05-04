@@ -1,15 +1,20 @@
 [[aws2-s3-component]]
-= AWS2 S3 Storage Service Component
+= AWS 2 S3 Storage Service Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-s3/src/main/docs/aws2-s3-component.adoc
+:docTitle: AWS 2 S3 Storage Service
+:artifactId: camel-aws2-s3
+:description: Store and retrie objects from AWS S3 Storage Service using AWS SDK version 2.x.
+:since: 3.2
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
+
+*Since Camel {since}*
 
 *Since Camel 3.2*
 
-*Since Camel 3.2*
 
-
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The S3 component supports storing and retrieving objects from/to
 https://aws.amazon.com/s3[Amazon's S3] service.
@@ -44,7 +49,7 @@ from("aws2-s3://helloBucket?accessKey=yourAccessKey&secretKey=yourSecretKey&pref
 
 
 // component options: START
-The AWS2 S3 Storage Service component supports 30 options, which are listed below.
+The AWS 2 S3 Storage Service component supports 38 options, which are listed below.
 
 
 
@@ -55,6 +60,7 @@ The AWS2 S3 Storage Service component supports 30 options, which are listed belo
 | *autoCreateBucket* (common) | Setting the autocreation of the bucket | true | boolean
 | *configuration* (common) | The component configuration |  | AWS2S3Configuration
 | *overrideEndpoint* (common) | Set the need for overidding the endpoint. This option needs to be used in combination with uriEndpointOverride option | false | boolean
+| *pojoRequest* (common) | If we want to use a POJO request as body or not | false | boolean
 | *policy* (common) | The policy for this queue to set in the com.amazonaws.services.s3.AmazonS3#setBucketPolicy() method. |  | String
 | *proxyHost* (common) | To define a proxy host when instantiating the SQS client |  | String
 | *proxyPort* (common) | Specify a proxy port to be used inside the client definition. |  | Integer
@@ -65,8 +71,11 @@ The AWS2 S3 Storage Service component supports 30 options, which are listed belo
 | *bridgeErrorHandler* (consumer) | Allows for bridging the consumer to the Camel routing Error Handler, which mean any exceptions occurred while the consumer is trying to pickup incoming messages, or the likes, will now be processed as a message and handled by the routing Error Handler. By default the consumer will use the org.apache.camel.spi.ExceptionHandler to deal with exceptions, that will be logged at WARN or ERROR level and ignored. | false | boolean
 | *deleteAfterRead* (consumer) | Delete objects from S3 after they have been retrieved. The delete is only performed if the Exchange is committed. If a rollback occurs, the object is not deleted. If this option is false, then the same objects will be retrieve over and over again on the polls. Therefore you need to use the Idempotent Consumer EIP in the route to filter out duplicates. You can filter using the AWS2S3Constants#BUCKET_NAME and AWS2S3Constants#KEY headers, or only the AWS2S3Constants#KEY header. | true | boolean
 | *delimiter* (consumer) | The delimiter which is used in the com.amazonaws.services.s3.model.ListObjectsRequest to only consume objects we are interested in. |  | String
+| *destinationBucket* (consumer) | Define the destination bucket where an object must be moved when moveAfterRead is set to true. |  | String
 | *fileName* (consumer) | To get the object from the bucket with the given file name |  | String
 | *includeBody* (consumer) | If it is true, the exchange body will be set to a stream to the contents of the file. If false, the headers will be set with the S3 object metadata, but the body will be null. This option is strongly related to autocloseBody option. In case of setting includeBody to true and autocloseBody to false, it will be up to the caller to close the S3Object stream. Setting autocloseBody to true, will close the S3Object stream automatically. | true | boolean
+| *includeFolders* (consumer) | If it is true, the folders/directories will be consumed. If it is false, they will be ignored, and Exchanges will not be created for those | true | boolean
+| *moveAfterRead* (consumer) | Move objects from S3 bucket to a different bucket after they have been retrieved. To accomplish the operation the destinationBucket option must be set. The copy bucket operation is only performed if the Exchange is committed. If a rollback occurs, the object is not moved. | false | boolean
 | *prefix* (consumer) | The prefix which is used in the com.amazonaws.services.s3.model.ListObjectsRequest to only consume objects we are interested in. |  | String
 | *autocloseBody* (consumer) | If this option is true and includeBody is true, then the S3Object.close() method will be called on exchange completion. This option is strongly related to includeBody option. In case of setting includeBody to true and autocloseBody to false, it will be up to the caller to close the S3Object stream. Setting autocloseBody to true, will close the S3Object stream automatically. | true | boolean
 | *deleteAfterWrite* (producer) | Delete file object after the S3 file has been uploaded | false | boolean
@@ -77,7 +86,11 @@ The AWS2 S3 Storage Service component supports 30 options, which are listed belo
 | *partSize* (producer) | Setup the partSize which is used in multi part upload, the default size is 25M. | 26214400 | long
 | *storageClass* (producer) | The storage class to set in the com.amazonaws.services.s3.model.PutObjectRequest request. |  | String
 | *awsKMSKeyId* (producer) | Define the id of KMS key to use in case KMS is enabled |  | String
+| *customerAlgorithm* (producer) | Define the customer algorithm to use in case CustomerKey is enabled |  | String
+| *customerKeyId* (producer) | Define the id of Customer key to use in case CustomerKey is enabled |  | String
+| *customerKeyMD5* (producer) | Define the MD5 of Customer key to use in case CustomerKey is enabled |  | String
 | *useAwsKMS* (producer) | Define if KMS must be used or not | false | boolean
+| *useCustomerKey* (producer) | Define if Customer Key must be used or not | false | boolean
 | *basicPropertyBinding* (advanced) | Whether the component should use basic property binding (Camel 2.x) or the newer property binding with additional capabilities | false | boolean
 | *accessKey* (security) | Amazon AWS Access Key |  | String
 | *secretKey* (security) | Amazon AWS Secret Key |  | String
@@ -95,7 +108,7 @@ The AWS2 S3 Storage Service component supports 30 options, which are listed belo
 
 
 // endpoint options: START
-The AWS2 S3 Storage Service endpoint is configured using URI syntax:
+The AWS 2 S3 Storage Service endpoint is configured using URI syntax:
 
 ----
 aws2-s3://bucketNameOrArn
@@ -113,7 +126,7 @@ with the following path and query parameters:
 |===
 
 
-=== Query Parameters (50 parameters):
+=== Query Parameters (58 parameters):
 
 
 [width="100%",cols="2,5,^1,2",options="header"]
@@ -122,6 +135,7 @@ with the following path and query parameters:
 | *amazonS3Client* (common) | Reference to a com.amazonaws.services.s3.AmazonS3 in the registry. |  | S3Client
 | *autoCreateBucket* (common) | Setting the autocreation of the bucket | true | boolean
 | *overrideEndpoint* (common) | Set the need for overidding the endpoint. This option needs to be used in combination with uriEndpointOverride option | false | boolean
+| *pojoRequest* (common) | If we want to use a POJO request as body or not | false | boolean
 | *policy* (common) | The policy for this queue to set in the com.amazonaws.services.s3.AmazonS3#setBucketPolicy() method. |  | String
 | *proxyHost* (common) | To define a proxy host when instantiating the SQS client |  | String
 | *proxyPort* (common) | Specify a proxy port to be used inside the client definition. |  | Integer
@@ -132,10 +146,13 @@ with the following path and query parameters:
 | *bridgeErrorHandler* (consumer) | Allows for bridging the consumer to the Camel routing Error Handler, which mean any exceptions occurred while the consumer is trying to pickup incoming messages, or the likes, will now be processed as a message and handled by the routing Error Handler. By default the consumer will use the org.apache.camel.spi.ExceptionHandler to deal with exceptions, that will be logged at WARN or ERROR level and ignored. | false | boolean
 | *deleteAfterRead* (consumer) | Delete objects from S3 after they have been retrieved. The delete is only performed if the Exchange is committed. If a rollback occurs, the object is not deleted. If this option is false, then the same objects will be retrieve over and over again on the polls. Therefore you need to use the Idempotent Consumer EIP in the route to filter out duplicates. You can filter using the AWS2S3Constants#BUCKET_NAME and AWS2S3Constants#KEY headers, or only the AWS2S3Constants#KEY header. | true | boolean
 | *delimiter* (consumer) | The delimiter which is used in the com.amazonaws.services.s3.model.ListObjectsRequest to only consume objects we are interested in. |  | String
+| *destinationBucket* (consumer) | Define the destination bucket where an object must be moved when moveAfterRead is set to true. |  | String
 | *fileName* (consumer) | To get the object from the bucket with the given file name |  | String
 | *includeBody* (consumer) | If it is true, the exchange body will be set to a stream to the contents of the file. If false, the headers will be set with the S3 object metadata, but the body will be null. This option is strongly related to autocloseBody option. In case of setting includeBody to true and autocloseBody to false, it will be up to the caller to close the S3Object stream. Setting autocloseBody to true, will close the S3Object stream automatically. | true | boolean
+| *includeFolders* (consumer) | If it is true, the folders/directories will be consumed. If it is false, they will be ignored, and Exchanges will not be created for those | true | boolean
 | *maxConnections* (consumer) | Set the maxConnections parameter in the S3 client configuration | 60 | int
 | *maxMessagesPerPoll* (consumer) | Gets the maximum number of messages as a limit to poll at each polling. Gets the maximum number of messages as a limit to poll at each polling. The default value is 10. Use 0 or a negative number to set it as unlimited. | 10 | int
+| *moveAfterRead* (consumer) | Move objects from S3 bucket to a different bucket after they have been retrieved. To accomplish the operation the destinationBucket option must be set. The copy bucket operation is only performed if the Exchange is committed. If a rollback occurs, the object is not moved. | false | boolean
 | *prefix* (consumer) | The prefix which is used in the com.amazonaws.services.s3.model.ListObjectsRequest to only consume objects we are interested in. |  | String
 | *sendEmptyMessageWhenIdle* (consumer) | If the polling consumer did not poll any files, you can enable this option to send an empty message (no body) instead. | false | boolean
 | *autocloseBody* (consumer) | If this option is true and includeBody is true, then the S3Object.close() method will be called on exchange completion. This option is strongly related to includeBody option. In case of setting includeBody to true and autocloseBody to false, it will be up to the caller to close the S3Object stream. Setting autocloseBody to true, will close the S3Object stream automatically. | true | boolean
@@ -150,7 +167,11 @@ with the following path and query parameters:
 | *partSize* (producer) | Setup the partSize which is used in multi part upload, the default size is 25M. | 26214400 | long
 | *storageClass* (producer) | The storage class to set in the com.amazonaws.services.s3.model.PutObjectRequest request. |  | String
 | *awsKMSKeyId* (producer) | Define the id of KMS key to use in case KMS is enabled |  | String
+| *customerAlgorithm* (producer) | Define the customer algorithm to use in case CustomerKey is enabled |  | String
+| *customerKeyId* (producer) | Define the id of Customer key to use in case CustomerKey is enabled |  | String
+| *customerKeyMD5* (producer) | Define the MD5 of Customer key to use in case CustomerKey is enabled |  | String
 | *useAwsKMS* (producer) | Define if KMS must be used or not | false | boolean
+| *useCustomerKey* (producer) | Define if Customer Key must be used or not | false | boolean
 | *basicPropertyBinding* (advanced) | Whether the endpoint should use basic property binding (Camel 2.x) or the newer property binding with additional capabilities | false | boolean
 | *synchronous* (advanced) | Sets whether synchronous processing should be strictly used, or Camel is allowed to use asynchronous processing (if supported). | false | boolean
 | *backoffErrorThreshold* (scheduler) | The number of subsequent error polls (failed due some error) that should happen before the backoffMultipler should kick-in. |  | int
@@ -493,6 +514,51 @@ This may be really useful for smarter configuration of the endpoint.
 Some users like to consume stuff from a bucket and move the content in a different one without using the copyObject feature of this component.
 If this is case for you, don't forget to remove the bucketName header from the incoming exchange of the consumer, otherwise the file will be always overwritten on the same 
 original bucket.
+
+== MoveAfterRead consumer option
+
+In addition to deleteAfterRead it has been added another option, moveAfterRead. With this option enabled the consumed object will be moved to a target destinationBucket instead of being only deleted.
+This will require specifying the destinationBucket option. As example:
+
+[source,java]
+--------------------------------------------------------------------------------
+  from("aws2-s3://mycamelbucket?amazonS3Client=#amazonS3Client&moveAfterRead=true&destinationBucket=myothercamelbucket")
+  .to("mock:result");
+--------------------------------------------------------------------------------
+
+In this case the objects consumed will be moved to myothercamelbucket bucket and deleted from the original one (because of deleteAfterRead set to true as default).
+
+== Using customer key as encryption
+
+We introduced also the customer key support (an alternative of using KMS). The following code shows an example.
+
+[source,java]
+--------------------------------------------------------------------------------
+String key = UUID.randomUUID().toString();
+byte[] secretKey = generateSecretKey();
+String b64Key = Base64.getEncoder().encodeToString(secretKey);
+String b64KeyMd5 = Md5Utils.md5AsBase64(secretKey);
+
+String awsEndpoint = "aws2-s3://mycamel?autoCreateBucket=false&useCustomerKey=true&customerKeyId=RAW(" + b64Key + ")&customerKeyMD5=RAW(" + b64KeyMd5 + ")&customerAlgorithm=" + AES256.name();
+
+from("direct:putObject")
+    .setHeader(AWS2S3Constants.KEY, constant("test.txt"))
+    .setBody(constant("Test"))
+    .to(awsEndpoint);
+--------------------------------------------------------------------------------
+
+== Using a POJO as body
+
+Sometimes build an AWS Request can be complex, because of multiple options. We introduce the possibility to use a POJO as body.
+In AWS S3 there are multiple operations you can submit, as an example for List brokers request, you can do something like:
+
+------------------------------------------------------------------------------------------------------
+from("direct:aws2-s3")
+     .setBody(ListObjectsRequest.builder().bucket(bucketName).build())
+     .to("aws2-s3://test?amazonS3Client=#amazonS3Client&operation=listObjects&pojoRequest=true")
+------------------------------------------------------------------------------------------------------
+
+In this way you'll pass the request directly without the need of passing headers and options specifically related to this operation.
 
 == Dependencies
 

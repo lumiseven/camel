@@ -55,6 +55,7 @@ import org.apache.camel.impl.engine.DefaultManagementStrategy;
 import org.apache.camel.impl.transformer.TransformerKey;
 import org.apache.camel.impl.validator.ValidatorKey;
 import org.apache.camel.model.ContextScanDefinition;
+import org.apache.camel.model.FaultToleranceConfigurationDefinition;
 import org.apache.camel.model.FromDefinition;
 import org.apache.camel.model.GlobalOptionsDefinition;
 import org.apache.camel.model.HystrixConfigurationDefinition;
@@ -543,29 +544,17 @@ public abstract class AbstractCamelContextFactoryBean<T extends ModelCamelContex
         }
 
         if (disabled) {
-            LOG.info("JMXAgent disabled");
+            LOG.debug("JMXAgent disabled");
             // clear the existing lifecycle strategies define by the DefaultCamelContext constructor
             getContext().getLifecycleStrategies().clear();
             // no need to add a lifecycle strategy as we do not need one as JMX is disabled
             getContext().setManagementStrategy(new DefaultManagementStrategy());
         } else if (camelJMXAgent != null) {
-            LOG.info("JMXAgent enabled: {}", camelJMXAgent);
+            LOG.debug("JMXAgent enabled: {}", camelJMXAgent);
 
             Map<String, Object> properties = new HashMap<>();
-            if (camelJMXAgent.getConnectorPort() != null) {
-                properties.put("connectorPort", CamelContextHelper.parseInteger(getContext(), camelJMXAgent.getConnectorPort()));
-            }
-            if (camelJMXAgent.getCreateConnector() != null) {
-                properties.put("createConnector", CamelContextHelper.parseBoolean(getContext(), camelJMXAgent.getCreateConnector()));
-            }
             if (camelJMXAgent.getMbeanObjectDomainName() != null) {
                 properties.put("mbeanObjectDomainName", CamelContextHelper.parseText(getContext(), camelJMXAgent.getMbeanObjectDomainName()));
-            }
-            if (camelJMXAgent.getRegistryPort() != null) {
-                properties.put("registryPort", CamelContextHelper.parseInteger(getContext(), camelJMXAgent.getRegistryPort()));
-            }
-            if (camelJMXAgent.getServiceUrlPath() != null) {
-                properties.put("serviceUrlPath", CamelContextHelper.parseText(getContext(), camelJMXAgent.getServiceUrlPath()));
             }
             if (camelJMXAgent.getUsePlatformMBeanServer() != null) {
                 properties.put("usePlatformMBeanServer", CamelContextHelper.parseBoolean(getContext(), camelJMXAgent.getUsePlatformMBeanServer()));
@@ -878,6 +867,10 @@ public abstract class AbstractCamelContextFactoryBean<T extends ModelCamelContex
 
     public abstract List<Resilience4jConfigurationDefinition> getResilience4jConfigurations();
 
+    public abstract FaultToleranceConfigurationDefinition getDefaultFaultToleranceConfiguration();
+
+    public abstract List<FaultToleranceConfigurationDefinition> getFaultToleranceConfigurations();
+
     // Implementation methods
     // -------------------------------------------------------------------------
 
@@ -1000,6 +993,14 @@ public abstract class AbstractCamelContextFactoryBean<T extends ModelCamelContex
         if (getResilience4jConfigurations() != null) {
             for (Resilience4jConfigurationDefinition bean : getResilience4jConfigurations()) {
                 context.addResilience4jConfiguration(bean.getId(), bean);
+            }
+        }
+        if (getDefaultFaultToleranceConfiguration() != null) {
+            context.setFaultToleranceConfiguration(getDefaultFaultToleranceConfiguration());
+        }
+        if (getFaultToleranceConfigurations() != null) {
+            for (FaultToleranceConfigurationDefinition bean : getFaultToleranceConfigurations()) {
+                context.addFaultToleranceConfiguration(bean.getId(), bean);
             }
         }
     }

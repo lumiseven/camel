@@ -1,5 +1,9 @@
 [[setHeader-eip]]
 = Set Header EIP
+:docTitle: Set Header
+:description: Sets the value of a message header
+:since: 
+:supportLevel: Stable
 
 The SetHeader EIP allows you to set and header on your exchange.
 

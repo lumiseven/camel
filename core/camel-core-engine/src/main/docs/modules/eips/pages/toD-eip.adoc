@@ -1,5 +1,9 @@
 [[toD-eip]]
 = To D EIP
+:docTitle: To D
+:description: Sends the message to a dynamic endpoint You can specify multiple languages in the uri separated by the plus sign, such as mock:language:xpath:/order/uri where mock: would be a prefix to a xpath expression. For more dynamic behavior use Recipient List or Dynamic Router EIP instead.
+:since: 
+:supportLevel: Stable
 
 There is a new `.toD` / `<toD>` that allows to send a message to a dynamic
 computed xref:latest@manual:ROOT:endpoint.adoc[Endpoint] using one or
@@ -10,7 +14,7 @@ the endpoint.
 == Options
 
 // eip options: START
-The To D EIP supports 5 options which are listed below:
+The To D EIP supports 6 options which are listed below:
 
 [width="100%",cols="2,5,^1,2",options="header"]
 |===
@@ -20,6 +24,7 @@ The To D EIP supports 5 options which are listed below:
 | *cacheSize* | Sets the maximum size used by the org.apache.camel.spi.ProducerCache which is used to cache and reuse producers when using this recipient list, when uris are reused. Beware that when using dynamic endpoints then it affects how well the cache can be utilized. If each dynamic endpoint is unique then its best to turn of caching by setting this to -1, which allows Camel to not cache both the producers and endpoints; they are regarded as prototype scoped and will be stopped and discarded after use. This reduces memory usage as otherwise producers/endpoints are stored in memory in the caches. However if there are a high degree of dynamic endpoints that have been used before, then it can benefit to use the cache to reuse both producers and endpoints and therefore the cache size can be set accordingly or rely on the default size (1000). If there is a mix of unique and used before dynamic endpoints, then setting a reasonable cache size can help reduce memory usage to avoid storing too many non frequent used producers. |  | Integer
 | *ignoreInvalidEndpoint* | Ignore the invalidate endpoint exception when try to create a producer with that endpoint | false | Boolean
 | *allowOptimisedComponents* | Whether to allow components to optimise toD if they are org.apache.camel.spi.SendDynamicAware . | true | Boolean
+| *autoStartComponents* | Whether to auto startup components when toD is starting up. | true | Boolean
 |===
 // eip options: END
 
@@ -135,12 +140,12 @@ for each different userid. To avoid having too many dynamic endpoints you can co
 [source,java]
 ----
 from("direct:login")
-  .toD("http:myloginserver:8080/login?cacheSize=10&userid=${header.userName}");
+  .toD("http:myloginserver:8080/login?userid=${header.userName}", 10);
 ----
 
 where the cache is 10. *Important* this will only reduce the endpoint cache of the `toD` that has a chance
 of being reused in case a message is routed with the same `userName` header. Therefore reducing the cache size
-will not solve the _endless dynamic endoints_ problem. Instead you should use static endpoints with `to` and
+will not solve the _endless dynamic endpoints_ problem. Instead you should use static endpoints with `to` and
 provide the dynamic parts in Camel message headers (if possible).
 
 === Using static endpoints
@@ -216,5 +221,3 @@ during startup if `toD` was optimised, or if there was a failure loading the opt
 ----
 Detected SendDynamicAware component: http optimising toD: http:myloginserver:8080/login?userid=${header.userName}
 ----
-
-

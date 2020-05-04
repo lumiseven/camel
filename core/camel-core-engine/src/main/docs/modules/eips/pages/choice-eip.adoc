@@ -1,5 +1,9 @@
 [[choice-eip]]
 = Choice EIP
+:docTitle: Choice
+:description: Routes messages based on a series of predicates
+:since: 
+:supportLevel: Stable
 
 The
 http://www.enterpriseintegrationpatterns.com/ContentBasedRouter.html[Content
@@ -46,7 +50,7 @@ RouteBuilder builder = new RouteBuilder() {
 
 [TIP]
 ====
-See xref:latest@manual:ROOT:faq/why-can-i-not-use-when-or-otherwise-in-a-java-camel-route.adoc[Why
+See xref:latest@manual:faq:why-can-i-not-use-when-or-otherwise-in-a-java-camel-route.adoc[Why
 can I not use when or otherwise in a Java Camel route] if you have
 problems with the Java DSL, accepting using `when` or `otherwise`.
 ====

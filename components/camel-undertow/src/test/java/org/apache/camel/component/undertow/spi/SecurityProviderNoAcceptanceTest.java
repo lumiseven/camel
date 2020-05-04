@@ -16,8 +16,11 @@
  */
 package org.apache.camel.component.undertow.spi;
 
+import io.undertow.util.StatusCodes;
 import org.apache.camel.CamelContext;
+import org.apache.camel.CamelExecutionException;
 import org.apache.camel.Exchange;
+import org.apache.camel.http.base.HttpOperationFailedException;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -34,15 +37,19 @@ public class SecurityProviderNoAcceptanceTest extends AbstractSecurityProviderTe
     }
 
     @Test
-    public void testSecuredNotAllowedButNotApplied() throws Exception {
-        securityConfiguration.setRoleToAssign("admin");
+    public void testSecuredNotAcceptingProvider() throws Exception {
+        securityConfiguration.setRoleToAssign("user");
 
         getMockEndpoint("mock:input").expectedHeaderReceived(Exchange.HTTP_METHOD, "GET");
 
-        String out = template.requestBody("undertow:http://localhost:{{port}}/foo", null, String.class);
+        try {
+            template.requestBody("undertow:http://localhost:{{port}}/foo", null, String.class);
 
-        Assert.assertEquals("", out);
+            fail("Should throw exception");
 
-        assertMockEndpointsSatisfied();
+        } catch (CamelExecutionException e) {
+            HttpOperationFailedException he = assertIsInstanceOf(HttpOperationFailedException.class, e.getCause());
+            assertEquals(StatusCodes.FORBIDDEN, he.getStatusCode());
+        }
     }
 }

@@ -1,11 +1,15 @@
 [[aws2-mq-component]]
 = AWS 2 MQ Component
+:docTitle: AWS 2 MQ
+:artifactId: camel-aws2-mq
+:description: Manage AWS MQ instances using AWS SDK version 2.x.
+:since: 3.1
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 3.1*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The MQ component supports create, run, start, stop and terminate
 https://aws.amazon.com/amazon-mq/[AWS MQ] instances.
@@ -35,7 +39,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 MQ component supports 11 options, which are listed below.
+The AWS 2 MQ component supports 12 options, which are listed below.
 
 
 
@@ -46,6 +50,7 @@ The AWS 2 MQ component supports 11 options, which are listed below.
 | *configuration* (producer) | Component configuration |  | MQ2Configuration
 | *lazyStartProducer* (producer) | Whether the producer should be started lazy (on the first message). By starting lazy you can use this to allow CamelContext and routes to startup in situations where a producer may otherwise fail during starting and cause the route to fail being started. By deferring this startup to be lazy then the startup failure can be handled during routing messages via Camel's routing error handlers. Beware that when the first message is processed then creating and starting the producer may take a little time and prolong the total processing time of the processing. | false | boolean
 | *operation* (producer) | *Required* The operation to perform. It can be listBrokers,createBroker,deleteBroker. The value can be one of: listBrokers, createBroker, deleteBroker, rebootBroker, updateBroker, describeBroker |  | MQ2Operations
+| *pojoRequest* (producer) | If we want to use a POJO request as body or not | false | boolean
 | *proxyHost* (producer) | To define a proxy host when instantiating the MQ client |  | String
 | *proxyPort* (producer) | To define a proxy port when instantiating the MQ client |  | Integer
 | *proxyProtocol* (producer) | To define a proxy protocol when instantiating the MQ client. The value can be one of: HTTP, HTTPS | HTTPS | Protocol
@@ -78,7 +83,7 @@ with the following path and query parameters:
 |===
 
 
-=== Query Parameters (11 parameters):
+=== Query Parameters (12 parameters):
 
 
 [width="100%",cols="2,5,^1,2",options="header"]
@@ -87,6 +92,7 @@ with the following path and query parameters:
 | *amazonMqClient* (producer) | To use a existing configured AmazonMQClient as client |  | MqClient
 | *lazyStartProducer* (producer) | Whether the producer should be started lazy (on the first message). By starting lazy you can use this to allow CamelContext and routes to startup in situations where a producer may otherwise fail during starting and cause the route to fail being started. By deferring this startup to be lazy then the startup failure can be handled during routing messages via Camel's routing error handlers. Beware that when the first message is processed then creating and starting the producer may take a little time and prolong the total processing time of the processing. | false | boolean
 | *operation* (producer) | *Required* The operation to perform. It can be listBrokers,createBroker,deleteBroker. The value can be one of: listBrokers, createBroker, deleteBroker, rebootBroker, updateBroker, describeBroker |  | MQ2Operations
+| *pojoRequest* (producer) | If we want to use a POJO request as body or not | false | boolean
 | *proxyHost* (producer) | To define a proxy host when instantiating the MQ client |  | String
 | *proxyPort* (producer) | To define a proxy port when instantiating the MQ client |  | Integer
 | *proxyProtocol* (producer) | To define a proxy protocol when instantiating the MQ client. The value can be one of: HTTP, HTTPS | HTTPS | Protocol
@@ -164,7 +170,20 @@ The component is capable of detecting the presence of an MqClient bean into the 
 If it's the only instance of that type it will be used as client and you won't have to define it as uri parameter.
 This may be really useful for smarter configuration of the endpoint.
 
-Dependencies
+== Using a POJO as body
+
+Sometimes build an AWS Request can be complex, because of multiple options. We introduce the possibility to use a POJO as body.
+In AWS MQ there are multiple operations you can submit, as an example for List brokers request, you can do something like:
+
+------------------------------------------------------------------------------------------------------
+from("direct:aws2-mq")
+     .setBody(ListBrokersRequest.builder().maxResults(10).build())
+     .to("aws2-mq://test?amazonMqClient=#amazonMqClient&operation=listBrokers&pojoRequest=true")
+------------------------------------------------------------------------------------------------------
+
+In this way you'll pass the request directly without the need of passing headers and options specifically related to this operation.
+
+== Dependencies
 
 Maven users will need to add the following dependency to their pom.xml.
 

@@ -1,8 +1,14 @@
 [[json-xstream-dataformat]]
 = JSon XStream DataFormat
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-xstream/src/main/docs/json-xstream-dataformat.adoc
+:docTitle: JSon XStream
+:artifactId: camel-xstream
+:description: Marshal POJOs to JSON and back.
+:since: 2.0
+:supportLevel: Stable
 
-*Since Camel 2.0*
+*Since Camel {since}*
 
 XStream is a Data Format which uses the
 http://xstream.codehaus.org/[XStream library] to marshal and unmarshal

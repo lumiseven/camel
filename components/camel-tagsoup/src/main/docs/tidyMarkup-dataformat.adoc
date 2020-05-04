@@ -1,7 +1,12 @@
 [[tidyMarkup-dataformat]]
 = TidyMarkup DataFormat
+:docTitle: TidyMarkup
+:artifactId: camel-tagsoup
+:description: Parse (potentially invalid) HTML into valid HTML or DOM.
+:since: 2.0
+:supportLevel: Stable
 
-*Since Camel 2.0*
+*Since Camel {since}*
 
 TidyMarkup is a Data Format that uses the
 http://www.ccil.org/~cowan/XML/tagsoup/[TagSoup] to tidy up HTML. It can

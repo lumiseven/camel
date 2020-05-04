@@ -1,11 +1,15 @@
 [[etcd-watch-component]]
 = Etcd Watch Component
+:docTitle: Etcd Watch
+:artifactId: camel-etcd
+:description: Watch specific etcd keys or directories for changes.
+:since: 2.18
+:supportLevel: Stable
+:component-header: Only consumer is supported
 
-*Since Camel 2.18*
+*Since Camel {since}*
 
-// HEADER START
-*Only consumer is supported*
-// HEADER END
+*{component-header}*
 
 *Since Camel 2.18*
 

@@ -1,12 +1,17 @@
 [[aws2-ec2-component]]
 = AWS 2 EC2 Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-ec2/src/main/docs/aws2-ec2-component.adoc
+:docTitle: AWS 2 EC2
+:artifactId: camel-aws2-ec2
+:description: Manage AWS EC2 instances using AWS SDK version 2.x.
+:since: 3.1
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 3.1*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The EC2 component supports the ability to create, run, start, stop and terminate
 https://aws.amazon.com/ec2/[AWS EC2] instances.
@@ -36,7 +41,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 EC2 component supports 11 options, which are listed below.
+The AWS 2 EC2 component supports 12 options, which are listed below.
 
 
 
@@ -48,10 +53,11 @@ The AWS 2 EC2 component supports 11 options, which are listed below.
 | *configuration* (producer) | The component configuration |  | AWS2EC2Configuration
 | *lazyStartProducer* (producer) | Whether the producer should be started lazy (on the first message). By starting lazy you can use this to allow CamelContext and routes to startup in situations where a producer may otherwise fail during starting and cause the route to fail being started. By deferring this startup to be lazy then the startup failure can be handled during routing messages via Camel's routing error handlers. Beware that when the first message is processed then creating and starting the producer may take a little time and prolong the total processing time of the processing. | false | boolean
 | *operation* (producer) | *Required* The operation to perform. It can be createAndRunInstances, startInstances, stopInstances, terminateInstances, describeInstances, describeInstancesStatus, rebootInstances, monitorInstances, unmonitorInstances, createTags or deleteTags. The value can be one of: createAndRunInstances, startInstances, stopInstances, terminateInstances, describeInstances, describeInstancesStatus, rebootInstances, monitorInstances, unmonitorInstances, createTags, deleteTags |  | AWS2EC2Operations
+| *pojoRequest* (producer) | If we want to use a POJO request as body or not | false | boolean
 | *proxyHost* (producer) | To define a proxy host when instantiating the EC2 client |  | String
 | *proxyPort* (producer) | To define a proxy port when instantiating the EC2 client |  | Integer
 | *proxyProtocol* (producer) | To define a proxy protocol when instantiating the EC2 client. The value can be one of: HTTP, HTTPS | HTTPS | Protocol
-| *region* (producer) | The region in which EC2 client needs to work. When using this parameter, the configuration will expect the capitalized name of the region (for example AP_EAST_1) You'll need to use the name Regions.EU_WEST_1.name() |  | String
+| *region* (producer) | The region in which EC2 client needs to work. When using this parameter, the configuration will expect the lowercase name of the region (for example ap-east-1) You'll need to use the name Region.EU_WEST_1.id() |  | String
 | *secretKey* (producer) | Amazon AWS Secret Key |  | String
 | *basicPropertyBinding* (advanced) | Whether the component should use basic property binding (Camel 2.x) or the newer property binding with additional capabilities | false | boolean
 |===
@@ -79,7 +85,7 @@ with the following path and query parameters:
 |===
 
 
-=== Query Parameters (11 parameters):
+=== Query Parameters (12 parameters):
 
 
 [width="100%",cols="2,5,^1,2",options="header"]
@@ -89,10 +95,11 @@ with the following path and query parameters:
 | *amazonEc2Client* (producer) | To use a existing configured AmazonEC2Client as client |  | Ec2Client
 | *lazyStartProducer* (producer) | Whether the producer should be started lazy (on the first message). By starting lazy you can use this to allow CamelContext and routes to startup in situations where a producer may otherwise fail during starting and cause the route to fail being started. By deferring this startup to be lazy then the startup failure can be handled during routing messages via Camel's routing error handlers. Beware that when the first message is processed then creating and starting the producer may take a little time and prolong the total processing time of the processing. | false | boolean
 | *operation* (producer) | *Required* The operation to perform. It can be createAndRunInstances, startInstances, stopInstances, terminateInstances, describeInstances, describeInstancesStatus, rebootInstances, monitorInstances, unmonitorInstances, createTags or deleteTags. The value can be one of: createAndRunInstances, startInstances, stopInstances, terminateInstances, describeInstances, describeInstancesStatus, rebootInstances, monitorInstances, unmonitorInstances, createTags, deleteTags |  | AWS2EC2Operations
+| *pojoRequest* (producer) | If we want to use a POJO request as body or not | false | boolean
 | *proxyHost* (producer) | To define a proxy host when instantiating the EC2 client |  | String
 | *proxyPort* (producer) | To define a proxy port when instantiating the EC2 client |  | Integer
 | *proxyProtocol* (producer) | To define a proxy protocol when instantiating the EC2 client. The value can be one of: HTTP, HTTPS | HTTPS | Protocol
-| *region* (producer) | The region in which EC2 client needs to work. When using this parameter, the configuration will expect the capitalized name of the region (for example AP_EAST_1) You'll need to use the name Regions.EU_WEST_1.name() |  | String
+| *region* (producer) | The region in which EC2 client needs to work. When using this parameter, the configuration will expect the lowercase name of the region (for example ap-east-1) You'll need to use the name Region.EU_WEST_1.id() |  | String
 | *secretKey* (producer) | Amazon AWS Secret Key |  | String
 | *basicPropertyBinding* (advanced) | Whether the endpoint should use basic property binding (Camel 2.x) or the newer property binding with additional capabilities | false | boolean
 | *synchronous* (advanced) | Sets whether synchronous processing should be strictly used, or Camel is allowed to use asynchronous processing (if supported). | false | boolean
@@ -173,7 +180,20 @@ The component is capable of detecting the presence of an Ec2Client bean into the
 If it's the only instance of that type it will be used as client and you won't have to define it as uri parameter.
 This may be really useful for smarter configuration of the endpoint.
 
-Dependencies
+== Using a POJO as body
+
+Sometimes build an AWS Request can be complex, because of multiple options. We introduce the possibility to use a POJO as body.
+In AWS EC2 there are multiple operations you can submit, as an example for Create and run an instance, you can do something like:
+
+------------------------------------------------------------------------------------------------------
+from("direct:start")
+  .setBody(RunInstancesRequest.builder().imageId("test-1").instanceType(InstanceType.T2_MICRO).build())
+  .to("aws2-ec2://TestDomain?accessKey=xxxx&secretKey=xxxx&operation=createAndRunInstances&pojoRequest=true");
+------------------------------------------------------------------------------------------------------
+
+In this way you'll pass the request directly without the need of passing headers and options specifically related to this operation.
+
+== Dependencies
 
 Maven users will need to add the following dependency to their pom.xml.
 

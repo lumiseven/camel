@@ -1,7 +1,12 @@
 [[flatpack-dataformat]]
 = Flatpack DataFormat
+:docTitle: Flatpack
+:artifactId: camel-flatpack
+:description: Marshal and unmarshal Java lists and maps to/from flat files (such as CSV, delimited, or fixed length formats) using Flatpack library.
+:since: 2.1
+:supportLevel: Stable
 
-*Since Camel 2.1*
+*Since Camel {since}*
 
 The xref:ROOT:flatpack-component.adoc[Flatpack] component ships with the Flatpack data
 format that can be used to format between fixed width or delimited text

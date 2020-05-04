@@ -1,12 +1,17 @@
 [[jooq-component]]
 = JOOQ Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-jooq/src/main/docs/jooq-component.adoc
+:docTitle: JOOQ
+:artifactId: camel-jooq
+:description: Store and retrieve Java objects from an SQL database using JOOQ.
+:since: 3.0
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 3.0*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The JOOQ component enables you to store and retrieve Java objects from persistent storage using JOOQ library.
 
@@ -33,7 +38,7 @@ SQL could be executed using JOOQ's objects "Query" or "ResultQuery".
 Also SQL query could be specified inside URI:
 [source,java]
 ----
-from("jooq://org.apache.camel.component.jooq.db.tables.records.BookStoreRecord?query=query=select * from book_store x where x.name = 'test'").to("bean:myBusinessLogic");
+from("jooq://org.apache.camel.component.jooq.db.tables.records.BookStoreRecord?query=select * from book_store x where x.name = 'test'").to("bean:myBusinessLogic");
 ----
 See examples below.
 

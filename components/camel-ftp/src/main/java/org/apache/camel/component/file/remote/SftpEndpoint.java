@@ -16,18 +16,22 @@
  */
 package org.apache.camel.component.file.remote;
 
+import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.Proxy;
 import org.apache.camel.Processor;
 import org.apache.camel.component.file.GenericFileConfiguration;
+import org.apache.camel.component.file.GenericFileProcessStrategy;
 import org.apache.camel.component.file.GenericFileProducer;
+import org.apache.camel.component.file.remote.strategy.FtpProcessStrategyFactory;
+import org.apache.camel.component.file.remote.strategy.SftpProcessStrategyFactory;
 import org.apache.camel.component.file.strategy.FileMoveExistingStrategy;
 import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
+import org.apache.commons.net.ftp.FTPFile;
 
 /**
- * The sftp (FTP over SSH) component is used for uploading or downloading files
- * from SFTP servers.
+ * Upload and download files to/from SFTP servers.
  */
 @UriEndpoint(firstVersion = "1.1.0", scheme = "sftp", extendsScheme = "file", title = "SFTP", syntax = "sftp:host:port/directoryName", label = "file")
 @Metadata(excludeProperties = "appendChars,bufferSize,siteCommand,"
@@ -79,11 +83,16 @@ public class SftpEndpoint extends RemoteFileEndpoint<SftpRemoteFile> {
 
     /**
      * Default Existing File Move Strategy
-     * 
+     *
      * @return the default implementation for sftp component
      */
     private FileMoveExistingStrategy createDefaultSftpMoveExistingFileStrategy() {
         return new SftpDefaultMoveExistingFileStrategy();
+    }
+
+    @Override
+    protected GenericFileProcessStrategy<SftpRemoteFile> createGenericFileStrategy() {
+        return new SftpProcessStrategyFactory().createGenericFileProcessStrategy(getCamelContext(), getParamsAsMap());
     }
 
     @Override

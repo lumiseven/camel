@@ -1,11 +1,15 @@
 [[undertow-component]]
 = Undertow Component
+:docTitle: Undertow
+:artifactId: camel-undertow
+:description: Expose HTTP and WebSocket endpoints and access external HTTP/WebSocket servers.
+:since: 2.16
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.16*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Undertow component provides HTTP and WebSocket based endpoints for consuming
 and producing HTTP/WebSocket requests.
@@ -204,7 +208,7 @@ If you need to expose an Undertow endpoint on all network interfaces, the
 `0.0.0.0` address should be used.
 
 To listen across an entire URI prefix, see
-xref:manual::faq/how-do-i-let-jetty-match-wildcards.adoc[How do I let Jetty match wildcards].
+xref:manual:faq:how-do-i-let-jetty-match-wildcards.adoc[How do I let Jetty match wildcards].
 
 If you actually want to expose routes by HTTP and already have a
 Servlet, you should instead refer to the
@@ -219,5 +223,9 @@ Undertow components locates all implementations of `UndertowSecurityProvider` us
 Java SPI (Service Provider Interfaces). If there is an object passed to component
 as parameter `securityConfiguration` and provider accepts it. Provider will be used
 for authentication of all requests.
+
+Property `requireServletContext` of security providers forces udertow server to start
+with servlet context. There will be no servlet actually handled. This feature is meant only
+for use with servlet filters, which needs servlet context for their functionality.
 
 include::camel-spring-boot::page$undertow-starter.adoc[]

@@ -1,7 +1,12 @@
 [[avro-dataformat]]
 = Avro DataFormat
+:docTitle: Avro
+:artifactId: camel-avro
+:description: Serialize and deserialize messages using Apache Avro binary data format.
+:since: 2.14
+:supportLevel: Stable
 
-*Since Camel 2.14*
+*Since Camel {since}*
 
 This component provides a dataformat for avro, which allows
 serialization and deserialization of messages using Apache Avro's binary

@@ -1,5 +1,9 @@
 [[when-eip]]
 = When EIP
+:docTitle: When
+:description: Triggers a route when an expression evaluates to true
+:since: 
+:supportLevel: Stable
 
 The When EIP is related to http://www.enterpriseintegrationpatterns.com/ContentBasedRouter.html[Content
 Based Router] from the xref:enterprise-integration-patterns.adoc[EIP

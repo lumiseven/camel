@@ -309,4 +309,5 @@ public abstract class RemoteFileEndpoint<T> extends GenericFileEndpoint<T> {
     public void setDownload(boolean download) {
         this.download = download;
     }
+
 }

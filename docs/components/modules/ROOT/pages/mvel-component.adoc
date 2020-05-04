@@ -1,12 +1,17 @@
 [[mvel-component]]
 = MVEL Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-mvel/src/main/docs/mvel-component.adoc
+:docTitle: MVEL
+:artifactId: camel-mvel
+:description: Transform messages using an MVEL template.
+:since: 2.12
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 2.12*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The MVEL component allows you to process a message using an
 http://mvel.documentnode.com/[MVEL] template. This can be ideal when using

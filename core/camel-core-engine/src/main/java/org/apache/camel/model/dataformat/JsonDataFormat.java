@@ -27,8 +27,7 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.util.CollectionStringBuffer;
 
 /**
- * JSon data format is used for unmarshal a JSon payload to POJO or to marshal
- * POJO back to JSon payload.
+ * Marshal POJOs to JSON and back.
  */
 @Metadata(label = "dataformat,transformation,json", title = "JSon")
 @XmlRootElement(name = "json")
@@ -63,9 +62,6 @@ public class JsonDataFormat extends DataFormatDefinition {
     @XmlAttribute
     @Metadata(javaType = "java.lang.Boolean")
     private String useList;
-    @XmlAttribute
-    @Metadata(javaType = "java.lang.Boolean")
-    private String enableJaxbAnnotationModule;
     @XmlAttribute
     private String moduleClassNames;
     @XmlAttribute
@@ -236,18 +232,6 @@ public class JsonDataFormat extends DataFormatDefinition {
         this.useList = useList;
     }
 
-    public String getEnableJaxbAnnotationModule() {
-        return enableJaxbAnnotationModule;
-    }
-
-    /**
-     * Whether to enable the JAXB annotations module when using jackson. When
-     * enabled then JAXB annotations can be used by Jackson.
-     */
-    public void setEnableJaxbAnnotationModule(String enableJaxbAnnotationModule) {
-        this.enableJaxbAnnotationModule = enableJaxbAnnotationModule;
-    }
-
     public String getModuleClassNames() {
         return moduleClassNames;
     }
@@ -337,7 +321,7 @@ public class JsonDataFormat extends DataFormatDefinition {
 
     /**
      * To add permission for the given pojo classes.
-     * 
+     *
      * @param type the pojo class(es) xstream should use as allowed permission
      * @see #setPermissions(String)
      */
@@ -485,15 +469,6 @@ public class JsonDataFormat extends DataFormatDefinition {
 
     public JsonDataFormat useList(String useList) {
         this.useList = useList;
-        return this;
-    }
-
-    public JsonDataFormat enableJaxbAnnotationModule(boolean enableJaxbAnnotationModule) {
-        return enableJaxbAnnotationModule(Boolean.toString(enableJaxbAnnotationModule));
-    }
-
-    public JsonDataFormat enableJaxbAnnotationModule(String enableJaxbAnnotationModule) {
-        this.enableJaxbAnnotationModule = enableJaxbAnnotationModule;
         return this;
     }
 

@@ -63,6 +63,11 @@ public class FileOperations implements GenericFileOperations<File> {
     }
 
     @Override
+    public GenericFile<File> newGenericFile() {
+        return new GenericFile<>();
+    }
+
+    @Override
     public void setEndpoint(GenericFileEndpoint<File> endpoint) {
         this.endpoint = (FileEndpoint)endpoint;
     }

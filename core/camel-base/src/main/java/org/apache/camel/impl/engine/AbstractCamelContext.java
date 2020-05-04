@@ -130,6 +130,7 @@ import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.ReactiveExecutor;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.spi.ReifierStrategy;
+import org.apache.camel.spi.RestBindingJaxbDataFormatFactory;
 import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.spi.RestRegistry;
 import org.apache.camel.spi.RestRegistryFactory;
@@ -258,6 +259,7 @@ public abstract class AbstractCamelContext extends BaseService
     private volatile BeanProcessorFactory beanProcessorFactory;
     private volatile XMLRoutesDefinitionLoader xmlRoutesDefinitionLoader;
     private volatile ModelToXMLDumper modelToXMLDumper;
+    private volatile RestBindingJaxbDataFormatFactory restBindingJaxbDataFormatFactory;
     private volatile RuntimeCamelCatalog runtimeCamelCatalog;
     private volatile ClassResolver classResolver;
     private volatile PackageScanClassResolver packageScanClassResolver;
@@ -3765,7 +3767,12 @@ public abstract class AbstractCamelContext extends BaseService
     }
 
     public boolean isJMXDisabled() {
-        return disableJMX;
+        String override = System.getProperty("org.apache.camel.jmx.disabled");
+        if (override != null) {
+            return "true".equals(override);
+        } else {
+            return disableJMX;
+        }
     }
 
     @Override
@@ -4316,6 +4323,21 @@ public abstract class AbstractCamelContext extends BaseService
         this.modelToXMLDumper = doAddService(modelToXMLDumper);
     }
 
+    public RestBindingJaxbDataFormatFactory getRestBindingJaxbDataFormatFactory() {
+        if (restBindingJaxbDataFormatFactory == null) {
+            synchronized (lock) {
+                if (restBindingJaxbDataFormatFactory == null) {
+                    setRestBindingJaxbDataFormatFactory(createRestBindingJaxbDataFormatFactory());
+                }
+            }
+        }
+        return restBindingJaxbDataFormatFactory;
+    }
+
+    public void setRestBindingJaxbDataFormatFactory(RestBindingJaxbDataFormatFactory restBindingJaxbDataFormatFactory) {
+        this.restBindingJaxbDataFormatFactory = restBindingJaxbDataFormatFactory;
+    }
+
     @Override
     public RuntimeCamelCatalog getRuntimeCamelCatalog() {
         if (runtimeCamelCatalog == null) {
@@ -4514,6 +4536,8 @@ public abstract class AbstractCamelContext extends BaseService
     protected abstract XMLRoutesDefinitionLoader createXMLRoutesDefinitionLoader();
 
     protected abstract ModelToXMLDumper createModelToXMLDumper();
+
+    protected abstract RestBindingJaxbDataFormatFactory createRestBindingJaxbDataFormatFactory();
 
     protected abstract RuntimeCamelCatalog createRuntimeCamelCatalog();
 

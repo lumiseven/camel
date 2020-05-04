@@ -38,10 +38,16 @@ public class AWS2S3Configuration implements Cloneable {
     private String prefix;
     @UriParam(label = "consumer")
     private String delimiter;
+    @UriParam(label = "consumer", defaultValue = "true")
+    private boolean includeFolders = true;
     @UriParam
     private String region;
     @UriParam(label = "consumer", defaultValue = "true")
     private boolean deleteAfterRead = true;
+    @UriParam(label = "consumer")
+    private boolean moveAfterRead;
+    @UriParam(label = "consumer")
+    private String destinationBucket;
     @UriParam(label = "producer")
     private boolean deleteAfterWrite;
     @UriParam(label = "producer")
@@ -71,6 +77,14 @@ public class AWS2S3Configuration implements Cloneable {
     private boolean useAwsKMS;
     @UriParam(label = "producer,advanced")
     private String awsKMSKeyId;
+    @UriParam(label = "producer,advanced", defaultValue = "false")
+    private boolean useCustomerKey;
+    @UriParam(label = "producer,advanced")
+    private String customerKeyId;
+    @UriParam(label = "producer,advanced")
+    private String customerKeyMD5;
+    @UriParam(label = "producer,advanced")
+    private String customerAlgorithm;
     @UriParam(defaultValue = "false")
     private boolean useIAMCredentials;
     @UriParam(label = "producer")
@@ -79,6 +93,8 @@ public class AWS2S3Configuration implements Cloneable {
     private boolean overrideEndpoint;
     @UriParam
     private String uriEndpointOverride;
+    @UriParam(defaultValue = "false")
+    private boolean pojoRequest;
 
     public long getPartSize() {
         return partSize;
@@ -163,6 +179,19 @@ public class AWS2S3Configuration implements Cloneable {
         this.delimiter = delimiter;
     }
 
+    /**
+     * If it is true, the folders/directories will be consumed.
+     * If it is false, they will be ignored, and Exchanges will not be created for those
+     */
+    public void setIncludeFolders(boolean includeFolders) {
+        this.includeFolders = includeFolders;
+    }
+
+    public boolean isIncludeFolders() {
+        return includeFolders;
+    }
+
+
     public String getBucketName() {
         return bucketName;
     }
@@ -233,6 +262,31 @@ public class AWS2S3Configuration implements Cloneable {
      */
     public void setDeleteAfterRead(boolean deleteAfterRead) {
         this.deleteAfterRead = deleteAfterRead;
+    }
+
+    public boolean isMoveAfterRead() {
+        return moveAfterRead;
+    }
+
+    /**
+     * Move objects from S3 bucket to a different bucket after they have been retrieved. To accomplish the operation 
+     * the destinationBucket option must be set.
+     * The copy bucket operation is only performed if the Exchange is committed. If a rollback occurs, the object
+     * is not moved.
+     */
+    public void setMoveAfterRead(boolean moveAfterRead) {
+        this.moveAfterRead = moveAfterRead;
+    }
+
+    public String getDestinationBucket() {
+        return destinationBucket;
+    }
+
+    /**
+     * Define the destination bucket where an object must be moved when moveAfterRead is set to true. 
+     */
+    public void setDestinationBucket(String destinationBucket) {
+        this.destinationBucket = destinationBucket;
     }
 
     public boolean isDeleteAfterWrite() {
@@ -352,6 +406,52 @@ public class AWS2S3Configuration implements Cloneable {
         this.awsKMSKeyId = awsKMSKeyId;
     }
 
+    public boolean isUseCustomerKey() {
+        return useCustomerKey;
+    }
+
+    /**
+     * Define if Customer Key must be used or not
+     */
+    public void setUseCustomerKey(boolean useCustomerKey) {
+        this.useCustomerKey = useCustomerKey;
+    }
+
+    public String getCustomerKeyId() {
+        return customerKeyId;
+    }
+
+    /**
+     * Define the id of Customer key to use in case CustomerKey is enabled
+     */
+    public void setCustomerKeyId(String customerKeyId) {
+        this.customerKeyId = customerKeyId;
+    }
+    
+    
+
+    public String getCustomerKeyMD5() {
+        return customerKeyMD5;
+    }
+
+    /**
+     * Define the MD5 of Customer key to use in case CustomerKey is enabled
+     */
+    public void setCustomerKeyMD5(String customerKeyMD5) {
+        this.customerKeyMD5 = customerKeyMD5;
+    }
+
+    public String getCustomerAlgorithm() {
+        return customerAlgorithm;
+    }
+
+    /**
+     * Define the customer algorithm to use in case CustomerKey is enabled
+     */
+    public void setCustomerAlgorithm(String customerAlgorithm) {
+        this.customerAlgorithm = customerAlgorithm;
+    }
+
     /**
      * Set whether the S3 client should expect to load credentials on an EC2
      * instance or to expect static credentials to be passed in.
@@ -409,6 +509,17 @@ public class AWS2S3Configuration implements Cloneable {
      */
     public void setUriEndpointOverride(String uriEndpointOverride) {
         this.uriEndpointOverride = uriEndpointOverride;
+    }
+    
+    public boolean isPojoRequest() {
+        return pojoRequest;
+    }
+
+    /**
+     * If we want to use a POJO request as body or not
+     */
+    public void setPojoRequest(boolean pojoRequest) {
+        this.pojoRequest = pojoRequest;
     }
 
     // *************************************************

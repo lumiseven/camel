@@ -1,7 +1,12 @@
 [[crypto-dataformat]]
 = Crypto (Java Cryptographic Extension) DataFormat
+:docTitle: Crypto (Java Cryptographic Extension)
+:artifactId: camel-crypto
+:description: Encrypt and decrypt messages using Java Cryptography Extension (JCE).
+:since: 2.3
+:supportLevel: Stable
 
-*Since Camel 2.3*
+*Since Camel {since}*
 
 The Crypto Data Format integrates the Java
 Cryptographic Extension into Camel, allowing simple and flexible

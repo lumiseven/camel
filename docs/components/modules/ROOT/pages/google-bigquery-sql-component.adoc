@@ -1,12 +1,17 @@
 [[google-bigquery-sql-component]]
 = Google BigQuery Standard SQL Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-google-bigquery/src/main/docs/google-bigquery-sql-component.adoc
+:docTitle: Google BigQuery Standard SQL
+:artifactId: camel-google-bigquery
+:description: Access Google Cloud BigQuery service using SQL queries.
+:since: 2.23
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 2.23*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The Google BigQuery SQL component provides access
 to https://cloud.google.com/bigquery/[Cloud BigQuery Infrastructure] via

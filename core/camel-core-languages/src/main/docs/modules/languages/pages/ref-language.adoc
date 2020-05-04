@@ -1,7 +1,12 @@
 [[ref-language]]
 = Ref Language
+:docTitle: Ref
+:artifactId: camel-core-languages
+:description: Look up an expression in the Camel Registry and evaluate it.
+:since: 2.8
+:supportLevel: Stable
 
-*Since Camel 2.8*
+*Since Camel {since}*
 
 The Ref Expression Language is really just a way to lookup a custom
 Expression or Predicate from the Registry.

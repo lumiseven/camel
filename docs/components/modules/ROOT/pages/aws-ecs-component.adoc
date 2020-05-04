@@ -1,12 +1,17 @@
 [[aws-ecs-component]]
 = AWS ECS Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws-ecs/src/main/docs/aws-ecs-component.adoc
+:docTitle: AWS ECS
+:artifactId: camel-aws-ecs
+:description: Manage AWS ECS cluster instances.
+:since: 3.0
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 3.0*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The ECS component supports create, delete, describe and list
 https://aws.amazon.com/ecs/[AWS ECS] clusters instances.

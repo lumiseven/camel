@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 
 import org.apache.camel.spi.annotations.ConstantProvider;
 import org.apache.camel.spi.annotations.ServiceFactory;
-import org.apache.camel.spi.annotations.SubServiceFactory;
-import org.apache.maven.artifact.DependencyResolutionRequiredException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -54,7 +52,6 @@ import org.jboss.jandex.Indexer;
 public class SpiGeneratorMojo extends AbstractGeneratorMojo {
 
     public static final DotName SERVICE_FACTORY = DotName.createSimple(ServiceFactory.class.getName());
-    public static final DotName SUB_SERVICE_FACTORY = DotName.createSimple(SubServiceFactory.class.getName());
     public static final DotName CONSTANT_PROVIDER = DotName.createSimple(ConstantProvider.class.getName());
 
     @Parameter(defaultValue = "${project.build.outputDirectory}")
@@ -63,8 +60,6 @@ public class SpiGeneratorMojo extends AbstractGeneratorMojo {
     protected File sourcesOutputDir;
     @Parameter(defaultValue = "${project.basedir}/src/generated/resources")
     protected File resourcesOutputDir;
-
-    private ClassLoader projectClassLoader;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -147,12 +142,6 @@ public class SpiGeneratorMojo extends AbstractGeneratorMojo {
                     } else {
                         StringBuilder sb = new StringBuilder();
                         sb.append("# " + GENERATED_MSG + NL + "class=").append(className).append(NL);
-                        for (AnnotationInstance ai : annotation.target().asClass().classAnnotations()) {
-                            AnnotationInstance ssf = index.getClassByName(ai.name()).classAnnotation(SUB_SERVICE_FACTORY);
-                            if (ssf != null) {
-                                sb.append(ssf.value().asString()).append(".class=").append(ai.value().asString()).append(NL);
-                            }
-                        }
                         updateResource(resourcesOutputDir.toPath(),
                                 "META-INF/services/org/apache/camel/" + sfa.value().asString() + "/" + pval,
                                 sb.toString());
@@ -166,21 +155,6 @@ public class SpiGeneratorMojo extends AbstractGeneratorMojo {
         Path output = Paths.get(project.getBuild().getOutputDirectory());
         Path file = output.resolve(className.replace('.', '/') + ".class");
         return Files.isRegularFile(file);
-    }
-
-    private ClassLoader getProjectClassLoader() throws MojoExecutionException {
-        if (projectClassLoader == null) {
-            projectClassLoader = createProjectClassLoader();
-        }
-        return projectClassLoader;
-    }
-
-    private DynamicClassLoader createProjectClassLoader() throws MojoExecutionException {
-        try {
-            return DynamicClassLoader.createDynamicClassLoader(project.getCompileClasspathElements());
-        } catch (DependencyResolutionRequiredException e) {
-            throw new MojoExecutionException("Unable to create project classloader", e);
-        }
     }
 
     private IndexView getIndex() throws MojoExecutionException {
@@ -223,7 +197,7 @@ public class SpiGeneratorMojo extends AbstractGeneratorMojo {
         String pn = fqn.substring(0, fqn.lastIndexOf('.'));
         String cn = fqn.substring(fqn.lastIndexOf('.') + 1);
 
-        StringBuilder w = new StringBuilder(); 
+        StringBuilder w = new StringBuilder();
         w.append("/* " + GENERATED_MSG + " */\n");
         w.append("package ").append(pn).append(";\n");
         w.append("\n");

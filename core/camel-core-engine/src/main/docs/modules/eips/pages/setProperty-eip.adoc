@@ -1,5 +1,9 @@
 [[setProperty-eip]]
 = Set Property EIP
+:docTitle: Set Property
+:description: Sets a named property on the message exchange
+:since: 
+:supportLevel: Stable
 
 The SetProperty EIP allows you to set a property on your exchange.
 

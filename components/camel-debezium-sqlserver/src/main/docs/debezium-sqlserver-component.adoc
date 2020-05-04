@@ -1,11 +1,15 @@
 [[debezium-sqlserver-component]]
 = Debezium SQL Server Connector Component
+:docTitle: Debezium SQL Server Connector
+:artifactId: camel-debezium-sqlserver
+:description: Capture changes from an SQL Server database.
+:since: 3.0
+:supportLevel: Stable
+:component-header: Only consumer is supported
 
-*Since Camel 3.0*
+*Since Camel {since}*
 
-// HEADER START
-*Only consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Debezium SQL Server component is wrapper around https://debezium.io/[Debezium] using https://debezium.io/documentation/reference/0.10/operations/embedded.html[Debezium Embedded], which enables Change Data Capture from SQL Server database using Debezium without the need for Kafka or Kafka Connect.
 

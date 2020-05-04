@@ -18,12 +18,18 @@ package org.apache.camel.component.undertow;
 
 import java.net.URI;
 
+import javax.servlet.ServletException;
+
 import io.undertow.Undertow;
 import io.undertow.UndertowOptions;
 import io.undertow.server.HttpHandler;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
 import org.apache.camel.component.undertow.handlers.CamelRootHandler;
 import org.apache.camel.component.undertow.handlers.NotFoundHandler;
 import org.apache.camel.component.undertow.handlers.RestRootHandler;
+import org.apache.camel.component.undertow.spi.UndertowSecurityProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +45,7 @@ public class DefaultUndertowHost implements UndertowHost {
     private final RestRootHandler restHandler;
     private Undertow undertow;
     private String hostString;
+    private DeploymentManager deploymentManager;
 
     public DefaultUndertowHost(UndertowHostKey key) {
         this(key, null);
@@ -87,9 +94,9 @@ public class DefaultUndertowHost implements UndertowHost {
 
             if (consumer != null && consumer.isRest()) {
                 // use the rest handler as its a rest consumer
-                undertow = builder.setHandler(restHandler).build();
+                undertow = registerHandler(consumer, builder, restHandler);
             } else {
-                undertow = builder.setHandler(rootHandler).build();
+                undertow = registerHandler(consumer, builder, rootHandler);
             }
             LOG.info("Starting Undertow server on {}://{}:{}", key.getSslContext() != null ? "https" : "http", key.getHost(), key.getPort());
 
@@ -119,6 +126,35 @@ public class DefaultUndertowHost implements UndertowHost {
         }
     }
 
+    private Undertow registerHandler(UndertowConsumer consumer, Undertow.Builder builder, HttpHandler handler) {
+        UndertowSecurityProvider securityProvider = consumer == null
+                ? null : consumer.getEndpoint().getComponent().getSecurityProvider() != null
+                ? consumer.getEndpoint().getComponent().getSecurityProvider() : consumer.getEndpoint().getSecurityProvider();
+        //if security provider needs servlet context, start empty servlet
+        if (securityProvider != null && securityProvider.requireServletContext()) {
+            DeploymentInfo deployment = Servlets.deployment()
+                    .setContextPath("")
+                    .setDisplayName("application")
+                    .setDeploymentName("camel-undertow")
+                    .setClassLoader(getClass().getClassLoader())
+                    //httpHandler for servlet is ignored, camel handler is used instead of it
+                    .addOuterHandlerChainWrapper(h -> handler);
+
+            deploymentManager = Servlets.newContainer().addDeployment(deployment);
+            deploymentManager.deploy();
+            try {
+                return builder.setHandler(deploymentManager.start()).build();
+            } catch (ServletException e) {
+                LOG.warn("Failed to start Undertow server on {}://{}:{}, reason: {}", key.getSslContext() != null ? "https" : "http", key.getHost(), key.getPort(), e.getMessage());
+
+                throw new RuntimeException(e);
+            }
+
+        }
+
+        return builder.setHandler(handler).build();
+    }
+
     @Override
     public synchronized void unregisterHandler(UndertowConsumer consumer, HttpHandlerRegistrationInfo registrationInfo) {
         if (undertow == null) {
@@ -132,6 +168,9 @@ public class DefaultUndertowHost implements UndertowHost {
         } else {
             rootHandler.remove(registrationInfo.getUri().getPath(), registrationInfo.getMethodRestrict(), registrationInfo.isMatchOnUriPrefix());
             stop = rootHandler.isEmpty();
+        }
+        if (deploymentManager != null) {
+            deploymentManager.undeploy();
         }
 
         if (stop) {

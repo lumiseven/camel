@@ -1,5 +1,9 @@
 [[step-eip]]
 = Step EIP
+:docTitle: Step
+:description: Routes the message to a sequence of processors which is grouped together as one logical name
+:since: 
+:supportLevel: Stable
 
 Camel supports the http://www.enterpriseintegrationpatterns.com/PipesAndFilters.html[Pipes and Filters] from the xref:enterprise-integration-patterns.adoc[EIP patterns] in various ways.
 

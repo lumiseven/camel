@@ -1,5 +1,9 @@
 [[customLoadBalancer-eip]]
 = Custom Load Balancer EIP
+:docTitle: Custom Load Balancer
+:description: Custom load balancer
+:since: 
+:supportLevel: Stable
 
 This EIP allows you to use your own Load Balancer implementation
 

@@ -1,12 +1,17 @@
 [[kafka-component]]
 = Kafka Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-kafka/src/main/docs/kafka-component.adoc
+:docTitle: Kafka
+:artifactId: camel-kafka
+:description: Sent and receive messages to/from an Apache Kafka broker.
+:since: 2.13
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.13*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Kafka component is used for communicating with
 http://kafka.apache.org/[Apache Kafka] message broker.

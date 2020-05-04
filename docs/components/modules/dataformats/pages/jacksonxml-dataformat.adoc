@@ -1,8 +1,14 @@
 [[jacksonxml-dataformat]]
 = JacksonXML DataFormat
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-jacksonxml/src/main/docs/jacksonxml-dataformat.adoc
+:docTitle: JacksonXML
+:artifactId: camel-jacksonxml
+:description: Unmarshal a XML payloads to POJOs and back using XMLMapper extension of Jackson.
+:since: 2.16
+:supportLevel: Stable
 
-*Since Camel 2.16*
+*Since Camel {since}*
 
 Jackson XML is a Data Format which uses the
 http://wiki.fasterxml.com/JacksonHome/[Jackson library] with the

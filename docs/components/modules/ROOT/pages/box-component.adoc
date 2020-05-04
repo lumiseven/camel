@@ -1,12 +1,17 @@
 [[box-component]]
 = Box Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-box/camel-box-component/src/main/docs/box-component.adoc
+:docTitle: Box
+:artifactId: camel-box
+:description: Upload, download and manage files, folders, groups, collaborations, etc. on box.com.
+:since: 2.14
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.14*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Box component provides access to all of the Box.com APIs accessible
 using https://github.com/box/box-java-sdk/[https://github.com/box/box-java-sdk]. It
@@ -812,4 +817,3 @@ from("direct:foo")
 ----
 
 include::camel-spring-boot::page$box-starter.adoc[]
-

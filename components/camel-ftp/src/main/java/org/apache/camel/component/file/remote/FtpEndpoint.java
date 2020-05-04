@@ -26,8 +26,10 @@ import org.apache.camel.Processor;
 import org.apache.camel.api.management.ManagedAttribute;
 import org.apache.camel.api.management.ManagedResource;
 import org.apache.camel.component.file.GenericFileConfiguration;
+import org.apache.camel.component.file.GenericFileProcessStrategy;
 import org.apache.camel.component.file.GenericFileProducer;
 import org.apache.camel.component.file.remote.RemoteFileConfiguration.PathSeparator;
+import org.apache.camel.component.file.remote.strategy.FtpProcessStrategyFactory;
 import org.apache.camel.component.file.strategy.FileMoveExistingStrategy;
 import org.apache.camel.spi.ClassResolver;
 import org.apache.camel.spi.Metadata;
@@ -42,8 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The ftp component is used for uploading or downloading files from FTP
- * servers.
+ * Upload and download files to/from FTP servers.
  */
 @UriEndpoint(firstVersion = "1.1.0", scheme = "ftp", extendsScheme = "file", title = "FTP",
         syntax = "ftp:host:port/directoryName", alternativeSyntax = "ftp:username:password@host:port/directoryName", label = "file")
@@ -131,6 +132,11 @@ public class FtpEndpoint<T extends FTPFile> extends RemoteFileEndpoint<FTPFile> 
      */
     private FileMoveExistingStrategy createDefaultFtpMoveExistingFileStrategy() {
         return new FtpDefaultMoveExistingFileStrategy();
+    }
+
+    @Override
+    protected GenericFileProcessStrategy<FTPFile> createGenericFileStrategy() {
+        return new FtpProcessStrategyFactory().createGenericFileProcessStrategy(getCamelContext(), getParamsAsMap());
     }
 
     @Override

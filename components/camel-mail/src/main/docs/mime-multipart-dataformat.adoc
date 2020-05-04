@@ -1,7 +1,12 @@
 [[mime-multipart-dataformat]]
 = MIME Multipart DataFormat
+:docTitle: MIME Multipart
+:artifactId: camel-mail
+:description: Marshal Camel messages with attachments into MIME-Multipart messages and back.
+:since: 2.17
+:supportLevel: Stable
 
-*Since Camel 2.17*
+*Since Camel {since}*
 
 This data format that can convert a Camel message with attachments into
 a Camel message having a MIME-Multipart message as message body (and no

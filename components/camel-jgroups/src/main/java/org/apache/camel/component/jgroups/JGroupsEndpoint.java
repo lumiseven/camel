@@ -35,7 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The jgroups component provides exchange of messages between Camel and JGroups clusters.
+ * Exchange messages with JGroups clusters.
  */
 @UriEndpoint(firstVersion = "2.13.0", scheme = "jgroups", title = "JGroups", syntax = "jgroups:clusterName", label = "clustering,messaging")
 public class JGroupsEndpoint extends DefaultEndpoint {
@@ -73,7 +73,9 @@ public class JGroupsEndpoint extends DefaultEndpoint {
 
     @Override
     public Consumer createConsumer(Processor processor) throws Exception {
-        return new JGroupsConsumer(this, processor, resolvedChannel, clusterName);
+        JGroupsConsumer consumer = new JGroupsConsumer(this, processor, resolvedChannel, clusterName);
+        configureConsumer(consumer);
+        return consumer;
     }
 
     public Exchange createExchange(Message message) {
@@ -106,8 +108,10 @@ public class JGroupsEndpoint extends DefaultEndpoint {
 
     @Override
     protected void doStop() throws Exception {
-        LOG.trace("Closing JGroups Channel {}", getEndpointUri());
-        resolvedChannel.close();
+        if (resolvedChannel != null) {
+            LOG.trace("Closing JGroups Channel {}", getEndpointUri());
+            resolvedChannel.close();
+        }
         super.doStop();
     }
 
@@ -123,7 +127,6 @@ public class JGroupsEndpoint extends DefaultEndpoint {
 
     /**
      * Connect shared channel, called by producer and consumer.
-     * @throws Exception
      */
     public void connect() throws Exception {
         connectCount.incrementAndGet();

@@ -37,7 +37,7 @@ import org.apache.camel.support.service.ServiceHelper;
 import org.slf4j.Logger;
 
 /**
- * The log component logs message exchanges to the underlying logging mechanism.
+ * Log messages to the underlying logging mechanism.
  *
  * Camel uses sfl4j which allows you to configure logging to the actual logging system.
  */
@@ -132,6 +132,7 @@ public class LogEndpoint extends ProcessorEndpoint {
             def.setShowBody(showBody);
             def.setShowBodyType(showBodyType);
             def.setShowException(showException);
+            def.setShowCaughtException(showCaughtException);
             def.setShowStackTrace(showStackTrace);
             def.setShowAll(showAll);
             def.setMultiline(multiline);

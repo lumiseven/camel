@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.InvalidPayloadException;
 import org.apache.camel.Message;
 import org.apache.camel.support.DefaultProducer;
 import org.apache.camel.util.ObjectHelper;
@@ -110,25 +111,40 @@ public class MQ2Producer extends DefaultProducer {
         return (MQ2Endpoint)super.getEndpoint();
     }
 
-    private void listBrokers(MqClient mqClient, Exchange exchange) {
-        ListBrokersRequest.Builder builder = ListBrokersRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.MAX_RESULTS))) {
-            int maxResults = exchange.getIn().getHeader(MQ2Constants.MAX_RESULTS, Integer.class);
-            builder.maxResults(maxResults);
+    private void listBrokers(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof ListBrokersRequest) {
+                ListBrokersResponse result;
+                try {
+                    result = mqClient.listBrokers((ListBrokersRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("List Brokers command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
+        } else {
+            ListBrokersRequest.Builder builder = ListBrokersRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.MAX_RESULTS))) {
+                int maxResults = exchange.getIn().getHeader(MQ2Constants.MAX_RESULTS, Integer.class);
+                builder.maxResults(maxResults);
+            }
+            ListBrokersResponse result;
+            try {
+                result = mqClient.listBrokers(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("List Brokers command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        ListBrokersResponse result;
-        try {
-            result = mqClient.listBrokers(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("List Brokers command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
     @SuppressWarnings("unchecked")
-    private void createBroker(MqClient mqClient, Exchange exchange) {
+    private void createBroker(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
         String brokerName;
         String brokerEngine;
         String brokerEngineVersion;
@@ -136,145 +152,220 @@ public class MQ2Producer extends DefaultProducer {
         String instanceType;
         Boolean publiclyAccessible;
         List<User> users;
-        CreateBrokerRequest.Builder builder = CreateBrokerRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_NAME))) {
-            brokerName = exchange.getIn().getHeader(MQ2Constants.BROKER_NAME, String.class);
-            builder.brokerName(brokerName);
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateBrokerRequest) {
+                CreateBrokerResponse result;
+                try {
+                    result = mqClient.createBroker((CreateBrokerRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Create Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
+            CreateBrokerRequest.Builder builder = CreateBrokerRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_NAME))) {
+                brokerName = exchange.getIn().getHeader(MQ2Constants.BROKER_NAME, String.class);
+                builder.brokerName(brokerName);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE))) {
+                brokerEngine = exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE, String.class);
+                builder.engineType(EngineType.fromValue(brokerEngine));
+            } else {
+                builder.engineType(EngineType.ACTIVEMQ.name());
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE_VERSION))) {
+                brokerEngineVersion = exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE_VERSION, String.class);
+                builder.engineVersion(brokerEngineVersion);
+            } else {
+                throw new IllegalArgumentException("Broker Engine Version must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_DEPLOYMENT_MODE))) {
+                deploymentMode = exchange.getIn().getHeader(MQ2Constants.BROKER_DEPLOYMENT_MODE, String.class);
+                builder.deploymentMode(DeploymentMode.fromValue(deploymentMode));
+            } else {
+                throw new IllegalArgumentException("Deployment Mode must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_INSTANCE_TYPE))) {
+                instanceType = exchange.getIn().getHeader(MQ2Constants.BROKER_INSTANCE_TYPE, String.class);
+                builder.hostInstanceType(instanceType);
+            } else {
+                throw new IllegalArgumentException("Instance Type must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_USERS))) {
+                users = exchange.getIn().getHeader(MQ2Constants.BROKER_USERS, List.class);
+                builder.users(users);
+            } else {
+                throw new IllegalArgumentException("A Users list must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_PUBLICLY_ACCESSIBLE))) {
+                publiclyAccessible = exchange.getIn().getHeader(MQ2Constants.BROKER_PUBLICLY_ACCESSIBLE, Boolean.class);
+                builder.publiclyAccessible(publiclyAccessible);
+            } else {
+                builder.publiclyAccessible(false);
+            }
+            CreateBrokerResponse result;
+            try {
+                result = mqClient.createBroker(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Create Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE))) {
-            brokerEngine = exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE, String.class);
-            builder.engineType(EngineType.fromValue(brokerEngine));
-        } else {
-            builder.engineType(EngineType.ACTIVEMQ.name());
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE_VERSION))) {
-            brokerEngineVersion = exchange.getIn().getHeader(MQ2Constants.BROKER_ENGINE_VERSION, String.class);
-            builder.engineVersion(brokerEngineVersion);
-        } else {
-            throw new IllegalArgumentException("Broker Engine Version must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_DEPLOYMENT_MODE))) {
-            deploymentMode = exchange.getIn().getHeader(MQ2Constants.BROKER_DEPLOYMENT_MODE, String.class);
-            builder.deploymentMode(DeploymentMode.fromValue(deploymentMode));
-        } else {
-            throw new IllegalArgumentException("Deployment Mode must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_INSTANCE_TYPE))) {
-            instanceType = exchange.getIn().getHeader(MQ2Constants.BROKER_INSTANCE_TYPE, String.class);
-            builder.hostInstanceType(instanceType);
-        } else {
-            throw new IllegalArgumentException("Instance Type must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_USERS))) {
-            users = exchange.getIn().getHeader(MQ2Constants.BROKER_USERS, List.class);
-            builder.users(users);
-        } else {
-            throw new IllegalArgumentException("A Users list must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_PUBLICLY_ACCESSIBLE))) {
-            publiclyAccessible = exchange.getIn().getHeader(MQ2Constants.BROKER_PUBLICLY_ACCESSIBLE, Boolean.class);
-            builder.publiclyAccessible(publiclyAccessible);
-        } else {
-            builder.publiclyAccessible(false);
-        }
-        CreateBrokerResponse result;
-        try {
-            result = mqClient.createBroker(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Create Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void deleteBroker(MqClient mqClient, Exchange exchange) {
+    private void deleteBroker(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
         String brokerId;
-        DeleteBrokerRequest.Builder builder = DeleteBrokerRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
-            brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
-            builder.brokerId(brokerId);
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DeleteBrokerRequest) {
+                DeleteBrokerResponse result;
+                try {
+                    result = mqClient.deleteBroker((DeleteBrokerRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
+            DeleteBrokerRequest.Builder builder = DeleteBrokerRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
+                brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
+                builder.brokerId(brokerId);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            DeleteBrokerResponse result;
+            try {
+                result = mqClient.deleteBroker(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DeleteBrokerResponse result;
-        try {
-            result = mqClient.deleteBroker(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void rebootBroker(MqClient mqClient, Exchange exchange) {
+    private void rebootBroker(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
         String brokerId;
-        RebootBrokerRequest.Builder builder = RebootBrokerRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
-            brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
-            builder.brokerId(brokerId);
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof RebootBrokerRequest) {
+                RebootBrokerResponse result;
+                try {
+                    result = mqClient.rebootBroker((RebootBrokerRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
+            RebootBrokerRequest.Builder builder = RebootBrokerRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
+                brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
+                builder.brokerId(brokerId);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            RebootBrokerResponse result;
+            try {
+                result = mqClient.rebootBroker(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        RebootBrokerResponse result;
-        try {
-            result = mqClient.rebootBroker(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void updateBroker(MqClient mqClient, Exchange exchange) {
+    private void updateBroker(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
         String brokerId;
         ConfigurationId configurationId;
-        UpdateBrokerRequest.Builder builder = UpdateBrokerRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
-            brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
-            builder.brokerId(brokerId);
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof UpdateBrokerRequest) {
+                UpdateBrokerResponse result;
+                try {
+                    result = mqClient.updateBroker((UpdateBrokerRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Update Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
+            UpdateBrokerRequest.Builder builder = UpdateBrokerRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
+                brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
+                builder.brokerId(brokerId);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.CONFIGURATION_ID))) {
+                configurationId = exchange.getIn().getHeader(MQ2Constants.CONFIGURATION_ID, ConfigurationId.class);
+                builder.configuration(configurationId);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            UpdateBrokerResponse result;
+            try {
+                result = mqClient.updateBroker(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Update Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.CONFIGURATION_ID))) {
-            configurationId = exchange.getIn().getHeader(MQ2Constants.CONFIGURATION_ID, ConfigurationId.class);
-            builder.configuration(configurationId);
-        } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
-        }
-        UpdateBrokerResponse result;
-        try {
-            result = mqClient.updateBroker(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Update Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void describeBroker(MqClient mqClient, Exchange exchange) {
+    private void describeBroker(MqClient mqClient, Exchange exchange) throws InvalidPayloadException {
         String brokerId;
-        DescribeBrokerRequest.Builder builder = DescribeBrokerRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
-            brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
-            builder.brokerId(brokerId);
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DescribeBrokerRequest) {
+                DescribeBrokerResponse result;
+                try {
+                    result = mqClient.describeBroker((DescribeBrokerRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Broker Name must be specified");
+            DescribeBrokerRequest.Builder builder = DescribeBrokerRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MQ2Constants.BROKER_ID))) {
+                brokerId = exchange.getIn().getHeader(MQ2Constants.BROKER_ID, String.class);
+                builder.brokerId(brokerId);
+            } else {
+                throw new IllegalArgumentException("Broker Name must be specified");
+            }
+            DescribeBrokerResponse result;
+            try {
+                result = mqClient.describeBroker(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DescribeBrokerResponse result;
-        try {
-            result = mqClient.describeBroker(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Reboot Broker command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
     public static Message getMessageForResponse(final Exchange exchange) {

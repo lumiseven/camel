@@ -1,12 +1,17 @@
 [[google-drive-component]]
 = Google Drive Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-google-drive/src/main/docs/google-drive-component.adoc
+:docTitle: Google Drive
+:artifactId: camel-google-drive
+:description: Manage files in Google Drive.
+:since: 2.14
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.14*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Google Drive component provides access to the
 http://drive.google.com[Google Drive file storage service] via the
@@ -185,8 +190,8 @@ at: https://developers.google.com/drive/v2/reference/[https://developers.google.
 Any of the producer endpoints can be used as a consumer endpoint.
 Consumer endpoints can use
 http://camel.apache.org/polling-consumer.html#PollingConsumer-ScheduledPollConsumerOptions[Scheduled
-Poll Consumer Options] with a `consumer.` prefix to schedule endpoint
-invocation. Consumer endpoints that return an array or collection will
+Poll Consumer Options] to schedule endpoint invocation.
+Consumer endpoints that return an array or collection will
 generate one exchange per element, and their routes will be executed
 once for each exchange.
 

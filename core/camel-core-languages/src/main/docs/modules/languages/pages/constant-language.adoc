@@ -1,7 +1,12 @@
 [[constant-language]]
 = Constant Language
+:docTitle: Constant
+:artifactId: camel-core-languages
+:description: A fixed value set only once during the route startup.
+:since: 1.5
+:supportLevel: Stable
 
-*Since Camel 1.5*
+*Since Camel {since}*
 
 The Constant Expression Language is really just a way to specify
 constant strings as a type of expression.

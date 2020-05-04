@@ -40,14 +40,25 @@ public class JsonDataFormatReifier extends DataFormatReifier<JsonDataFormat> {
                 properties.put("useDefaultObjectMapper", definition.getUseDefaultObjectMapper());
             }
         }
-        properties.put("unmarshalType", or(definition.getUnmarshalType(), definition.getUnmarshalTypeName()));
+        if (definition.getLibrary() != JsonLibrary.XStream) {
+            if (definition.getUnmarshalType() != null) {
+                properties.put("unmarshalTypeName", definition.getUnmarshalType().getName());
+            } else {
+                properties.put("unmarshalTypeName", definition.getUnmarshalTypeName());
+            }
+        }
         properties.put("prettyPrint", definition.getPrettyPrint());
         properties.put("jsonView", definition.getJsonView());
         properties.put("include", definition.getInclude());
         properties.put("allowJmsType", definition.getAllowJmsType());
-        properties.put("collectionType", or(definition.getCollectionType(), definition.getCollectionTypeName()));
+        if (definition.getLibrary() != JsonLibrary.XStream) {
+            if (definition.getCollectionType() != null) {
+                properties.put("collectionTypeName", definition.getCollectionType().getName());
+            } else {
+                properties.put("collectionTypeName", definition.getCollectionTypeName());
+            }
+        }
         properties.put("useList", definition.getUseList());
-        properties.put("enableJaxbAnnotationModule", definition.getEnableJaxbAnnotationModule());
         properties.put("moduleClassNames", definition.getModuleClassNames());
         properties.put("moduleRefs", definition.getModuleRefs());
         properties.put("enableFeatures", definition.getEnableFeatures());

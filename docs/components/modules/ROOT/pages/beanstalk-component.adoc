@@ -1,12 +1,17 @@
 [[beanstalk-component]]
 = Beanstalk Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-beanstalk/src/main/docs/beanstalk-component.adoc
+:docTitle: Beanstalk
+:artifactId: camel-beanstalk
+:description: Retrieve and post-process Beanstalk jobs.
+:since: 2.15
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.15*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 Camel Beanstalk project provides a Camel component for job retrieval and
 post-processing of Beanstalk jobs.
@@ -51,7 +56,7 @@ beanstalk://localhost:11300/tube1+tube2
 
 Tube name will be URL decoded, so if your tube names include special
 characters like + or ?, you need to URL-encode them appropriately, or
-use the RAW syntax, see xref:manual::faq/how-do-i-configure-endpoints.adoc[more
+use the RAW syntax, see xref:manual:faq:how-do-i-configure-endpoints.adoc[more
 details here].
 
 By the way, you cannot specify several tubes when you are writing jobs
@@ -144,16 +149,16 @@ what to do with the job, it can be
 The consumer may delete the job immediately after reserving it or wait
 until Camel routes process it. While the first scenario is more like a
 “message queue”, the second is similar to “job queue”. This behavior is
-controlled by `consumer.awaitJob` parameter, which equals `true` by
+controlled by `awaitJob` parameter, which equals `true` by
 default (following Beanstalkd nature).
 
 When synchronous, the consumer calls `delete` on successful job
 completion and calls `bury` on failure. You can choose which command to
 execute in the case of failure by
-specifying `consumer.onFailure` parameter in the URI. It can take values
+specifying `onFailure` parameter in the URI. It can take values
 of `bury`, `delete` or `release`.
 
-There is a boolean parameter `consumer.useBlockIO` which corresponds to
+There is a boolean parameter `useBlockIO` which corresponds to
 the same parameter in JavaBeanstalkClient library. By default it
 is `true`.
 

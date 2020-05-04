@@ -100,6 +100,11 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
     }
 
     @Override
+    public GenericFile<SftpRemoteFile> newGenericFile() {
+        return new RemoteFile<>();
+    }
+
+    @Override
     public synchronized boolean connect(RemoteFileConfiguration configuration, Exchange exchange) throws GenericFileOperationFailedException {
         if (isConnected()) {
             // already connected
@@ -508,10 +513,19 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
         // ignore absolute as all dirs are relative with FTP
         boolean success = false;
 
+        // whether to check for existing dir using CD or LS
+        boolean cdCheck = !this.endpoint.getConfiguration().isExistDirCheckUsingLs();
+        String originalDirectory = cdCheck ? getCurrentDirectory() : null;
+
         try {
             // maybe the full directory already exists
             try {
-                channel.ls(directory);
+                if (cdCheck) {
+                    channel.cd(directory);
+                } else {
+                    // just do a fast listing
+                    channel.ls(directory, entry -> ChannelSftp.LsEntrySelector.BREAK);
+                }
                 success = true;
             } catch (SftpException e) {
                 // ignore, we could not change directory so try to create it
@@ -533,6 +547,11 @@ public class SftpOperations implements RemoteFileOperations<SftpRemoteFile> {
             }
         } catch (IOException | SftpException e) {
             throw new GenericFileOperationFailedException("Cannot build directory: " + directory, e);
+        } finally {
+            // change back to original directory
+            if (originalDirectory != null) {
+                changeCurrentDirectory(originalDirectory);
+            }
         }
         return success;
     }

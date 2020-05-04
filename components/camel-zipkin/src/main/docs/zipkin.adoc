@@ -1,7 +1,12 @@
-[[Zipkin-ZipkinComponent]]
+[[zipkin-component]]
 = Zipkin Component
+:docTitle: Zipkin
+:artifactId: camel-zipkin
+:description: Distributed message tracing using Zipkin
+:since: 2.18
+:supportLevel: Stable
 
-*Since Camel 2.18*
+*Since Camel {since}*
 
 The Camel Zipkin component is used for tracing and timing incoming and outgoing Camel messages using http://zipkin.io/[zipkin].
 
@@ -77,7 +82,7 @@ The pattern uses the rules from Intercept.
 |false 
 |Whether to include the Camel message body in the zipkin traces.
 This is not recommended for production usage, or when having big payloads.
-You can limit the size by configuring the xref:manual::faq/how-do-i-set-the-max-chars-when-debug-logging-messages-in-camel.adoc[max
+You can limit the size by configuring the xref:manual:faq:how-do-i-set-the-max-chars-when-debug-logging-messages-in-camel.adoc[max
 debug log size]. 
 
 |includeMessageBodyStreams 
@@ -85,7 +90,7 @@ debug log size].
 |Whether to include message bodies that are stream based in the zipkin traces.
 This requires enabling streamcaching on the routes or globally on the `CamelContext`.
 This is not recommended for production usage, or when having big payloads.
-You can limit the size by configuring the xref:manual::faq/how-do-i-set-the-max-chars-when-debug-logging-messages-in-camel.adoc[max
+You can limit the size by configuring the xref:manual:faq:how-do-i-set-the-max-chars-when-debug-logging-messages-in-camel.adoc[max
 debug log size].  
 
 |===

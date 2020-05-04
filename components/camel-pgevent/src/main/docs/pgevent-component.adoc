@@ -1,11 +1,15 @@
 [[pgevent-component]]
 = PostgresSQL Event Component
+:docTitle: PostgresSQL Event
+:artifactId: camel-pgevent
+:description: Send and receive PostgreSQL events via LISTEN and NOTIFY commands.
+:since: 2.15
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.15*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 This is a component for Apache Camel which allows for
 Producing/Consuming PostgreSQL events related to the LISTEN/NOTIFY

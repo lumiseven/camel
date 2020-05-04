@@ -1,11 +1,11 @@
 [[elytron-component]]
 = Undertow Elytron Security Provider
+//by hand
+:since: 3.2
 
-*Since Camel 3.2*
+*Since Camel {since}*
 
-// HEADER START
 *Replaces component camel-elytron*
-// HEADER END
 
 *OSGi is not supported*
 
@@ -43,4 +43,10 @@ for this component:
     <!-- use the same version as your Camel core version -->
 </dependency>
 ----
+
+== Other Elytron capabilities
+
+This seurity provider contains only basic Elytron dependencies (without any transitive dependency
+from org.wildfly.security:wildfly-elytron).
+Ignored libraries should be added among application's dependencies for their usage.
 

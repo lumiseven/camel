@@ -1,7 +1,12 @@
 [[simple-language]]
 = Simple Language
+:docTitle: Simple
+:artifactId: camel-core-languages
+:description: Evaluate Camel's built-in Simple language expression against the Camel Exchange.
+:since: 1.1
+:supportLevel: Stable
 
-*Since Camel 1.1*
+*Since Camel {since}*
 
 The Simple Expression Language was a really simple language when it was
 created, but has since grown more powerful. It is primarily intended for
@@ -20,9 +25,7 @@ choose a more expressive and powerful language such as:
 * xref:mvel-language.adoc[MVEL]
 * xref:ognl-language.adoc[OGNL]
 
-The simple language uses `${body`} placeholders for complex expressions
-where the expression contains constant literals. The $\{ } placeholders
-can be omitted if the expression is only the token itself.
+The simple language uses `${body`} placeholders for complex expressions or functions.
 
 [TIP]
 ====
@@ -441,8 +444,12 @@ defined as numbers: `from..to`. .
 |startsWith |For testing if the left hand side string starts
 with the right hand string.
 
+|starts with |Same as the startsWith operator.
+
 |endsWith |For testing if the left hand side string ends with
 the right hand string.
+
+|ends with |Same as the endsWith operator.
 |===
 
 And the following unary operators can be used:
@@ -881,4 +888,3 @@ You can set a spring bean into an exchange property as shown below:
   ...
 </route>
 ----
-

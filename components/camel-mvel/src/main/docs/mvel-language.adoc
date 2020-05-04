@@ -1,7 +1,12 @@
 [[mvel-language]]
 = MVEL Language
+:docTitle: MVEL
+:artifactId: camel-mvel
+:description: Evaluate an MVEL template against the Camel Exchange.
+:since: 2.0
+:supportLevel: Stable
 
-*Since Camel 2.0*
+*Since Camel {since}*
 
 Camel allows Mvel to be used as an Expression or
 Predicate the DSL or

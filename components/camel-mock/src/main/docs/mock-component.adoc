@@ -1,11 +1,16 @@
 [[mock-component]]
 = Mock Component
+:docTitle: Mock
+:artifactId: camel-mock
+:description: Test routes and mediation rules using mocks.
+:since: 1.0
+:supportLevel: Stable
+:component-header: Only producer is supported
+:core:
 
-*Since Camel 1.0*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 Testing of distributed and asynchronous processing is
 notoriously difficult. The xref:mock-component.adoc[Mock], xref:mock-component.adoc[Test]
@@ -37,7 +42,7 @@ Expression.
 
 [NOTE]
 ====
-There is also the xref:test.adoc[Test endpoint] which is a
+There is also the xref:others:test.adoc[Test endpoint] which is a
 Mock endpoint, but which uses a second endpoint to provide the list of
 expected message bodies and automatically sets up the Mock endpoint
 assertions. In other words, it's a Mock endpoint that automatically sets
@@ -150,7 +155,7 @@ test has run, we assert that our expectations have been met:
 
 [source,java]
 ----
-MockEndpoint resultEndpoint = context.resolveEndpoint("mock:foo", MockEndpoint.class);
+MockEndpoint resultEndpoint = context.getEndpoint("mock:foo", MockEndpoint.class);
 
 // set expectations
 resultEndpoint.expectedMessageCount(2);
@@ -180,7 +185,7 @@ can do that by setting the `setAssertPeriod` method, for example:
 
 [source,java]
 ----
-MockEndpoint resultEndpoint = context.resolveEndpoint("mock:foo", MockEndpoint.class);
+MockEndpoint resultEndpoint = context.getEndpoint("mock:foo", MockEndpoint.class);
 resultEndpoint.setAssertPeriod(5000);
 resultEndpoint.expectedMessageCount(2);
 

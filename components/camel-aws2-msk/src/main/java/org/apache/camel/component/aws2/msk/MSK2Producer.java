@@ -18,6 +18,7 @@ package org.apache.camel.component.aws2.msk;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.InvalidPayloadException;
 import org.apache.camel.Message;
 import org.apache.camel.support.DefaultProducer;
 import org.apache.camel.util.ObjectHelper;
@@ -95,96 +96,156 @@ public class MSK2Producer extends DefaultProducer {
         return (MSK2Endpoint)super.getEndpoint();
     }
 
-    private void listClusters(KafkaClient mskClient, Exchange exchange) {
-        ListClustersRequest.Builder builder = ListClustersRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTERS_FILTER))) {
-            String filter = exchange.getIn().getHeader(MSK2Constants.CLUSTERS_FILTER, String.class);
-            builder.clusterNameFilter(filter);
+    private void listClusters(KafkaClient mskClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof ListClustersRequest) {
+                ListClustersResponse result;
+                try {
+                    result = mskClient.listClusters((ListClustersRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("List Clusters command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
+        } else {
+            ListClustersRequest.Builder builder = ListClustersRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTERS_FILTER))) {
+                String filter = exchange.getIn().getHeader(MSK2Constants.CLUSTERS_FILTER, String.class);
+                builder.clusterNameFilter(filter);
+            }
+            ListClustersResponse result;
+            try {
+                result = mskClient.listClusters(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("List Clusters command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        ListClustersResponse result;
-        try {
-            result = mskClient.listClusters(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("List Clusters command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void createCluster(KafkaClient mskClient, Exchange exchange) {
-        CreateClusterRequest.Builder builder = CreateClusterRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_NAME))) {
-            String name = exchange.getIn().getHeader(MSK2Constants.CLUSTER_NAME, String.class);
-            builder.clusterName(name);
+    private void createCluster(KafkaClient mskClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateClusterRequest) {
+                CreateClusterResponse response;
+                try {
+                    response = mskClient.createCluster((CreateClusterRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Create Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(response);
+            }
         } else {
-            throw new IllegalArgumentException("Cluster Name must be specified");
+            CreateClusterRequest.Builder builder = CreateClusterRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_NAME))) {
+                String name = exchange.getIn().getHeader(MSK2Constants.CLUSTER_NAME, String.class);
+                builder.clusterName(name);
+            } else {
+                throw new IllegalArgumentException("Cluster Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_KAFKA_VERSION))) {
+                String version = exchange.getIn().getHeader(MSK2Constants.CLUSTER_KAFKA_VERSION, String.class);
+                builder.kafkaVersion(version);
+            } else {
+                throw new IllegalArgumentException("Kafka Version must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_NUMBER))) {
+                Integer nodesNumber = exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_NUMBER, Integer.class);
+                builder.numberOfBrokerNodes(nodesNumber);
+            } else {
+                throw new IllegalArgumentException("Kafka Version must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_GROUP_INFO))) {
+                BrokerNodeGroupInfo brokerNodesGroupInfo = exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_GROUP_INFO, BrokerNodeGroupInfo.class);
+                builder.brokerNodeGroupInfo(brokerNodesGroupInfo);
+            } else {
+                throw new IllegalArgumentException("BrokerNodeGroupInfo must be specified");
+            }
+            CreateClusterResponse response;
+            try {
+                response = mskClient.createCluster(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Create Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(response);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_KAFKA_VERSION))) {
-            String version = exchange.getIn().getHeader(MSK2Constants.CLUSTER_KAFKA_VERSION, String.class);
-            builder.kafkaVersion(version);
-        } else {
-            throw new IllegalArgumentException("Kafka Version must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_NUMBER))) {
-            Integer nodesNumber = exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_NUMBER, Integer.class);
-            builder.numberOfBrokerNodes(nodesNumber);
-        } else {
-            throw new IllegalArgumentException("Kafka Version must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_GROUP_INFO))) {
-            BrokerNodeGroupInfo brokerNodesGroupInfo = exchange.getIn().getHeader(MSK2Constants.BROKER_NODES_GROUP_INFO, BrokerNodeGroupInfo.class);
-            builder.brokerNodeGroupInfo(brokerNodesGroupInfo);
-        } else {
-            throw new IllegalArgumentException("BrokerNodeGroupInfo must be specified");
-        }
-        CreateClusterResponse response;
-        try {
-            response = mskClient.createCluster(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Create Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(response);
     }
 
-    private void deleteCluster(KafkaClient mskClient, Exchange exchange) {
-        DeleteClusterRequest.Builder builder = DeleteClusterRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN))) {
-            String arn = exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN, String.class);
-            builder.clusterArn(arn);
+    private void deleteCluster(KafkaClient mskClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DeleteClusterRequest) {
+                DeleteClusterResponse result;
+                try {
+                    result = mskClient.deleteCluster((DeleteClusterRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Cluster ARN must be specified");
+            DeleteClusterRequest.Builder builder = DeleteClusterRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN))) {
+                String arn = exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN, String.class);
+                builder.clusterArn(arn);
+            } else {
+                throw new IllegalArgumentException("Cluster ARN must be specified");
+            }
+            DeleteClusterResponse result;
+            try {
+                result = mskClient.deleteCluster(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DeleteClusterResponse result;
-        try {
-            result = mskClient.deleteCluster(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void describeCluster(KafkaClient mskClient, Exchange exchange) {
-        DescribeClusterRequest.Builder builder = DescribeClusterRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN))) {
-            String arn = exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN, String.class);
-            builder.clusterArn(arn);
+    private void describeCluster(KafkaClient mskClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DescribeClusterRequest) {
+                DescribeClusterResponse result;
+                try {
+                    result = mskClient.describeCluster((DescribeClusterRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Cluster ARN must be specified");
+            DescribeClusterRequest.Builder builder = DescribeClusterRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN))) {
+                String arn = exchange.getIn().getHeader(MSK2Constants.CLUSTER_ARN, String.class);
+                builder.clusterArn(arn);
+            } else {
+                throw new IllegalArgumentException("Cluster ARN must be specified");
+            }
+            DescribeClusterResponse result;
+            try {
+                result = mskClient.describeCluster(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DescribeClusterResponse result;
-        try {
-            result = mskClient.describeCluster(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete Cluster command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
     public static Message getMessageForResponse(final Exchange exchange) {

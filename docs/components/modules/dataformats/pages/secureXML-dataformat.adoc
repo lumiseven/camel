@@ -1,8 +1,14 @@
 [[secureXML-dataformat]]
 = XML Security DataFormat
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-xmlsecurity/src/main/docs/secureXML-dataformat.adoc
+:docTitle: XML Security
+:artifactId: camel-xmlsecurity
+:description: Encrypt and decrypt XML payloads using Apache Santuario.
+:since: 2.0
+:supportLevel: Stable
 
-*Since Camel 2.0*
+*Since Camel {since}*
 
 The XMLSecurity Data Format facilitates encryption and decryption of XML
 payloads at the Document, Element, and Element Content levels (including

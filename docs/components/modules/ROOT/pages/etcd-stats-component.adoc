@@ -1,12 +1,17 @@
 [[etcd-stats-component]]
 = Etcd Stats Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-etcd/src/main/docs/etcd-stats-component.adoc
+:docTitle: Etcd Stats
+:artifactId: camel-etcd
+:description: Access etcd cluster statistcs.
+:since: 2.18
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.18*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 *Since Camel 2.18*
 

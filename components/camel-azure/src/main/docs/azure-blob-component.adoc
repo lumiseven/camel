@@ -1,14 +1,21 @@
 [[azure-blob-component]]
-= Azure Storage Blob Service Component
+= Azure Storage Blob Service (Legacy) Component
+:docTitle: Azure Storage Blob Service (Legacy)
+:artifactId: camel-azure
+:description: Store and retrieve blobs from Azure Storage Blob Service.
+:since: 2.19
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.19*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Azure Blob component supports storing and retrieving the blobs to/from
 https://azure.microsoft.com/services/storage/blobs/[Azure Storage Blob] service.
+
+*Note:* This component uses the legacy https://github.com/azure/azure-storage-java/tree/legacy-master[Azure SDK v8]. There is another component
+xref:components::azure-storage-blob-component.adoc[Azure Storage Blob Component] that uses the latest *12+* Azure SDK version.
 
 Prerequisites
 
@@ -17,7 +24,7 @@ https://docs.microsoft.com/azure/[Azure Documentation Portal].
 
 == URI Format
 
-[source,java]
+[source,text]
 ------------------------------
 azure-blob://accountName/containerName[/blobName][?options]
 ------------------------------
@@ -39,7 +46,7 @@ to("file://blobdirectory");
 
 
 // component options: START
-The Azure Storage Blob Service component supports 21 options, which are listed below.
+The Azure Storage Blob Service (Legacy) component supports 22 options, which are listed below.
 
 
 
@@ -55,6 +62,7 @@ The Azure Storage Blob Service component supports 21 options, which are listed b
 | *fileDir* (common) | Set the file directory where the downloaded blobs will be saved to |  | String
 | *publicForRead* (common) | Storage resources can be public for reading their content, if this property is enabled then the credentials do not have to be set | false | boolean
 | *streamReadSize* (common) | Set the minimum read size in bytes when reading the blob content |  | int
+| *validateClientURI* (common) | Whether to validate the Azure client URI | true | boolean
 | *bridgeErrorHandler* (consumer) | Allows for bridging the consumer to the Camel routing Error Handler, which mean any exceptions occurred while the consumer is trying to pickup incoming messages, or the likes, will now be processed as a message and handled by the routing Error Handler. By default the consumer will use the org.apache.camel.spi.ExceptionHandler to deal with exceptions, that will be logged at WARN or ERROR level and ignored. | false | boolean
 | *blobMetadata* (producer) | Set the blob meta-data |  | Map
 | *blobPrefix* (producer) | Set a prefix which can be used for listing the blobs |  | String
@@ -81,7 +89,7 @@ The Azure Storage Blob Service component supports 21 options, which are listed b
 
 
 // endpoint options: START
-The Azure Storage Blob Service endpoint is configured using URI syntax:
+The Azure Storage Blob Service (Legacy) endpoint is configured using URI syntax:
 
 ----
 azure-blob:containerOrBlobUri
@@ -99,7 +107,7 @@ with the following path and query parameters:
 |===
 
 
-=== Query Parameters (23 parameters):
+=== Query Parameters (24 parameters):
 
 
 [width="100%",cols="2,5,^1,2",options="header"]
@@ -114,6 +122,7 @@ with the following path and query parameters:
 | *fileDir* (common) | Set the file directory where the downloaded blobs will be saved to |  | String
 | *publicForRead* (common) | Storage resources can be public for reading their content, if this property is enabled then the credentials do not have to be set | false | boolean
 | *streamReadSize* (common) | Set the minimum read size in bytes when reading the blob content |  | int
+| *validateClientURI* (common) | Whether to validate the Azure client URI | true | boolean
 | *bridgeErrorHandler* (consumer) | Allows for bridging the consumer to the Camel routing Error Handler, which mean any exceptions occurred while the consumer is trying to pickup incoming messages, or the likes, will now be processed as a message and handled by the routing Error Handler. By default the consumer will use the org.apache.camel.spi.ExceptionHandler to deal with exceptions, that will be logged at WARN or ERROR level and ignored. | false | boolean
 | *exceptionHandler* (consumer) | To let the consumer use a custom ExceptionHandler. Notice if the option bridgeErrorHandler is enabled then this option is not in use. By default the consumer will deal with exceptions, that will be logged at WARN or ERROR level and ignored. |  | ExceptionHandler
 | *exchangePattern* (consumer) | Sets the exchange pattern when the consumer creates an exchange. The value can be one of: InOnly, InOut, InOptionalOut |  | ExchangePattern
@@ -233,6 +242,20 @@ Then refer to this instance in your Camel `azure-blob` component configuration:
 from("azure-blob://" + accountName + "/" + containerName + "/" + fileName + "?azureBlobClient=#client")
 .to("mock:result");
 ----
+
+== Dynamic blob names
+
+The producer supports overriding the default blob name from a message header as shown below:
+
+[source,java]
+----
+   .setHeader("CamelAzureOverrideBlobName", constant("myNewBlob"))
+    .to("azure-blob://myacount/mycontainer/myblob")
+----
+
+Here the producer would normally use `myBlob` as the blob name, but the header will override this and use
+`myNewBlob` instead. This allow for dynamic blob names.
+
 
 == Dependencies
 

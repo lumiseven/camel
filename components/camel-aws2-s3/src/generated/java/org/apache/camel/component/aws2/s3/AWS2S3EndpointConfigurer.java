@@ -39,12 +39,20 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "basicPropertyBinding": target.setBasicPropertyBinding(property(camelContext, boolean.class, value)); return true;
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": target.setBridgeErrorHandler(property(camelContext, boolean.class, value)); return true;
+        case "customeralgorithm":
+        case "customerAlgorithm": target.getConfiguration().setCustomerAlgorithm(property(camelContext, java.lang.String.class, value)); return true;
+        case "customerkeyid":
+        case "customerKeyId": target.getConfiguration().setCustomerKeyId(property(camelContext, java.lang.String.class, value)); return true;
+        case "customerkeymd5":
+        case "customerKeyMD5": target.getConfiguration().setCustomerKeyMD5(property(camelContext, java.lang.String.class, value)); return true;
         case "delay": target.setDelay(property(camelContext, long.class, value)); return true;
         case "deleteafterread":
         case "deleteAfterRead": target.getConfiguration().setDeleteAfterRead(property(camelContext, boolean.class, value)); return true;
         case "deleteafterwrite":
         case "deleteAfterWrite": target.getConfiguration().setDeleteAfterWrite(property(camelContext, boolean.class, value)); return true;
         case "delimiter": target.getConfiguration().setDelimiter(property(camelContext, java.lang.String.class, value)); return true;
+        case "destinationbucket":
+        case "destinationBucket": target.getConfiguration().setDestinationBucket(property(camelContext, java.lang.String.class, value)); return true;
         case "exceptionhandler":
         case "exceptionHandler": target.setExceptionHandler(property(camelContext, org.apache.camel.spi.ExceptionHandler.class, value)); return true;
         case "exchangepattern":
@@ -54,6 +62,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "greedy": target.setGreedy(property(camelContext, boolean.class, value)); return true;
         case "includebody":
         case "includeBody": target.getConfiguration().setIncludeBody(property(camelContext, boolean.class, value)); return true;
+        case "includefolders":
+        case "includeFolders": target.getConfiguration().setIncludeFolders(property(camelContext, boolean.class, value)); return true;
         case "initialdelay":
         case "initialDelay": target.setInitialDelay(property(camelContext, long.class, value)); return true;
         case "keyname":
@@ -64,6 +74,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "maxConnections": target.setMaxConnections(property(camelContext, int.class, value)); return true;
         case "maxmessagesperpoll":
         case "maxMessagesPerPoll": target.setMaxMessagesPerPoll(property(camelContext, int.class, value)); return true;
+        case "moveafterread":
+        case "moveAfterRead": target.getConfiguration().setMoveAfterRead(property(camelContext, boolean.class, value)); return true;
         case "multipartupload":
         case "multiPartUpload": target.getConfiguration().setMultiPartUpload(property(camelContext, boolean.class, value)); return true;
         case "operation": target.getConfiguration().setOperation(property(camelContext, org.apache.camel.component.aws2.s3.AWS2S3Operations.class, value)); return true;
@@ -71,6 +83,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "overrideEndpoint": target.getConfiguration().setOverrideEndpoint(property(camelContext, boolean.class, value)); return true;
         case "partsize":
         case "partSize": target.getConfiguration().setPartSize(property(camelContext, long.class, value)); return true;
+        case "pojorequest":
+        case "pojoRequest": target.getConfiguration().setPojoRequest(property(camelContext, boolean.class, value)); return true;
         case "policy": target.getConfiguration().setPolicy(property(camelContext, java.lang.String.class, value)); return true;
         case "pollstrategy":
         case "pollStrategy": target.setPollStrategy(property(camelContext, org.apache.camel.spi.PollingConsumerPollStrategy.class, value)); return true;
@@ -106,6 +120,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "uriEndpointOverride": target.getConfiguration().setUriEndpointOverride(property(camelContext, java.lang.String.class, value)); return true;
         case "useawskms":
         case "useAwsKMS": target.getConfiguration().setUseAwsKMS(property(camelContext, boolean.class, value)); return true;
+        case "usecustomerkey":
+        case "useCustomerKey": target.getConfiguration().setUseCustomerKey(property(camelContext, boolean.class, value)); return true;
         case "usefixeddelay":
         case "useFixedDelay": target.setUseFixedDelay(property(camelContext, boolean.class, value)); return true;
         case "useiamcredentials":
@@ -127,24 +143,31 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         answer.put("backoffMultiplier", int.class);
         answer.put("basicPropertyBinding", boolean.class);
         answer.put("bridgeErrorHandler", boolean.class);
+        answer.put("customerAlgorithm", java.lang.String.class);
+        answer.put("customerKeyId", java.lang.String.class);
+        answer.put("customerKeyMD5", java.lang.String.class);
         answer.put("delay", long.class);
         answer.put("deleteAfterRead", boolean.class);
         answer.put("deleteAfterWrite", boolean.class);
         answer.put("delimiter", java.lang.String.class);
+        answer.put("destinationBucket", java.lang.String.class);
         answer.put("exceptionHandler", org.apache.camel.spi.ExceptionHandler.class);
         answer.put("exchangePattern", org.apache.camel.ExchangePattern.class);
         answer.put("fileName", java.lang.String.class);
         answer.put("greedy", boolean.class);
         answer.put("includeBody", boolean.class);
+        answer.put("includeFolders", boolean.class);
         answer.put("initialDelay", long.class);
         answer.put("keyName", java.lang.String.class);
         answer.put("lazyStartProducer", boolean.class);
         answer.put("maxConnections", int.class);
         answer.put("maxMessagesPerPoll", int.class);
+        answer.put("moveAfterRead", boolean.class);
         answer.put("multiPartUpload", boolean.class);
         answer.put("operation", org.apache.camel.component.aws2.s3.AWS2S3Operations.class);
         answer.put("overrideEndpoint", boolean.class);
         answer.put("partSize", long.class);
+        answer.put("pojoRequest", boolean.class);
         answer.put("policy", java.lang.String.class);
         answer.put("pollStrategy", org.apache.camel.spi.PollingConsumerPollStrategy.class);
         answer.put("prefix", java.lang.String.class);
@@ -165,6 +188,7 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         answer.put("timeUnit", java.util.concurrent.TimeUnit.class);
         answer.put("uriEndpointOverride", java.lang.String.class);
         answer.put("useAwsKMS", boolean.class);
+        answer.put("useCustomerKey", boolean.class);
         answer.put("useFixedDelay", boolean.class);
         answer.put("useIAMCredentials", boolean.class);
         return answer;
@@ -194,12 +218,20 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "basicPropertyBinding": return target.isBasicPropertyBinding();
         case "bridgeerrorhandler":
         case "bridgeErrorHandler": return target.isBridgeErrorHandler();
+        case "customeralgorithm":
+        case "customerAlgorithm": return target.getConfiguration().getCustomerAlgorithm();
+        case "customerkeyid":
+        case "customerKeyId": return target.getConfiguration().getCustomerKeyId();
+        case "customerkeymd5":
+        case "customerKeyMD5": return target.getConfiguration().getCustomerKeyMD5();
         case "delay": return target.getDelay();
         case "deleteafterread":
         case "deleteAfterRead": return target.getConfiguration().isDeleteAfterRead();
         case "deleteafterwrite":
         case "deleteAfterWrite": return target.getConfiguration().isDeleteAfterWrite();
         case "delimiter": return target.getConfiguration().getDelimiter();
+        case "destinationbucket":
+        case "destinationBucket": return target.getConfiguration().getDestinationBucket();
         case "exceptionhandler":
         case "exceptionHandler": return target.getExceptionHandler();
         case "exchangepattern":
@@ -209,6 +241,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "greedy": return target.isGreedy();
         case "includebody":
         case "includeBody": return target.getConfiguration().isIncludeBody();
+        case "includefolders":
+        case "includeFolders": return target.getConfiguration().isIncludeFolders();
         case "initialdelay":
         case "initialDelay": return target.getInitialDelay();
         case "keyname":
@@ -219,6 +253,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "maxConnections": return target.getMaxConnections();
         case "maxmessagesperpoll":
         case "maxMessagesPerPoll": return target.getMaxMessagesPerPoll();
+        case "moveafterread":
+        case "moveAfterRead": return target.getConfiguration().isMoveAfterRead();
         case "multipartupload":
         case "multiPartUpload": return target.getConfiguration().isMultiPartUpload();
         case "operation": return target.getConfiguration().getOperation();
@@ -226,6 +262,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "overrideEndpoint": return target.getConfiguration().isOverrideEndpoint();
         case "partsize":
         case "partSize": return target.getConfiguration().getPartSize();
+        case "pojorequest":
+        case "pojoRequest": return target.getConfiguration().isPojoRequest();
         case "policy": return target.getConfiguration().getPolicy();
         case "pollstrategy":
         case "pollStrategy": return target.getPollStrategy();
@@ -261,6 +299,8 @@ public class AWS2S3EndpointConfigurer extends PropertyConfigurerSupport implemen
         case "uriEndpointOverride": return target.getConfiguration().getUriEndpointOverride();
         case "useawskms":
         case "useAwsKMS": return target.getConfiguration().isUseAwsKMS();
+        case "usecustomerkey":
+        case "useCustomerKey": return target.getConfiguration().isUseCustomerKey();
         case "usefixeddelay":
         case "useFixedDelay": return target.isUseFixedDelay();
         case "useiamcredentials":

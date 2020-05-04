@@ -39,6 +39,7 @@ import software.amazon.awssdk.awscore.exception.AwsServiceException;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.CopyObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
@@ -130,10 +131,12 @@ public class AWS2S3Consumer extends ScheduledBatchPollingConsumer {
             for (S3Object s3ObjectSummary : s3ObjectSummaries) {
                 ResponseInputStream<GetObjectResponse> s3Object = getAmazonS3Client()
                     .getObject(GetObjectRequest.builder().bucket(getConfiguration().getBucketName()).key(s3ObjectSummary.key()).build(), ResponseTransformer.toInputStream());
-                s3Objects.add(s3Object);
 
-                Exchange exchange = getEndpoint().createExchange(s3Object, s3ObjectSummary.key());
-                answer.add(exchange);
+                if (includeS3Object(s3Object)) {
+                    s3Objects.add(s3Object);
+                    Exchange exchange = getEndpoint().createExchange(s3Object, s3ObjectSummary.key());
+                    answer.add(exchange);
+                }
             }
         } catch (Throwable e) {
             LOG.warn("Error getting S3Object due: {}", e.getMessage(), e);
@@ -144,6 +147,22 @@ public class AWS2S3Consumer extends ScheduledBatchPollingConsumer {
         }
 
         return answer;
+    }
+
+    /**
+     * Decide whether to include the S3Objects in the results
+     *
+     * @param s3Object
+     * @return true to include, false to exclude
+     */
+    protected boolean includeS3Object(ResponseInputStream<GetObjectResponse> s3Object) {
+
+        if (getConfiguration().isIncludeFolders()) {
+            return true;
+        } else {
+            //Config says to ignore folders/directories
+            return !"application/x-directory".equalsIgnoreCase(s3Object.response().contentType());
+        }
     }
 
     @Override
@@ -196,6 +215,16 @@ public class AWS2S3Consumer extends ScheduledBatchPollingConsumer {
      */
     protected void processCommit(Exchange exchange) {
         try {
+            if (getConfiguration().isMoveAfterRead()) {
+                String bucketName = exchange.getIn().getHeader(AWS2S3Constants.BUCKET_NAME, String.class);
+                String key = exchange.getIn().getHeader(AWS2S3Constants.KEY, String.class);
+
+                LOG.trace("Moving object from bucket {} with key {} to bucket {}...", bucketName, key, getConfiguration().getDestinationBucket());
+
+                getAmazonS3Client().copyObject(CopyObjectRequest.builder().destinationKey(key).destinationBucket(getConfiguration().getDestinationBucket()).copySource(bucketName + "/" + key).build());
+
+                LOG.trace("Moved object from bucket {} with key {} to bucket {}...", bucketName, key, getConfiguration().getDestinationBucket());
+            }
             if (getConfiguration().isDeleteAfterRead()) {
                 String bucketName = exchange.getIn().getHeader(AWS2S3Constants.BUCKET_NAME, String.class);
                 String key = exchange.getIn().getHeader(AWS2S3Constants.KEY, String.class);
@@ -207,7 +236,7 @@ public class AWS2S3Consumer extends ScheduledBatchPollingConsumer {
                 LOG.trace("Deleted object from bucket {} with key {}...", bucketName, key);
             }
         } catch (AwsServiceException e) {
-            getExceptionHandler().handleException("Error occurred during deleting object. This exception is ignored.", exchange, e);
+            getExceptionHandler().handleException("Error occurred during moving or deleting object. This exception is ignored.", exchange, e);
         }
     }
 

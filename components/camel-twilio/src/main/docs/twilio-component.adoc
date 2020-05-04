@@ -1,11 +1,15 @@
 [[twilio-component]]
 = Twilio Component
+:docTitle: Twilio
+:artifactId: camel-twilio
+:description: Interact with Twilio REST APIs using Twilio Java SDK.
+:since: 2.20
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.20*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Twilio component provides access to Version 2010-04-01 of Twilio REST APIs accessible
 using https://github.com/twilio/twilio-java[Twilio Java SDK].
@@ -200,8 +204,8 @@ https://www.twilio.com/docs/libraries/reference/twilio-java/index.html
 Any of the producer endpoints can be used as a consumer endpoint.
 Consumer endpoints can use
 http://camel.apache.org/polling-consumer.html#PollingConsumer-ScheduledPollConsumerOptions[Scheduled
-Poll Consumer Options] with a `consumer.` prefix to schedule endpoint
-invocation. Consumer endpoints that return an array or collection will
+Poll Consumer Options] to schedule endpoint invocation.
+Consumer endpoints that return an array or collection will
 generate one exchange per element, and their routes will be executed
 once for each exchange.
 

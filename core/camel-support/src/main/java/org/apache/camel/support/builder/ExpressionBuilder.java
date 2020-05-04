@@ -112,7 +112,7 @@ public class ExpressionBuilder {
      * @return an expression object which will return the header value
      */
     public static <T> Expression headerExpression(final String headerName, final Class<T> type) {
-        return headerExpression(simpleExpression(headerName), constantExpression(type));
+        return headerExpression(simpleExpression(headerName), constantExpression(type.getName()));
     }
 
     /**
@@ -695,8 +695,9 @@ public class ExpressionBuilder {
                             if (lan != null) {
                                 pred = lan.createPredicate(expression);
                                 pred.init(context);
-                                expr = lan.createExpression(expression);
-                                expr.init(context);
+                                Expression newExpression = lan.createExpression(expression);
+                                newExpression.init(context);
+                                expr = newExpression;
                             } else {
                                 throw new NoSuchLanguageException(language);
                             }

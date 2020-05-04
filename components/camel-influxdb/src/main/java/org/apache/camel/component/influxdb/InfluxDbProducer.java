@@ -32,22 +32,18 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Producer for the InfluxDB components
- *
  */
 public class InfluxDbProducer extends DefaultProducer {
 
     private static final Logger LOG = LoggerFactory.getLogger(InfluxDbProducer.class);
+    private static final String CREATE_DATABASE = "CREATE DATABASE ";
+    private static final String SHOW_DATABASES = "SHOW DATABASES";
 
     InfluxDbEndpoint endpoint;
     InfluxDB connection;
 
     public InfluxDbProducer(InfluxDbEndpoint endpoint) {
         super(endpoint);
-
-        if (ObjectHelper.isEmpty(endpoint.getInfluxDB())) {
-            throw new IllegalArgumentException("Can't create a producer when the database connection is null");
-        }
-
         this.connection = endpoint.getInfluxDB();
         this.endpoint = endpoint;
     }
@@ -60,7 +56,6 @@ public class InfluxDbProducer extends DefaultProducer {
      */
     @Override
     public void process(Exchange exchange) throws Exception {
-
         String dataBaseName = calculateDatabaseName(exchange);
         String retentionPolicy = calculateRetentionPolicy(exchange);
         switch (endpoint.getOperation()) {
@@ -81,24 +76,17 @@ public class InfluxDbProducer extends DefaultProducer {
     private void doInsert(Exchange exchange, String dataBaseName, String retentionPolicy) throws InvalidPayloadException {
         if (!endpoint.isBatch()) {
             Point p = exchange.getIn().getMandatoryBody(Point.class);
-
             try {
                 LOG.debug("Writing point {}", p.lineProtocol());
-
-                if (!connection.databaseExists(dataBaseName)) {
-                    LOG.debug("Database {} doesn't exist. Creating it...", dataBaseName);
-                    connection.createDatabase(dataBaseName);
-                }
+                ensureDatabaseExists(dataBaseName);
                 connection.write(dataBaseName, retentionPolicy, p);
             } catch (Exception ex) {
                 exchange.setException(new CamelInfluxDbException(ex));
             }
         } else {
             BatchPoints batchPoints = exchange.getIn().getMandatoryBody(BatchPoints.class);
-
             try {
                 LOG.debug("Writing BatchPoints {}", batchPoints.lineProtocol());
-
                 connection.write(batchPoints);
             } catch (Exception ex) {
                 exchange.setException(new CamelInfluxDbException(ex));
@@ -122,37 +110,51 @@ public class InfluxDbProducer extends DefaultProducer {
 
     private String calculateRetentionPolicy(Exchange exchange) {
         String retentionPolicy = exchange.getIn().getHeader(InfluxDbConstants.RETENTION_POLICY_HEADER, String.class);
-
         if (ObjectHelper.isNotEmpty(retentionPolicy)) {
             return retentionPolicy;
         }
-
         return endpoint.getRetentionPolicy();
     }
 
     private String calculateDatabaseName(Exchange exchange) {
         String dbName = exchange.getIn().getHeader(InfluxDbConstants.DBNAME_HEADER, String.class);
-
         if (ObjectHelper.isNotEmpty(dbName)) {
             return dbName;
         }
-
         return endpoint.getDatabaseName();
     }
 
     private String calculateQuery(Exchange exchange) {
         String query = exchange.getIn().getHeader(InfluxDbConstants.INFLUXDB_QUERY, String.class);
-
         if (ObjectHelper.isNotEmpty(query)) {
             return query;
         } else {
             query = endpoint.getQuery();
         }
-
         if (ObjectHelper.isEmpty(query)) {
             throw new IllegalArgumentException("The query option must be set if you want to run a query operation");
         }
         return query;
+    }
+
+    private void ensureDatabaseExists(String dataBaseName) {
+        QueryResult result = connection.query(new Query(SHOW_DATABASES));
+
+        //values are located in the first item in series, where list of values is the first item in the Serie's values,
+        //if any object on the 'path' is null, database does not exist
+        boolean exists;
+        try {
+            //NPE could be thrown from objects deep in the structure.
+            //try catch block with NullPointerException is used on purpose
+            exists = result.getResults().get(0).getSeries().get(0).getValues().get(0).contains(dataBaseName);
+        } catch (NullPointerException e) {
+            exists = false;
+        }
+
+        if (!exists) {
+            LOG.debug("Database {} doesn't exist. Creating it...", dataBaseName);
+            connection.query(new Query(CREATE_DATABASE + dataBaseName, ""));
+        }
     }
 
 }

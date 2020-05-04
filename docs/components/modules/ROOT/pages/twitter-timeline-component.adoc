@@ -1,12 +1,17 @@
 [[twitter-timeline-component]]
 = Twitter Timeline Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-twitter/src/main/docs/twitter-timeline-component.adoc
+:docTitle: Twitter Timeline
+:artifactId: camel-twitter
+:description: Send tweets and receive tweets from user's timeline.
+:since: 2.10
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.10*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Twitter Timeline component consumes twitter timeline or update the status of specific user.
 

@@ -20,16 +20,13 @@ import java.net.URI;
 import java.util.Map;
 
 import org.apache.camel.CamelContext;
-import org.apache.camel.component.file.FileProcessStrategy;
 import org.apache.camel.component.file.GenericFileEndpoint;
-import org.apache.camel.component.file.remote.strategy.SftpProcessStrategyFactory;
 import org.apache.camel.spi.annotations.Component;
 
 /**
  * Secure FTP Component
  */
 @Component("sftp")
-@FileProcessStrategy(SftpProcessStrategyFactory.class)
 public class SftpComponent extends RemoteFileComponent<SftpRemoteFile> {
 
     public SftpComponent() {
@@ -48,7 +45,7 @@ public class SftpComponent extends RemoteFileComponent<SftpRemoteFile> {
         // to escape the $ for the expression (file language)
         String baseUri = uri;
         if (uri.contains("?")) {
-            baseUri = uri.substring(0, uri.indexOf("?"));
+            baseUri = uri.substring(0, uri.indexOf('?'));
         }
 
         // lets make sure we create a new configuration as each endpoint can

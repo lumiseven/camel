@@ -44,7 +44,6 @@
         <include>org.apache.camel:camel-main</include>
         <include>org.apache.camel:camel-tooling-model</include>
         <include>org.apache.camel:camel-tooling-util</include>
-        <include>org.apache.camel:camel-headersmap</include>
         <include>org.apache.camel:camel-caffeine-lrucache</include>
         <include>org.apache.camel:camel-xml-io</include>
         <include>org.apache.camel:camel-xml-jaxb</include>
@@ -104,6 +103,8 @@
         <include>org.apache.camel:camel-aws2-sqs</include>
         <include>org.apache.camel:camel-aws2-translate</include>
         <include>org.apache.camel:camel-azure</include>
+        <include>org.apache.camel:camel-azure-storage-blob</include>
+        <include>org.apache.camel:camel-azure-storage-queue</include>
         <include>org.apache.camel:camel-barcode</include>
         <include>org.apache.camel:camel-base64</include>
         <include>org.apache.camel:camel-bean</include>
@@ -148,6 +149,7 @@
         <include>org.apache.camel:camel-direct</include>
         <include>org.apache.camel:camel-directvm</include>
         <include>org.apache.camel:camel-disruptor</include>
+        <include>org.apache.camel:camel-djl</include>
         <include>org.apache.camel:camel-dns</include>
         <include>org.apache.camel:camel-docker</include>
         <include>org.apache.camel:camel-dozer</include>
@@ -191,6 +193,7 @@
         <include>org.apache.camel:camel-hazelcast</include>
         <include>org.apache.camel:camel-hbase</include>
         <include>org.apache.camel:camel-hdfs</include>
+        <include>org.apache.camel:camel-headersmap</include>
         <include>org.apache.camel:camel-hipchat</include>
         <include>org.apache.camel:camel-hl7</include>
         <include>org.apache.camel:camel-http</include>
@@ -250,6 +253,7 @@
         <include>org.apache.camel:camel-metrics</include>
         <include>org.apache.camel:camel-micrometer</include>
         <include>org.apache.camel:camel-microprofile-config</include>
+        <include>org.apache.camel:camel-microprofile-fault-tolerance</include>
         <include>org.apache.camel:camel-microprofile-health</include>
         <include>org.apache.camel:camel-microprofile-metrics</include>
         <include>org.apache.camel:camel-milo</include>
@@ -324,8 +328,8 @@
         <include>org.apache.camel:camel-solr</include>
         <include>org.apache.camel:camel-soroush</include>
         <include>org.apache.camel:camel-spark</include>
-        <include>org.apache.camel:camel-spark-rest</include>
         <include>org.apache.camel:camel-splunk</include>
+        <include>org.apache.camel:camel-splunk-hec</include>
         <include>org.apache.camel:camel-spring</include>
         <include>org.apache.camel:camel-spring-batch</include>
         <include>org.apache.camel:camel-spring-integration</include>
@@ -350,7 +354,6 @@
         <include>org.apache.camel:camel-test</include>
         <include>org.apache.camel:camel-test-cdi</include>
         <include>org.apache.camel:camel-test-junit5</include>
-        <include>org.apache.camel:camel-test-karaf</include>
         <include>org.apache.camel:camel-test-spring</include>
         <include>org.apache.camel:camel-test-spring-junit5</include>
         <include>org.apache.camel:camel-testcontainers</include>
@@ -363,6 +366,7 @@
         <include>org.apache.camel:camel-twilio</include>
         <include>org.apache.camel:camel-twitter</include>
         <include>org.apache.camel:camel-undertow</include>
+        <include>org.apache.camel:camel-undertow-spring-security</include>
         <include>org.apache.camel:camel-univocity-parsers</include>
         <include>org.apache.camel:camel-validator</include>
         <include>org.apache.camel:camel-velocity</include>
@@ -413,9 +417,6 @@
         <include>org.apache.camel:camel-catalog</include>
         <include>org.apache.camel:camel-catalog-lucene</include>
         <include>org.apache.camel:camel-catalog-maven</include>
-        <include>org.apache.camel:camel-catalog-provider-karaf</include>
-        <include>org.apache.camel:camel-commands-core</include>
-        <include>org.apache.camel.karaf:camel-karaf-commands</include>
         <include>org.apache.camel:camel-route-parser</include>
       </includes>
     </dependencySet>

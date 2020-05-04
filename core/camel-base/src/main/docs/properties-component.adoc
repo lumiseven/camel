@@ -1,7 +1,13 @@
 [[properties-component]]
 = Properties Component
+//Written by hand, not generated.
+:docTitle: Properties
+:artifactId: camel-base
+:description: The properties component is used for property placeholders in your Camel application, such as endpoint URIs.
+:since: 2.3
+:supportLevel: Stable
 
-*Since Camel 2.3*
+*Since Camel {since}*
 
 The properties component is used for property placeholders in your Camel application, such as endpoint URIs.
 It is *not* a regular Camel component with producer and consumer for routing messages. However for historical
@@ -43,7 +49,7 @@ This works much like you would do if using Spring's
 `<property-placeholder>` tag. However Spring have a limitation which
 prevents 3rd party frameworks to leverage Spring property placeholders
 to the fullest. See more at
-xref:manual::faq/how-do-i-use-spring-property-placeholder-with-camel-xml.adoc[How do
+xref:manual:faq:how-do-i-use-spring-property-placeholder-with-camel-xml.adoc[How do
 I use Spring Property Placeholder with Camel XML].
 
 [TIP]

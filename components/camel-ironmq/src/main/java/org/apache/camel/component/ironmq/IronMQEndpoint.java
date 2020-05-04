@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The ironmq provides integration with <a href="https://www.iron.io/">IronMQ</a> an elastic and durable hosted message queue as a service.
+ * Send and receive messages to/from <a href="https://www.iron.io/">IronMQ</a> an elastic and durable hosted message queue as a service.
  */
 @UriEndpoint(firstVersion = "2.17.0", scheme = "ironmq", syntax = "ironmq:queueName", title = "IronMQ", label = "cloud,messaging")
 public class IronMQEndpoint extends ScheduledPollEndpoint {
@@ -62,9 +62,12 @@ public class IronMQEndpoint extends ScheduledPollEndpoint {
         configureConsumer(ironMQConsumer);
         ironMQConsumer.setMaxMessagesPerPoll(configuration.getMaxMessagesPerPoll());
         DefaultScheduledPollConsumerScheduler scheduler = new DefaultScheduledPollConsumerScheduler();
+        scheduler.setDelay(ironMQConsumer.getDelay());
+        scheduler.setUseFixedDelay(ironMQConsumer.isUseFixedDelay());
+        scheduler.setInitialDelay(ironMQConsumer.getInitialDelay());
+        scheduler.setTimeUnit(ironMQConsumer.getTimeUnit());
         scheduler.setConcurrentTasks(configuration.getConcurrentConsumers());
         ironMQConsumer.setScheduler(scheduler);
-
         return ironMQConsumer;
     }
 
@@ -112,7 +115,7 @@ public class IronMQEndpoint extends ScheduledPollEndpoint {
     /**
      * Provide the possibility to override this method for an mock
      * implementation
-     * 
+     *
      * @return Client
      */
     Client createClient() {

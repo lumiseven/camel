@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.EndpointProducerBuilder;
+import org.apache.camel.spi.AsEndpointUri;
 import org.apache.camel.spi.Metadata;
 
 /**
@@ -60,6 +61,9 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
     @XmlAttribute
     @Metadata(defaultValue = "true", javaType = "java.lang.Boolean")
     private String allowOptimisedComponents;
+    @XmlAttribute
+    @Metadata(label = "advanced", defaultValue = "true", javaType = "java.lang.Boolean")
+    private String autoStartComponents;
 
     public ToDynamicDefinition() {
     }
@@ -85,6 +89,26 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
 
     // Fluent API
     // -------------------------------------------------------------------------
+
+    /**
+     * The uri of the endpoint to send to. The uri can be dynamic computed using
+     * the {@link org.apache.camel.language.simple.SimpleLanguage} expression.
+     */
+    public ToDynamicDefinition uri(@AsEndpointUri String uri) {
+        setUri(uri);
+        return this;
+    }
+
+    /**
+     * The uri of the endpoint to send to.
+     *
+     * @param endpointProducerBuilder the dynamic endpoint to send to (resolved
+     *            using simple language by default)
+     */
+    public ToDynamicDefinition uri(@AsEndpointUri EndpointProducerBuilder endpointProducerBuilder) {
+        setEndpointProducerBuilder(endpointProducerBuilder);
+        return this;
+    }
 
     /**
      * Sets the optional {@link ExchangePattern} used to invoke this endpoint
@@ -206,6 +230,16 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
         return this;
     }
 
+    /**
+     * Whether to auto startup components when toD is starting up.
+     *
+     * @return the builder
+     */
+    public ToDynamicDefinition autoStartComponents(String autoStartComponents) {
+        setAutoStartComponents(autoStartComponents);
+        return this;
+    }
+
     // Properties
     // -------------------------------------------------------------------------
 
@@ -261,4 +295,11 @@ public class ToDynamicDefinition extends NoOutputDefinition<ToDynamicDefinition>
         this.allowOptimisedComponents = allowOptimisedComponents;
     }
 
+    public String getAutoStartComponents() {
+        return autoStartComponents;
+    }
+
+    public void setAutoStartComponents(String autoStartComponents) {
+        this.autoStartComponents = autoStartComponents;
+    }
 }

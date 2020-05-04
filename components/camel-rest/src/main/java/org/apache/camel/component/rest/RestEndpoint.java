@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
 import static org.apache.camel.support.RestProducerFactoryHelper.setupComponent;
 
 /**
- * The rest component is used for either hosting REST services (consumer) or calling external REST services (producer).
+ * Expose REST services or call external REST services.
  */
 @UriEndpoint(firstVersion = "2.14.0", scheme = "rest", title = "REST", syntax = "rest:method:path:uriTemplate", label = "core,rest", lenientProperties = true)
 public class RestEndpoint extends DefaultEndpoint {
@@ -389,8 +389,6 @@ public class RestEndpoint extends DefaultEndpoint {
                 }
             }
         }
-
-        parameters.put("producerComponentName", pname);
 
         // lookup in registry
         if (factory == null) {

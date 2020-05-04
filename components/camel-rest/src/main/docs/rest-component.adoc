@@ -1,11 +1,16 @@
 [[rest-component]]
 = REST Component
+:docTitle: REST
+:artifactId: camel-rest
+:description: Expose REST services or call external REST services.
+:since: 2.14
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
+:core:
 
-*Since Camel 2.14*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The REST component allows to define REST endpoints (consumer) using the
 Rest DSL and plugin to other Camel components as the
@@ -97,7 +102,6 @@ The following components support rest consumer (Rest DSL):
 * camel-netty-http
 * camel-jetty
 * camel-servlet
-* camel-spark-rest
 * camel-undertow
 
 The following components support rest producer:

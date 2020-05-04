@@ -1,12 +1,18 @@
 [[xslt-saxon-component]]
 = XSLT Saxon Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-xslt-saxon/src/main/docs/xslt-saxon-component.adoc
+:docTitle: XSLT Saxon
+:artifactId: camel-xslt-saxon
+:description: Transform XML payloads using an XSLT template using Saxon.
+:since: 3.0
+:supportLevel: Stable
+:component-header: Only producer is supported
+:core:
 
-*Since Camel 3.0*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The XSLT Saxon component allows you to process a message using an
 http://www.w3.org/TR/xslt[XSLT] template using Saxon. This can be ideal when using
@@ -245,7 +251,7 @@ With Spring XML:
 == Dynamic stylesheets
 
 To provide a dynamic stylesheet at runtime you can define a dynamic URI.
-See xref:manual::faq/how-to-use-a-dynamic-uri-in-to.adoc[How to use a dynamic URI in
+See xref:manual:faq:how-to-use-a-dynamic-uri-in-to.adoc[How to use a dynamic URI in
 to()] for more information.
 
 == Accessing warnings, errors and fatalErrors from XSLT ErrorListener

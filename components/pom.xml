@@ -16,14 +16,13 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-parent</artifactId>
-        <version>3.2.0-SNAPSHOT</version>
+        <version>3.3.0-SNAPSHOT</version>
         <relativePath>../parent</relativePath>
     </parent>
 
@@ -60,7 +59,6 @@
         <!-- we want to test these modules first to catch any errors early as possible -->
         <module>camel-test</module>
         <module>camel-test-cdi</module>
-        <module>camel-test-karaf</module>
         <module>camel-test-spring</module>
         <module>camel-testcontainers</module>
         <module>camel-testcontainers-spring</module>
@@ -141,6 +139,8 @@
         <module>camel-aws2-translate</module>
         <module>camel-aws-xray</module>
         <module>camel-azure</module>
+        <module>camel-azure-storage-blob</module>
+        <module>camel-azure-storage-queue</module>
         <module>camel-barcode</module>
         <module>camel-base64</module>
         <module>camel-bean-validator</module>
@@ -174,6 +174,7 @@
         <module>camel-debezium-sqlserver</module>
         <module>camel-digitalocean</module>
         <module>camel-disruptor</module>
+        <module>camel-djl</module>
         <module>camel-dns</module>
         <module>camel-docker</module>
         <module>camel-dozer</module>
@@ -214,6 +215,7 @@
         <module>camel-hazelcast</module>
         <module>camel-hbase</module>
         <module>camel-hdfs</module>
+        <module>camel-headersmap</module>
         <module>camel-hipchat</module>
         <module>camel-hl7</module>
         <module>camel-ical</module>
@@ -262,6 +264,7 @@
         <module>camel-metrics</module>
         <module>camel-micrometer</module>
         <module>camel-microprofile-config</module>
+        <module>camel-microprofile-fault-tolerance</module>
         <module>camel-microprofile-health</module>
         <module>camel-microprofile-metrics</module>
         <module>camel-milo</module>
@@ -326,9 +329,9 @@
         <module>camel-soap</module>
         <module>camel-solr</module>
         <module>camel-soroush</module>
-        <module>camel-spark-rest</module>
         <module>camel-spark</module>
         <module>camel-splunk</module>
+        <module>camel-splunk-hec</module>
         <module>camel-spring-batch</module>
         <module>camel-spring-integration</module>
         <module>camel-spring-javaconfig</module>
@@ -352,6 +355,7 @@
         <module>camel-tika</module>
         <module>camel-twilio</module>
         <module>camel-twitter</module>
+        <module>camel-undertow-spring-security</module>
         <module>camel-univocity-parsers</module>
         <module>camel-velocity</module>
         <module>camel-vertx</module>
@@ -376,7 +380,7 @@
         <module>camel-zipkin</module>
         <module>camel-zookeeper-master</module>
         <module>camel-zookeeper</module>
-    </modules>
+  </modules>
 
     <properties>
         <camel.osgi.manifest>${project.build.outputDirectory}/META-INF/MANIFEST.MF</camel.osgi.manifest>
@@ -400,6 +404,13 @@
                             <goal>generate</goal>
                         </goals>
                         <phase>process-classes</phase>
+                    </execution>
+                    <execution>
+                        <id>generate-postcompile</id>
+                        <goals>
+                            <goal>generate-postcompile</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
                     </execution>
                 </executions>
             </plugin>

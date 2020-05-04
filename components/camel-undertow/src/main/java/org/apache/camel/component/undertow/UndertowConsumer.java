@@ -65,6 +65,7 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
     private static final Logger LOG = LoggerFactory.getLogger(UndertowConsumer.class);
     private CamelWebSocketHandler webSocketHandler;
     private boolean rest;
+    private volatile boolean suspended;
 
     public UndertowConsumer(UndertowEndpoint endpoint, Processor processor) {
         super(endpoint, processor);
@@ -93,6 +94,7 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
 
     @Override
     protected void doStart() throws Exception {
+        this.suspended = false;
         super.doStart();
         final UndertowEndpoint endpoint = getEndpoint();
         if (endpoint.isWebSocket()) {
@@ -128,6 +130,7 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
 
     @Override
     protected void doStop() throws Exception {
+        this.suspended = false;
         super.doStop();
         if (this.webSocketHandler != null) {
             this.webSocketHandler.setConsumer(null);
@@ -136,10 +139,23 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
         endpoint.getComponent().unregisterEndpoint(this, endpoint.getHttpHandlerRegistrationInfo(), endpoint.getSslContext());
     }
 
+    protected void doSuspend() throws Exception {
+        this.suspended = true;
+        super.doSuspend();
+    }
+
+    protected void doResume() throws Exception {
+        this.suspended = false;
+        super.doResume();
+    }
+
+    public boolean isSuspended() {
+        return this.suspended;
+    }
+
     @Override
     public void handleRequest(HttpServerExchange httpExchange) throws Exception {
         HttpString requestMethod = httpExchange.getRequestMethod();
-
         if (Methods.OPTIONS.equals(requestMethod) && !getEndpoint().isOptionsEnabled()) {
             CollectionStringBuffer csb = new CollectionStringBuffer(",");
 
@@ -180,6 +196,13 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
             return;
         }
 
+        // are we suspended
+        if (isSuspended()) {
+            httpExchange.setStatusCode(StatusCodes.SERVICE_UNAVAILABLE);
+            httpExchange.endExchange();
+            return;
+        }
+
         if (getEndpoint().getSecurityProvider() != null) {
             //security provider decides, whether endpoint is accessible
             int statusCode = getEndpoint().getSecurityProvider().authenticate(httpExchange, computeAllowedRoles());
@@ -188,6 +211,13 @@ public class UndertowConsumer extends DefaultConsumer implements HttpHandler, Su
                 httpExchange.endExchange();
                 return;
             }
+        } else if (computeAllowedRoles() != null && !computeAllowedRoles().isEmpty()) {
+            //this case could happen due to bad configuration
+            //if allowedRoles are present but securityProvider is not, access has to be denied in this case
+            LOG.warn("Illegal state caused by missing securitProvider but existing allowed roles!");
+            httpExchange.setStatusCode(StatusCodes.FORBIDDEN);
+            httpExchange.endExchange();
+            return;
         }
 
         //create new Exchange

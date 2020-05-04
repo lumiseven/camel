@@ -1,8 +1,14 @@
 [[ical-dataformat]]
 = iCal DataFormat
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-ical/src/main/docs/ical-dataformat.adoc
+:docTitle: iCal
+:artifactId: camel-ical
+:description: Marshal and unmarshal iCal (.ics) documents to/from model objects provided by the iCal4j library.
+:since: 2.12
+:supportLevel: Stable
 
-*Since Camel 2.12*
+*Since Camel {since}*
 
 The ICal dataformat is used for working with
 http://en.wikipedia.org/wiki/ICalendar[iCalendar] messages.

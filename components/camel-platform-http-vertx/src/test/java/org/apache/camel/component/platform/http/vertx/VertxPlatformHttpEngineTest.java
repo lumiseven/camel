@@ -16,6 +16,8 @@
  */
 package org.apache.camel.component.platform.http.vertx;
 
+import java.util.Arrays;
+
 import org.apache.camel.CamelContext;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.platform.http.PlatformHttpComponent;
@@ -189,6 +191,94 @@ public class VertxPlatformHttpEngineTest {
                 .request(String.class);
 
             assertThat(result).isEqualTo("TEST");
+        } finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testEngineCORS() throws Exception {
+        VertxPlatformHttpServerConfiguration conf = new VertxPlatformHttpServerConfiguration();
+        conf.setBindPort(AvailablePortFinder.getNextAvailable());
+        conf.getCors().setEnabled(true);
+        conf.getCors().setMethods(Arrays.asList("GET", "POST"));
+
+        CamelContext context = new DefaultCamelContext();
+
+        try {
+            context.addService(new VertxPlatformHttpServer(context, conf), true, true);
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from("platform-http:/")
+                        .transform().constant("cors");
+                }
+            });
+
+            context.start();
+
+            final String origin = "http://custom.origin.quarkus";
+            final String methods = "GET,POST";
+            final String headers = "X-Custom";
+
+            given()
+                .port(conf.getBindPort())
+                .header("Origin", origin)
+                .header("Access-Control-Request-Method", methods)
+                .header("Access-Control-Request-Headers", headers)
+            .when()
+                .get("/")
+            .then()
+                .statusCode(200)
+                .header("Access-Control-Allow-Origin", origin)
+                .header("Access-Control-Allow-Methods", methods)
+                .header("Access-Control-Allow-Headers", headers);
+        } finally {
+            context.stop();
+        }
+    }
+
+    @Test
+    public void testMatchOnUriPrefix() throws Exception {
+        VertxPlatformHttpServerConfiguration conf = new VertxPlatformHttpServerConfiguration();
+        conf.setBindPort(AvailablePortFinder.getNextAvailable());
+
+        CamelContext context = new DefaultCamelContext();
+        try {
+            final String greeting = "Hello Camel";
+            context.addService(new VertxPlatformHttpServer(context, conf), true, true);
+            context.addRoutes(new RouteBuilder() {
+                @Override
+                public void configure() throws Exception {
+                    from("platform-http:/greeting/{name}?matchOnUriPrefix=true")
+                            .transform().simple("Hello ${header.name}");
+                }
+            });
+
+            context.start();
+
+            given()
+                .port(conf.getBindPort())
+            .when()
+                .get("/greeting")
+            .then()
+                .statusCode(404);
+
+            given()
+                .port(conf.getBindPort())
+            .when()
+                .get("/greeting/Camel")
+            .then()
+                .statusCode(200)
+                .body(equalTo(greeting));
+
+            given()
+                .port(conf.getBindPort())
+            .when()
+                .get("/greeting/Camel/other/path/")
+            .then()
+                .statusCode(200)
+                .body(equalTo(greeting));
         } finally {
             context.stop();
         }

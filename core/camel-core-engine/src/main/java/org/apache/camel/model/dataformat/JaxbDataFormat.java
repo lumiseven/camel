@@ -25,8 +25,7 @@ import org.apache.camel.model.DataFormatDefinition;
 import org.apache.camel.spi.Metadata;
 
 /**
- * JAXB data format uses the JAXB2 XML marshalling standard to unmarshal an XML
- * payload into Java objects or to marshal Java objects into an XML payload.
+ * Unmarshal XML payloads to POJOs and back using JAXB2 XML marshalling standard.
  */
 @Metadata(firstVersion = "1.0.0", label = "dataformat,transformation,xml", title = "JAXB")
 @XmlRootElement(name = "jaxb")
@@ -34,6 +33,9 @@ import org.apache.camel.spi.Metadata;
 public class JaxbDataFormat extends DataFormatDefinition {
     @XmlAttribute(required = true)
     private String contextPath;
+    @XmlAttribute
+    @Metadata(javaType = "java.lang.Boolean")
+    private String contextPathIsClassName;
     @XmlAttribute
     private String schema;
     @XmlAttribute
@@ -95,6 +97,17 @@ public class JaxbDataFormat extends DataFormatDefinition {
      */
     public void setContextPath(String contextPath) {
         this.contextPath = contextPath;
+    }
+
+    public String getContextPathIsClassName() {
+        return contextPathIsClassName;
+    }
+
+    /**
+     * This can be set to true to mark that the contextPath is referring to a classname and not a package name.
+     */
+    public void setContextPathIsClassName(String contextPathIsClassName) {
+        this.contextPathIsClassName = contextPathIsClassName;
     }
 
     public String getSchema() {

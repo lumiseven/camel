@@ -1,7 +1,12 @@
 [[ognl-language]]
 = OGNL Language
+:docTitle: OGNL
+:artifactId: camel-ognl
+:description: Evaluate an Apache Commons Object Graph Navigation Library (OGNL) expression against the Camel Exchange.
+:since: 1.1
+:supportLevel: Stable
 
-*Since Camel 1.1*
+*Since Camel {since}*
 
 Camel allows http://commons.apache.org/proper/commons-ognl/[OGNL] to be
 used as an Expression or
@@ -89,7 +94,7 @@ And the sample using Java DSL:
 
 [source,java]
 ---------------------------------------------------------------------------------
-   from("seda:foo").filter().ognl("request.headers.foo == 'bar'").to("seda:bar");
+from("seda:foo").filter().ognl("request.headers.foo == 'bar'").to("seda:bar");
 ---------------------------------------------------------------------------------
 
 == Loading script from external resource

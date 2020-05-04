@@ -1,11 +1,15 @@
 [[vertx-component]]
 = Vert.x Component
+:docTitle: Vert.x
+:artifactId: camel-vertx
+:description: Send and receive messages to/from Vert.x Event Bus.
+:since: 2.12
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.12*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Vert.x component is for working with the http://vertx.io/[Vertx]
 https://vertx.io/docs/vertx-core/java/#event_bus[EventBus].

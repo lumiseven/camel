@@ -1,12 +1,17 @@
 [[stomp-component]]
 = Stomp Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-stomp/src/main/docs/stomp-component.adoc
+:docTitle: Stomp
+:artifactId: camel-stomp
+:description: Send and rececive messages to/from STOMP (Simple Text Oriented Messaging Protocol) compliant message brokers.
+:since: 2.12
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.12*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Stomp component is used for communicating with
 http://stomp.github.io/[Stomp] compliant message brokers, like

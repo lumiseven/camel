@@ -18,6 +18,7 @@ package org.apache.camel.component.aws2.iam;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
+import org.apache.camel.InvalidPayloadException;
 import org.apache.camel.Message;
 import org.apache.camel.support.DefaultProducer;
 import org.apache.camel.util.ObjectHelper;
@@ -42,8 +43,11 @@ import software.amazon.awssdk.services.iam.model.DeleteUserRequest;
 import software.amazon.awssdk.services.iam.model.DeleteUserResponse;
 import software.amazon.awssdk.services.iam.model.GetUserRequest;
 import software.amazon.awssdk.services.iam.model.GetUserResponse;
+import software.amazon.awssdk.services.iam.model.ListAccessKeysRequest;
 import software.amazon.awssdk.services.iam.model.ListAccessKeysResponse;
+import software.amazon.awssdk.services.iam.model.ListGroupsRequest;
 import software.amazon.awssdk.services.iam.model.ListGroupsResponse;
+import software.amazon.awssdk.services.iam.model.ListUsersRequest;
 import software.amazon.awssdk.services.iam.model.ListUsersResponse;
 import software.amazon.awssdk.services.iam.model.RemoveUserFromGroupRequest;
 import software.amazon.awssdk.services.iam.model.RemoveUserFromGroupResponse;
@@ -136,258 +140,453 @@ public class IAM2Producer extends DefaultProducer {
         return (IAM2Endpoint)super.getEndpoint();
     }
 
-    private void listAccessKeys(IamClient iamClient, Exchange exchange) {
-        ListAccessKeysResponse response;
-        try {
-            response = iamClient.listAccessKeys();
-        } catch (AwsServiceException ase) {
-            LOG.trace("List Access Keys command returned the error code {}", ase.getMessage());
-            throw ase;
+    private void listAccessKeys(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof ListAccessKeysRequest) {
+                ListAccessKeysResponse response;
+                try {
+                    response = iamClient.listAccessKeys((ListAccessKeysRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("List Access Keys command returned the error code {}", ase.getMessage());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(response);
+            }
+        } else {
+            ListAccessKeysResponse response;
+            try {
+                response = iamClient.listAccessKeys();
+            } catch (AwsServiceException ase) {
+                LOG.trace("List Access Keys command returned the error code {}", ase.getMessage());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(response);
         }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(response);
     }
 
-    private void createUser(IamClient iamClient, Exchange exchange) {
-        CreateUserRequest.Builder builder = CreateUserRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
+    private void createUser(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateUserRequest) {
+                CreateUserResponse result;
+                try {
+                    result = iamClient.createUser((CreateUserRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Create user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("User Name must be specified");
+            CreateUserRequest.Builder builder = CreateUserRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            } else {
+                throw new IllegalArgumentException("User Name must be specified");
+            }
+            CreateUserResponse result;
+            try {
+                result = iamClient.createUser(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Create user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        CreateUserResponse result;
-        try {
-            result = iamClient.createUser(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Create user command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void deleteUser(IamClient iamClient, Exchange exchange) {
-        DeleteUserRequest.Builder builder = DeleteUserRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
+    private void deleteUser(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DeleteUserRequest) {
+                DeleteUserResponse result;
+                try {
+                    result = iamClient.deleteUser((DeleteUserRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("User Name must be specified");
+            DeleteUserRequest.Builder builder = DeleteUserRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            } else {
+                throw new IllegalArgumentException("User Name must be specified");
+            }
+            DeleteUserResponse result;
+            try {
+                result = iamClient.deleteUser(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DeleteUserResponse result;
-        try {
-            result = iamClient.deleteUser(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete user command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void getUser(IamClient iamClient, Exchange exchange) {
-        GetUserRequest.Builder builder = GetUserRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
+    private void getUser(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof GetUserRequest) {
+                GetUserResponse result;
+                try {
+                    result = iamClient.getUser((GetUserRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("get user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("User Name must be specified");
+            GetUserRequest.Builder builder = GetUserRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            } else {
+                throw new IllegalArgumentException("User Name must be specified");
+            }
+            GetUserResponse result;
+            try {
+                result = iamClient.getUser(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("get user command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        GetUserResponse result;
-        try {
-            result = iamClient.getUser(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("get user command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void listUsers(IamClient iamClient, Exchange exchange) {
-        ListUsersResponse result;
-        try {
-            result = iamClient.listUsers();
-        } catch (AwsServiceException ase) {
-            LOG.trace("List users command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
+    private void listUsers(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof ListUsersRequest) {
+                ListUsersResponse result;
+                try {
+                    result = iamClient.listUsers((ListUsersRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("List users command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
+        } else {
+            ListUsersResponse result;
+            try {
+                result = iamClient.listUsers();
+            } catch (AwsServiceException ase) {
+                LOG.trace("List users command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void createAccessKey(IamClient iamClient, Exchange exchange) {
-        CreateAccessKeyRequest.Builder builder = CreateAccessKeyRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
+    private void createAccessKey(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateAccessKeyRequest) {
+                CreateAccessKeyResponse result;
+                try {
+                    result = iamClient.createAccessKey((CreateAccessKeyRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Create Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
+        } else {
+            CreateAccessKeyRequest.Builder builder = CreateAccessKeyRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            }
+            CreateAccessKeyResponse result;
+            try {
+                result = iamClient.createAccessKey(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Create Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        CreateAccessKeyResponse result;
-        try {
-            result = iamClient.createAccessKey(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Create Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void deleteAccessKey(IamClient iamClient, Exchange exchange) {
-        DeleteAccessKeyRequest.Builder builder = DeleteAccessKeyRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID))) {
-            String accessKeyId = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID, String.class);
-            builder.accessKeyId(accessKeyId);
+    private void deleteAccessKey(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof DeleteAccessKeyRequest) {
+                DeleteAccessKeyResponse result;
+                try {
+                    result = iamClient.deleteAccessKey((DeleteAccessKeyRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Key Id must be specified");
+            DeleteAccessKeyRequest.Builder builder = DeleteAccessKeyRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID))) {
+                String accessKeyId = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID, String.class);
+                builder.accessKeyId(accessKeyId);
+            } else {
+                throw new IllegalArgumentException("Key Id must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            }
+            DeleteAccessKeyResponse result;
+            try {
+                result = iamClient.deleteAccessKey(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
-        }
-        DeleteAccessKeyResponse result;
-        try {
-            result = iamClient.deleteAccessKey(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void updateAccessKey(IamClient iamClient, Exchange exchange) {
-        UpdateAccessKeyRequest.Builder builder = UpdateAccessKeyRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID))) {
-            String accessKeyId = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID, String.class);
-            builder.accessKeyId(accessKeyId);
+    private void updateAccessKey(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof UpdateAccessKeyRequest) {
+                UpdateAccessKeyResponse result;
+                try {
+                    result = iamClient.updateAccessKey((UpdateAccessKeyRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Update Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Key Id must be specified");
+            UpdateAccessKeyRequest.Builder builder = UpdateAccessKeyRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID))) {
+                String accessKeyId = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_ID, String.class);
+                builder.accessKeyId(accessKeyId);
+            } else {
+                throw new IllegalArgumentException("Key Id must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_STATUS))) {
+                String status = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_STATUS, String.class);
+                builder.status(StatusType.fromValue(status));
+            } else {
+                throw new IllegalArgumentException("Access Key status must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            }
+            UpdateAccessKeyResponse result;
+            try {
+                result = iamClient.updateAccessKey(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Update Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_STATUS))) {
-            String status = exchange.getIn().getHeader(IAM2Constants.ACCESS_KEY_STATUS, String.class);
-            builder.status(StatusType.fromValue(status));
-        } else {
-            throw new IllegalArgumentException("Access Key status must be specified");
-        }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
-        }
-        UpdateAccessKeyResponse result;
-        try {
-            result = iamClient.updateAccessKey(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Update Access Key command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void createGroup(IamClient iamClient, Exchange exchange) {
-        CreateGroupRequest.Builder builder = CreateGroupRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
-            String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
-            builder.groupName(groupName);
+    private void createGroup(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateGroupRequest) {
+                CreateGroupResponse result;
+                try {
+                    result = iamClient.createGroup((CreateGroupRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Create Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Group Name must be specified");
+            CreateGroupRequest.Builder builder = CreateGroupRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
+                String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
+                builder.groupName(groupName);
+            } else {
+                throw new IllegalArgumentException("Group Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_PATH))) {
+                String groupPath = exchange.getIn().getHeader(IAM2Constants.GROUP_PATH, String.class);
+                builder.path(groupPath);
+            }
+            CreateGroupResponse result;
+            try {
+                result = iamClient.createGroup(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Create Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_PATH))) {
-            String groupPath = exchange.getIn().getHeader(IAM2Constants.GROUP_PATH, String.class);
-            builder.path(groupPath);
-        }
-        CreateGroupResponse result;
-        try {
-            result = iamClient.createGroup(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Create Group command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void deleteGroup(IamClient iamClient, Exchange exchange) {
-        DeleteGroupRequest.Builder builder = DeleteGroupRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
-            String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
-            builder.groupName(groupName);
+    private void deleteGroup(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof CreateGroupRequest) {
+                DeleteGroupResponse result;
+                try {
+                    result = iamClient.deleteGroup((DeleteGroupRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Delete Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Group Name must be specified");
+            DeleteGroupRequest.Builder builder = DeleteGroupRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
+                String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
+                builder.groupName(groupName);
+            } else {
+                throw new IllegalArgumentException("Group Name must be specified");
+            }
+            DeleteGroupResponse result;
+            try {
+                result = iamClient.deleteGroup(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Delete Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        DeleteGroupResponse result;
-        try {
-            result = iamClient.deleteGroup(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Delete Group command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void listGroups(IamClient iamClient, Exchange exchange) {
-        ListGroupsResponse result;
-        try {
-            result = iamClient.listGroups();
-        } catch (AwsServiceException ase) {
-            LOG.trace("List Groups command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
+    private void listGroups(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof ListGroupsRequest) {
+                ListGroupsResponse result;
+                try {
+                    result = iamClient.listGroups((ListGroupsRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("List Groups command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
+        } else {
+            ListGroupsResponse result;
+            try {
+                result = iamClient.listGroups();
+            } catch (AwsServiceException ase) {
+                LOG.trace("List Groups command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void addUserToGroup(IamClient iamClient, Exchange exchange) {
-        AddUserToGroupRequest.Builder builder = AddUserToGroupRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
-            String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
-            builder.groupName(groupName);
+    private void addUserToGroup(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof AddUserToGroupRequest) {
+                AddUserToGroupResponse result;
+                try {
+                    result = iamClient.addUserToGroup((AddUserToGroupRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Add User To Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Group Name must be specified");
+            AddUserToGroupRequest.Builder builder = AddUserToGroupRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
+                String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
+                builder.groupName(groupName);
+            } else {
+                throw new IllegalArgumentException("Group Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            } else {
+                throw new IllegalArgumentException("User Name must be specified");
+            }
+            AddUserToGroupResponse result;
+            try {
+                result = iamClient.addUserToGroup(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Add User To Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
-        } else {
-            throw new IllegalArgumentException("User Name must be specified");
-        }
-        AddUserToGroupResponse result;
-        try {
-            result = iamClient.addUserToGroup(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Add User To Group command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
-    private void removeUserFromGroup(IamClient iamClient, Exchange exchange) {
-        RemoveUserFromGroupRequest.Builder builder = RemoveUserFromGroupRequest.builder();
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
-            String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
-            builder.groupName(groupName);
+    private void removeUserFromGroup(IamClient iamClient, Exchange exchange) throws InvalidPayloadException {
+        if (getConfiguration().isPojoRequest()) {
+            Object payload = exchange.getIn().getMandatoryBody();
+            if (payload instanceof RemoveUserFromGroupRequest) {
+                RemoveUserFromGroupResponse result;
+                try {
+                    result = iamClient.removeUserFromGroup((RemoveUserFromGroupRequest)payload);
+                } catch (AwsServiceException ase) {
+                    LOG.trace("Remove User From Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                    throw ase;
+                }
+                Message message = getMessageForResponse(exchange);
+                message.setBody(result);
+            }
         } else {
-            throw new IllegalArgumentException("Group Name must be specified");
+            RemoveUserFromGroupRequest.Builder builder = RemoveUserFromGroupRequest.builder();
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.GROUP_NAME))) {
+                String groupName = exchange.getIn().getHeader(IAM2Constants.GROUP_NAME, String.class);
+                builder.groupName(groupName);
+            } else {
+                throw new IllegalArgumentException("Group Name must be specified");
+            }
+            if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
+                String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
+                builder.userName(userName);
+            } else {
+                throw new IllegalArgumentException("User Name must be specified");
+            }
+            RemoveUserFromGroupResponse result;
+            try {
+                result = iamClient.removeUserFromGroup(builder.build());
+            } catch (AwsServiceException ase) {
+                LOG.trace("Remove User From Group command returned the error code {}", ase.awsErrorDetails().errorCode());
+                throw ase;
+            }
+            Message message = getMessageForResponse(exchange);
+            message.setBody(result);
         }
-        if (ObjectHelper.isNotEmpty(exchange.getIn().getHeader(IAM2Constants.USERNAME))) {
-            String userName = exchange.getIn().getHeader(IAM2Constants.USERNAME, String.class);
-            builder.userName(userName);
-        } else {
-            throw new IllegalArgumentException("User Name must be specified");
-        }
-        RemoveUserFromGroupResponse result;
-        try {
-            result = iamClient.removeUserFromGroup(builder.build());
-        } catch (AwsServiceException ase) {
-            LOG.trace("Remove User From Group command returned the error code {}", ase.awsErrorDetails().errorCode());
-            throw ase;
-        }
-        Message message = getMessageForResponse(exchange);
-        message.setBody(result);
     }
 
     public static Message getMessageForResponse(final Exchange exchange) {

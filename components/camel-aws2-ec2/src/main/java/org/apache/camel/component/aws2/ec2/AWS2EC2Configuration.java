@@ -47,6 +47,8 @@ public class AWS2EC2Configuration implements Cloneable {
     private Integer proxyPort;
     @UriParam
     private String region;
+    @UriParam(defaultValue = "false")
+    private boolean pojoRequest;
 
     public Ec2Client getAmazonEc2Client() {
         return amazonEc2Client;
@@ -133,12 +135,24 @@ public class AWS2EC2Configuration implements Cloneable {
     }
 
     /**
-     * The region in which EC2 client needs to work. When using this parameter,
-     * the configuration will expect the capitalized name of the region (for
-     * example AP_EAST_1) You'll need to use the name Regions.EU_WEST_1.name()
+     * The region in which EC2 client needs to work. When using this
+     * parameter, the configuration will expect the lowercase name of the
+     * region (for example ap-east-1) You'll need to use the name
+     * Region.EU_WEST_1.id()
      */
     public void setRegion(String region) {
         this.region = region;
+    }
+    
+    public boolean isPojoRequest() {
+        return pojoRequest;
+    }
+
+    /**
+     * If we want to use a POJO request as body or not
+     */
+    public void setPojoRequest(boolean pojoRequest) {
+        this.pojoRequest = pojoRequest;
     }
 
     // *************************************************

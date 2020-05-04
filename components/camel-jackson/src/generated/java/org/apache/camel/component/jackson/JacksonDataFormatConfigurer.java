@@ -22,10 +22,14 @@ public class JacksonDataFormatConfigurer extends PropertyConfigurerSupport imple
         case "objectMapper": dataformat.setObjectMapper(property(camelContext, com.fasterxml.jackson.databind.ObjectMapper.class, value)); return true;
         case "usedefaultobjectmapper":
         case "useDefaultObjectMapper": dataformat.setUseDefaultObjectMapper(property(camelContext, boolean.class, value)); return true;
+        case "collectiontypename":
+        case "collectionTypeName": dataformat.setCollectionTypeName(property(camelContext, java.lang.String.class, value)); return true;
         case "moduleclassnames":
         case "moduleClassNames": dataformat.setModuleClassNames(property(camelContext, java.lang.String.class, value)); return true;
         case "modulerefs":
         case "moduleRefs": dataformat.setModuleRefs(property(camelContext, java.lang.String.class, value)); return true;
+        case "unmarshaltypename":
+        case "unmarshalTypeName": dataformat.setUnmarshalTypeName(property(camelContext, java.lang.String.class, value)); return true;
         case "jsonview":
         case "jsonView": dataformat.setJsonView(property(camelContext, java.lang.Class.class, value)); return true;
         case "include": dataformat.setInclude(property(camelContext, java.lang.String.class, value)); return true;
@@ -35,8 +39,6 @@ public class JacksonDataFormatConfigurer extends PropertyConfigurerSupport imple
         case "allowJmsType": dataformat.setAllowJmsType(property(camelContext, boolean.class, value)); return true;
         case "uselist":
         case "useList": dataformat.setUseList(property(camelContext, boolean.class, value)); return true;
-        case "enablejaxbannotationmodule":
-        case "enableJaxbAnnotationModule": dataformat.setEnableJaxbAnnotationModule(property(camelContext, boolean.class, value)); return true;
         case "enablefeatures":
         case "enableFeatures": dataformat.setEnableFeatures(property(camelContext, java.lang.String.class, value)); return true;
         case "disablefeatures":

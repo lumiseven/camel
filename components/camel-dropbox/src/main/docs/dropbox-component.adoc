@@ -1,11 +1,15 @@
 [[dropbox-component]]
 = Dropbox Component
+:docTitle: Dropbox
+:artifactId: camel-dropbox
+:description: Upload, download and manage files, folders, groups, collaborations, etc on Dropbox.
+:since: 2.14
+:supportLevel: Stable
+:component-header: Both producer and consumer are supported
 
-*Since Camel 2.14*
+*Since Camel {since}*
 
-// HEADER START
-*Both producer and consumer is supported*
-// HEADER END
+*{component-header}*
 
 The Dropbox component allows you to treat
 https://www.dropbox.com[Dropbox] remote folders as a producer or

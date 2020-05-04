@@ -1,7 +1,12 @@
 [[gzipdeflater-dataformat]]
 = GZip Deflater DataFormat
+:docTitle: GZip Deflater
+:artifactId: camel-zip-deflater
+:description: Compress and decompress messages using java.util.zip.GZIPStream.
+:since: 2.0
+:supportLevel: Stable
 
-*Since Camel 2.0*
+*Since Camel {since}*
 
 The GZip Deflater Data Format is a message compression and
 de-compression format. It uses the same deflate algorithm that is used

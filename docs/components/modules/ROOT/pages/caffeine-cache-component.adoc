@@ -1,12 +1,17 @@
 [[caffeine-cache-component]]
 = Caffeine Cache Component
+//THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-caffeine/src/main/docs/caffeine-cache-component.adoc
+:docTitle: Caffeine Cache
+:artifactId: camel-caffeine
+:description: Perform caching operations using Caffeine Cache.
+:since: 2.20
+:supportLevel: Stable
+:component-header: Only producer is supported
 
-*Since Camel 2.20*
+*Since Camel {since}*
 
-// HEADER START
-*Only producer is supported*
-// HEADER END
+*{component-header}*
 
 The Caffeine Cache component enables you to perform caching operations using
 the simple cache from Caffeine.
@@ -121,18 +126,18 @@ You can use your cache with the following code:
 
 [source,java]
 ------------------------------------------------------------
-    @Override
-    protected RouteBuilder createRouteBuilder() throws Exception {
-        return new RouteBuilder() {
-            public void configure() {
-                from("direct://start")
-                    .toF("caffeine-cache://%s?cache=#cache&action=PUT&key=1", "test")
-                    .toF("caffeine-cache://%s?cache=#cache&key=1&action=GET", "test")
-                    .log("Test! ${body}")
-                    .to("mock:result");
-            }
-        };
-    }
+@Override
+protected RouteBuilder createRouteBuilder() throws Exception {
+    return new RouteBuilder() {
+        public void configure() {
+            from("direct://start")
+                .toF("caffeine-cache://%s?cache=#cache&action=PUT&key=1", "test")
+                .toF("caffeine-cache://%s?cache=#cache&key=1&action=GET", "test")
+                .log("Test! ${body}")
+                .to("mock:result");
+        }
+    };
+}
 ------------------------------------------------------------
 
 In this way you'll work always on the same cache in the registry.

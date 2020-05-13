@@ -566,7 +566,7 @@ public interface GridFsEndpointBuilderFactory {
             return this;
         }
         /**
-         * Sets the operation this endpoint will execute against GridRS.
+         * Sets the operation this endpoint will execute against GridFs.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -833,29 +833,42 @@ public interface GridFsEndpointBuilderFactory {
          * Syntax: <code>mongodb-gridfs:connectionBean</code>
          * 
          * Path parameter: connectionBean (required)
-         * Name of com.mongodb.MongoClient to use.
+         * Name of com.mongodb.client.MongoClient to use.
+         * 
+         * @param path connectionBean
          */
         default GridFsEndpointBuilder mongodbGridfs(String path) {
-            return GridFsEndpointBuilderFactory.mongodbGridfs(path);
+            return GridFsEndpointBuilderFactory.endpointBuilder("mongodb-gridfs", path);
+        }
+        /**
+         * MongoDB GridFS (camel-mongodb-gridfs)
+         * Interact with MongoDB GridFS.
+         * 
+         * Category: database,nosql
+         * Since: 2.18
+         * Maven coordinates: org.apache.camel:camel-mongodb-gridfs
+         * 
+         * Syntax: <code>mongodb-gridfs:connectionBean</code>
+         * 
+         * Path parameter: connectionBean (required)
+         * Name of com.mongodb.client.MongoClient to use.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path connectionBean
+         */
+        default GridFsEndpointBuilder mongodbGridfs(
+                String componentName,
+                String path) {
+            return GridFsEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * MongoDB GridFS (camel-mongodb-gridfs)
-     * Interact with MongoDB GridFS.
-     * 
-     * Category: database,nosql
-     * Since: 2.18
-     * Maven coordinates: org.apache.camel:camel-mongodb-gridfs
-     * 
-     * Syntax: <code>mongodb-gridfs:connectionBean</code>
-     * 
-     * Path parameter: connectionBean (required)
-     * Name of com.mongodb.MongoClient to use.
-     */
-    static GridFsEndpointBuilder mongodbGridfs(String path) {
+    static GridFsEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class GridFsEndpointBuilderImpl extends AbstractEndpointBuilder implements GridFsEndpointBuilder, AdvancedGridFsEndpointBuilder {
             public GridFsEndpointBuilderImpl(String path) {
-                super("mongodb-gridfs", path);
+                super(componentName, path);
             }
         }
         return new GridFsEndpointBuilderImpl(path);

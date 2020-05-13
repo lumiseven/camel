@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +44,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.PropertyBindingException;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.RuntimeCamelException;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.builder.ThreadPoolProfileBuilder;
 import org.apache.camel.model.FaultToleranceConfigurationDefinition;
 import org.apache.camel.model.HystrixConfigurationDefinition;
@@ -61,6 +61,7 @@ import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.support.PropertyBindingSupport;
+import org.apache.camel.support.ResourceHelper;
 import org.apache.camel.support.service.BaseService;
 import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.FileUtil;
@@ -73,7 +74,8 @@ import org.apache.camel.util.concurrent.ThreadPoolRejectedPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import static org.apache.camel.main.MainHelper.lookupPropertyFromSysOrEnv;
+import static org.apache.camel.main.MainHelper.loadEnvironmentVariablesAsProperties;
 import static org.apache.camel.support.ObjectHelper.invokeMethod;
 import static org.apache.camel.util.ReflectionHelper.findMethod;
 import static org.apache.camel.util.StringHelper.matches;
@@ -82,6 +84,10 @@ import static org.apache.camel.util.StringHelper.matches;
  * Base class for main implementations to allow bootstrapping Camel in standalone mode.
  */
 public abstract class BaseMainSupport extends BaseService {
+    public static final String DEFAULT_PROPERTY_PLACEHOLDER_LOCATION = "classpath:application.properties;optional=true";
+    public static final String INITIAL_PROPERTIES_LOCATION = "camel.main.initial-properties-location";
+    public static final String OVERRIDE_PROPERTIES_LOCATION = "camel.main.override-properties-location";
+    public static final String PROPERTY_PLACEHOLDER_LOCATION = "camel.main.property-placeholder-location";
 
     private static final Logger LOG = LoggerFactory.getLogger(BaseMainSupport.class);
 
@@ -98,35 +104,10 @@ public abstract class BaseMainSupport extends BaseService {
     protected final MainConfigurationProperties mainConfigurationProperties = new MainConfigurationProperties();
     protected final Properties wildcardProperties = new OrderedProperties();
     protected RoutesCollector routesCollector = new DefaultRoutesCollector();
-    protected List<RoutesBuilder> routeBuilders = new ArrayList<>();
-    protected String routeBuilderClasses;
-    protected List<Object> configurations = new ArrayList<>();
-    protected String configurationClasses;
     protected String propertyPlaceholderLocations;
-    protected String defaultPropertyPlaceholderLocation = "classpath:application.properties;optional=true";
+    protected String defaultPropertyPlaceholderLocation = DEFAULT_PROPERTY_PLACEHOLDER_LOCATION;
     protected Properties initialProperties;
     protected Properties overrideProperties;
-
-    protected static Properties loadEnvironmentVariablesAsProperties(String[] prefixes) {
-        Properties answer = new OrderedProperties();
-        if (prefixes == null || prefixes.length == 0) {
-            return answer;
-        }
-
-        for (String prefix : prefixes) {
-            final String pk = prefix.toUpperCase(Locale.US).replaceAll("[^\\w]", "-");
-            final String pk2 = pk.replace('-', '_');
-            System.getenv().forEach((k, v) -> {
-                k = k.toUpperCase(Locale.US);
-                if (k.startsWith(pk) || k.startsWith(pk2)) {
-                    String key = k.toLowerCase(Locale.ENGLISH).replace('_', '.');
-                    answer.put(key, v);
-                }
-            });
-        }
-
-        return answer;
-    }
 
     protected static String optionKey(String key) {
         // as we ignore case for property names we should use keys in same case and without dashes
@@ -215,34 +196,6 @@ public abstract class BaseMainSupport extends BaseService {
         return mainConfigurationProperties;
     }
 
-    public String getConfigurationClasses() {
-        return configurationClasses;
-    }
-
-    public void setConfigurationClasses(String configurations) {
-        this.configurationClasses = configurations;
-    }
-
-    public void addConfigurationClass(Class... configuration) {
-        String existing = configurationClasses;
-        if (existing == null) {
-            existing = "";
-        }
-        if (configuration != null) {
-            for (Class clazz : configuration) {
-                if (!existing.isEmpty()) {
-                    existing = existing + ",";
-                }
-                existing = existing + clazz.getName();
-            }
-        }
-        setConfigurationClasses(existing);
-    }
-
-    public void addConfiguration(Object configuration) {
-        configurations.add(configuration);
-    }
-
     public RoutesCollector getRoutesCollector() {
         return routesCollector;
     }
@@ -252,14 +205,6 @@ public abstract class BaseMainSupport extends BaseService {
      */
     public void setRoutesCollector(RoutesCollector routesCollector) {
         this.routesCollector = routesCollector;
-    }
-
-    public String getRouteBuilderClasses() {
-        return routeBuilderClasses;
-    }
-
-    public void setRouteBuilderClasses(String builders) {
-        this.routeBuilderClasses = builders;
     }
 
     public String getPropertyPlaceholderLocations() {
@@ -390,35 +335,21 @@ public abstract class BaseMainSupport extends BaseService {
     }
 
     /**
-     * @deprecated use {@link #getRoutesBuilders()}
+     * Adds a {@link MainListener} to receive callbacks when the main is started or stopping
+     *
+     * @param listener the listener
      */
-    @Deprecated
-    public List<RoutesBuilder> getRouteBuilders() {
-        return getRoutesBuilders();
+    public void addMainListener(MainListener listener) {
+        listeners.add(listener);
     }
 
     /**
-     * @deprecated use {@link #setRoutesBuilders(List)} ()}
+     * Removes the {@link MainListener}
+     *
+     * @param listener the listener
      */
-    @Deprecated
-    public void setRouteBuilders(List<RoutesBuilder> routeBuilders) {
-        setRoutesBuilders(routeBuilders);
-    }
-
-    public List<RoutesBuilder> getRoutesBuilders() {
-        return routeBuilders;
-    }
-
-    public void setRoutesBuilders(List<RoutesBuilder> routesBuilders) {
-        this.routeBuilders = routesBuilders;
-    }
-
-    public List<Object> getConfigurations() {
-        return configurations;
-    }
-
-    public void setConfigurations(List<Object> configurations) {
-        this.configurations = configurations;
+    public void removeMainListener(MainListener listener) {
+        listeners.remove(listener);
     }
 
     public List<RouteDefinition> getRouteDefinitions() {
@@ -452,22 +383,24 @@ public abstract class BaseMainSupport extends BaseService {
         // lets use Camel's bean post processor on any existing route builder classes
         // so the instance has some support for dependency injection
         CamelBeanPostProcessor postProcessor = camelContext.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
-        for (RoutesBuilder routeBuilder : getRoutesBuilders()) {
+        for (RoutesBuilder routeBuilder : mainConfigurationProperties.getRoutesBuilders()) {
             postProcessor.postProcessBeforeInitialization(routeBuilder, routeBuilder.getClass().getName());
             postProcessor.postProcessAfterInitialization(routeBuilder, routeBuilder.getClass().getName());
         }
 
-        if (routeBuilderClasses != null) {
-            String[] routeClasses = routeBuilderClasses.split(",");
+        if (mainConfigurationProperties.getRoutesBuilderClasses() != null) {
+            String[] routeClasses = mainConfigurationProperties.getRoutesBuilderClasses().split(",");
             for (String routeClass : routeClasses) {
-                Class<?> routeClazz = camelContext.getClassResolver().resolveClass(routeClass);
-                // lets use Camel's injector so the class has some support for dependency injection
-                Object builder = camelContext.getInjector().newInstance(routeClazz);
-                if (builder instanceof RouteBuilder) {
-                    getRoutesBuilders().add((RouteBuilder) builder);
-                } else {
-                    LOG.warn("Class {} is not a RouteBuilder class", routeClazz);
+                Class<RoutesBuilder> routeClazz = camelContext.getClassResolver().resolveClass(routeClass, RoutesBuilder.class);
+                if (routeClazz == null) {
+                    LOG.warn("Unable to resolve class: {}", routeClass);
+                    continue;
                 }
+
+                // lets use Camel's injector so the class has some support for dependency injection
+                RoutesBuilder builder = camelContext.getInjector().newInstance(routeClazz);
+
+                mainConfigurationProperties.addRoutesBuilder(builder);
             }
         }
 
@@ -476,8 +409,8 @@ public abstract class BaseMainSupport extends BaseService {
             Set<Class<?>> set = camelContext.getExtension(ExtendedCamelContext.class).getPackageScanClassResolver().findImplementations(RoutesBuilder.class, pkgs);
             for (Class<?> routeClazz : set) {
                 Object builder = camelContext.getInjector().newInstance(routeClazz);
-                if (builder instanceof RouteBuilder) {
-                    getRoutesBuilders().add((RouteBuilder) builder);
+                if (builder instanceof RoutesBuilder) {
+                    mainConfigurationProperties.addRoutesBuilder((RoutesBuilder) builder);
                 } else {
                     LOG.warn("Class {} is not a RouteBuilder class", routeClazz);
                 }
@@ -489,22 +422,22 @@ public abstract class BaseMainSupport extends BaseService {
         // lets use Camel's bean post processor on any existing configuration classes
         // so the instance has some support for dependency injection
         CamelBeanPostProcessor postProcessor = camelContext.adapt(ExtendedCamelContext.class).getBeanPostProcessor();
-        for (Object configuration : getConfigurations()) {
+        for (Object configuration : mainConfigurationProperties.getConfigurations()) {
             postProcessor.postProcessBeforeInitialization(configuration, configuration.getClass().getName());
             postProcessor.postProcessAfterInitialization(configuration, configuration.getClass().getName());
         }
 
-        if (configurationClasses != null) {
-            String[] configClasses = configurationClasses.split(",");
+        if (mainConfigurationProperties.getConfigurationClasses() != null) {
+            String[] configClasses = mainConfigurationProperties.getConfigurationClasses().split(",");
             for (String configClass : configClasses) {
                 Class<?> configClazz = camelContext.getClassResolver().resolveClass(configClass);
                 // lets use Camel's injector so the class has some support for dependency injection
                 Object config = camelContext.getInjector().newInstance(configClazz);
-                getConfigurations().add(config);
+                mainConfigurationProperties.addConfiguration(config);
             }
         }
 
-        for (Object config : getConfigurations()) {
+        for (Object config : mainConfigurationProperties.getConfigurations()) {
             // invoke configure method if exists
             Method method = findMethod(config.getClass(), "configure");
             if (method != null) {
@@ -515,26 +448,44 @@ public abstract class BaseMainSupport extends BaseService {
     }
 
     protected void configurePropertiesService(CamelContext camelContext) throws Exception {
-        if (propertyPlaceholderLocations != null) {
-            PropertiesComponent pc = camelContext.getPropertiesComponent();
-            pc.addLocation(propertyPlaceholderLocations);
-            LOG.info("Using properties from: {}", propertyPlaceholderLocations);
-        } else if (ObjectHelper.isNotEmpty(defaultPropertyPlaceholderLocation) && !ObjectHelper.equal("false", defaultPropertyPlaceholderLocation)) {
-            // lets default to defaultPropertyPlaceholderLocation if
-            // there are no existing locations configured
-            PropertiesComponent pc = camelContext.getPropertiesComponent();
-            if (pc.getLocations().isEmpty()) {
-                pc.addLocation(defaultPropertyPlaceholderLocation);
+        PropertiesComponent pc = camelContext.getPropertiesComponent();
+        if (pc.getLocations().isEmpty()) {
+            String locations = propertyPlaceholderLocations;
+            if (locations == null) {
+                locations = lookupPropertyFromSysOrEnv(PROPERTY_PLACEHOLDER_LOCATION).orElse(defaultPropertyPlaceholderLocation);
             }
-            LOG.info("Using properties from {}", defaultPropertyPlaceholderLocation);
+            if (!Objects.equals(locations, "false")) {
+                pc.addLocation(locations);
+                LOG.info("Using properties from: {}", locations);
+            }
         }
 
-        PropertiesComponent pc = camelContext.getPropertiesComponent();
-        if (initialProperties != null) {
-            pc.setInitialProperties(initialProperties);
+        Properties ip = initialProperties;
+        if (ip == null || ip.isEmpty()) {
+            Optional<String> location = lookupPropertyFromSysOrEnv(INITIAL_PROPERTIES_LOCATION);
+            if (location.isPresent()) {
+                try (InputStream is = ResourceHelper.resolveMandatoryResourceAsInputStream(camelContext, location.get())) {
+                    ip = new Properties();
+                    ip.load(is);
+                }
+            }
         }
-        if (overrideProperties != null) {
-            pc.setOverrideProperties(overrideProperties);
+        if (ip != null) {
+            pc.setInitialProperties(ip);
+        }
+
+        Properties op = overrideProperties;
+        if (op == null || op.isEmpty()) {
+            Optional<String> location = lookupPropertyFromSysOrEnv(OVERRIDE_PROPERTIES_LOCATION);
+            if (location.isPresent()) {
+                try (InputStream is = ResourceHelper.resolveMandatoryResourceAsInputStream(camelContext, location.get())) {
+                    op = new Properties();
+                    op.load(is);
+                }
+            }
+        }
+        if (op != null) {
+            pc.setOverrideProperties(op);
         }
     }
 
@@ -597,13 +548,17 @@ public abstract class BaseMainSupport extends BaseService {
         loadRouteBuilders(camelContext);
 
         // then configure and add the routes
-        RoutesConfigurer configurer = new RoutesConfigurer(routesCollector, routeBuilders);
+        RoutesConfigurer configurer = new RoutesConfigurer(routesCollector, mainConfigurationProperties.getRoutesBuilders());
         configurer.configureRoutes(camelContext, mainConfigurationProperties);
     }
 
     protected void postProcessCamelContext(CamelContext camelContext) throws Exception {
         // ensure camel is initialized
         camelContext.build();
+
+        for (MainListener listener : listeners) {
+            listener.beforeInitialize(this);
+        }
 
         configurePropertiesService(camelContext);
 
@@ -618,6 +573,7 @@ public abstract class BaseMainSupport extends BaseService {
 
         // allow to do configuration before its started
         for (MainListener listener : listeners) {
+            listener.afterConfigure(this);
             listener.configure(camelContext);
         }
     }
@@ -1246,52 +1202,6 @@ public abstract class BaseMainSupport extends BaseService {
         if (ObjectHelper.isEmpty(value)) {
             throw new IllegalArgumentException("Error configuring property: " + key + " because value is empty");
         }
-    }
-
-    /**
-     * @deprecated use {@link #addRoutesBuilder(RoutesBuilder)}
-     */
-    @Deprecated
-    public void addRouteBuilder(RoutesBuilder routeBuilder) {
-        getRoutesBuilders().add(routeBuilder);
-    }
-
-    public void addRoutesBuilder(RoutesBuilder routeBuilder) {
-        getRoutesBuilders().add(routeBuilder);
-    }
-
-    public void addRouteBuilder(Class... routeBuilder) {
-        String existing = routeBuilderClasses;
-        if (existing == null) {
-            existing = "";
-        }
-        if (routeBuilder != null) {
-            for (Class clazz : routeBuilder) {
-                if (!existing.isEmpty()) {
-                    existing = existing + ",";
-                }
-                existing = existing + clazz.getName();
-            }
-        }
-        setRouteBuilderClasses(existing);
-    }
-
-    /**
-     * Adds a {@link MainListener} to receive callbacks when the main is started or stopping
-     *
-     * @param listener the listener
-     */
-    public void addMainListener(MainListener listener) {
-        listeners.add(listener);
-    }
-
-    /**
-     * Removes the {@link MainListener}
-     *
-     * @param listener the listener
-     */
-    public void removeMainListener(MainListener listener) {
-        listeners.remove(listener);
     }
 
     private static final class PropertyOptionKey {

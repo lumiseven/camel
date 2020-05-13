@@ -38,6 +38,73 @@ public interface JsltEndpointBuilderFactory {
             return (AdvancedJsltEndpointBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsltEndpointBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsltEndpointBuilder allowContextMapAll(String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsltEndpointBuilder allowTemplateFromHeader(
+                boolean allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsltEndpointBuilder allowTemplateFromHeader(
+                String allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
          * Sets whether to use resource content cache or not.
          * 
          * The option is a: <code>boolean</code> type.
@@ -210,32 +277,42 @@ public interface JsltEndpointBuilderFactory {
          * registry. bean will call a method on a bean to be used as the
          * resource. For bean you can specify the method name after dot, eg
          * bean:myBean.myMethod.
+         * 
+         * @param path resourceUri
          */
         default JsltEndpointBuilder jslt(String path) {
-            return JsltEndpointBuilderFactory.jslt(path);
+            return JsltEndpointBuilderFactory.endpointBuilder("jslt", path);
+        }
+        /**
+         * JSLT (camel-jslt)
+         * Query or transform JSON payloads using an JSLT.
+         * 
+         * Category: transformation
+         * Since: 3.1
+         * Maven coordinates: org.apache.camel:camel-jslt
+         * 
+         * Syntax: <code>jslt:resourceUri</code>
+         * 
+         * Path parameter: resourceUri (required)
+         * Path to the resource. You can prefix with: classpath, file, http,
+         * ref, or bean. classpath, file and http loads the resource using these
+         * protocols (classpath is default). ref will lookup the resource in the
+         * registry. bean will call a method on a bean to be used as the
+         * resource. For bean you can specify the method name after dot, eg
+         * bean:myBean.myMethod.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path resourceUri
+         */
+        default JsltEndpointBuilder jslt(String componentName, String path) {
+            return JsltEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * JSLT (camel-jslt)
-     * Query or transform JSON payloads using an JSLT.
-     * 
-     * Category: transformation
-     * Since: 3.1
-     * Maven coordinates: org.apache.camel:camel-jslt
-     * 
-     * Syntax: <code>jslt:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     */
-    static JsltEndpointBuilder jslt(String path) {
+    static JsltEndpointBuilder endpointBuilder(String componentName, String path) {
         class JsltEndpointBuilderImpl extends AbstractEndpointBuilder implements JsltEndpointBuilder, AdvancedJsltEndpointBuilder {
             public JsltEndpointBuilderImpl(String path) {
-                super("jslt", path);
+                super(componentName, path);
             }
         }
         return new JsltEndpointBuilderImpl(path);

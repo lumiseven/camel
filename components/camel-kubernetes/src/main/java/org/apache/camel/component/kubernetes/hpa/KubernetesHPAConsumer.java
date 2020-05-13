@@ -18,9 +18,9 @@ package org.apache.camel.component.kubernetes.hpa;
 
 import java.util.concurrent.ExecutorService;
 
-import io.fabric8.kubernetes.api.model.DoneableHorizontalPodAutoscaler;
-import io.fabric8.kubernetes.api.model.HorizontalPodAutoscaler;
-import io.fabric8.kubernetes.api.model.HorizontalPodAutoscalerList;
+import io.fabric8.kubernetes.api.model.autoscaling.v1.DoneableHorizontalPodAutoscaler;
+import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscaler;
+import io.fabric8.kubernetes.api.model.autoscaling.v1.HorizontalPodAutoscalerList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import io.fabric8.kubernetes.client.Watch;
 import io.fabric8.kubernetes.client.Watcher;
@@ -91,7 +91,7 @@ public class KubernetesHPAConsumer extends DefaultConsumer {
         @Override
         public void run() {
             MixedOperation<HorizontalPodAutoscaler, HorizontalPodAutoscalerList, DoneableHorizontalPodAutoscaler, Resource<HorizontalPodAutoscaler, DoneableHorizontalPodAutoscaler>> w = getEndpoint()
-                .getKubernetesClient().autoscaling().horizontalPodAutoscalers();
+                .getKubernetesClient().autoscaling().v1().horizontalPodAutoscalers();
             if (ObjectHelper.isNotEmpty(getEndpoint().getKubernetesConfiguration().getNamespace())) {
                 w.inNamespace(getEndpoint().getKubernetesConfiguration().getNamespace());
             }

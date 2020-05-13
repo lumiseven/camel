@@ -26,6 +26,10 @@ public class RobotFrameworkComponentConfigurer extends PropertyConfigurerSupport
     public boolean configure(CamelContext camelContext, Object obj, String name, Object value, boolean ignoreCase) {
         RobotFrameworkComponent target = (RobotFrameworkComponent) obj;
         switch (ignoreCase ? name.toLowerCase() : name) {
+        case "allowcontextmapall":
+        case "allowContextMapAll": getOrCreateConfiguration(target).setAllowContextMapAll(property(camelContext, boolean.class, value)); return true;
+        case "allowtemplatefromheader":
+        case "allowTemplateFromHeader": getOrCreateConfiguration(target).setAllowTemplateFromHeader(property(camelContext, boolean.class, value)); return true;
         case "argumentfile":
         case "argumentFile": getOrCreateConfiguration(target).setArgumentFile(property(camelContext, java.io.File.class, value)); return true;
         case "basicpropertybinding":
@@ -114,6 +118,8 @@ public class RobotFrameworkComponentConfigurer extends PropertyConfigurerSupport
     @Override
     public Map<String, Object> getAllOptions(Object target) {
         Map<String, Object> answer = new CaseInsensitiveMap();
+        answer.put("allowContextMapAll", boolean.class);
+        answer.put("allowTemplateFromHeader", boolean.class);
         answer.put("argumentFile", java.io.File.class);
         answer.put("basicPropertyBinding", boolean.class);
         answer.put("bridgeErrorHandler", boolean.class);
@@ -170,6 +176,10 @@ public class RobotFrameworkComponentConfigurer extends PropertyConfigurerSupport
     public Object getOptionValue(Object obj, String name, boolean ignoreCase) {
         RobotFrameworkComponent target = (RobotFrameworkComponent) obj;
         switch (ignoreCase ? name.toLowerCase() : name) {
+        case "allowcontextmapall":
+        case "allowContextMapAll": return getOrCreateConfiguration(target).isAllowContextMapAll();
+        case "allowtemplatefromheader":
+        case "allowTemplateFromHeader": return getOrCreateConfiguration(target).isAllowTemplateFromHeader();
         case "argumentfile":
         case "argumentFile": return getOrCreateConfiguration(target).getArgumentFile();
         case "basicpropertybinding":

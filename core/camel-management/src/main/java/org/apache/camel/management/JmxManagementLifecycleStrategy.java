@@ -246,7 +246,7 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
         }
 
         try {
-            Object me = getManagementObjectStrategy().getManagedObjectForRouteController(camelContext);
+            Object me = getManagementObjectStrategy().getManagedObjectForRouteController(camelContext, camelContext.getRouteController());
             if (me == null) {
                 // endpoint should not be managed
                 return;
@@ -309,7 +309,7 @@ public class JmxManagementLifecycleStrategy extends ServiceSupport implements Li
         }
 
         try {
-            Object mc = getManagementObjectStrategy().getManagedObjectForRouteController(context);
+            Object mc = getManagementObjectStrategy().getManagedObjectForRouteController(context, context.getRouteController());
             // the context could have been removed already
             if (getManagementStrategy().isManaged(mc)) {
                 unmanageObject(mc);

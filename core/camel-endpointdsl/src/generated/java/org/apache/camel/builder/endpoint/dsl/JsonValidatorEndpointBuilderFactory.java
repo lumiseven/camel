@@ -40,6 +40,40 @@ public interface JsonValidatorEndpointBuilderFactory {
             return (AdvancedJsonValidatorEndpointBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsonValidatorEndpointBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default JsonValidatorEndpointBuilder allowContextMapAll(
+                String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
          * Sets whether to use resource content cache or not.
          * 
          * The option is a: <code>boolean</code> type.
@@ -313,32 +347,46 @@ public interface JsonValidatorEndpointBuilderFactory {
          * registry. bean will call a method on a bean to be used as the
          * resource. For bean you can specify the method name after dot, eg
          * bean:myBean.myMethod.
+         * 
+         * @param path resourceUri
          */
         default JsonValidatorEndpointBuilder jsonValidator(String path) {
-            return JsonValidatorEndpointBuilderFactory.jsonValidator(path);
+            return JsonValidatorEndpointBuilderFactory.endpointBuilder("json-validator", path);
+        }
+        /**
+         * JSON Schema Validator (camel-json-validator)
+         * Validate JSON payloads using NetworkNT JSON Schema.
+         * 
+         * Category: validation
+         * Since: 2.20
+         * Maven coordinates: org.apache.camel:camel-json-validator
+         * 
+         * Syntax: <code>json-validator:resourceUri</code>
+         * 
+         * Path parameter: resourceUri (required)
+         * Path to the resource. You can prefix with: classpath, file, http,
+         * ref, or bean. classpath, file and http loads the resource using these
+         * protocols (classpath is default). ref will lookup the resource in the
+         * registry. bean will call a method on a bean to be used as the
+         * resource. For bean you can specify the method name after dot, eg
+         * bean:myBean.myMethod.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path resourceUri
+         */
+        default JsonValidatorEndpointBuilder jsonValidator(
+                String componentName,
+                String path) {
+            return JsonValidatorEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * JSON Schema Validator (camel-json-validator)
-     * Validate JSON payloads using NetworkNT JSON Schema.
-     * 
-     * Category: validation
-     * Since: 2.20
-     * Maven coordinates: org.apache.camel:camel-json-validator
-     * 
-     * Syntax: <code>json-validator:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     */
-    static JsonValidatorEndpointBuilder jsonValidator(String path) {
+    static JsonValidatorEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class JsonValidatorEndpointBuilderImpl extends AbstractEndpointBuilder implements JsonValidatorEndpointBuilder, AdvancedJsonValidatorEndpointBuilder {
             public JsonValidatorEndpointBuilderImpl(String path) {
-                super("json-validator", path);
+                super(componentName, path);
             }
         }
         return new JsonValidatorEndpointBuilderImpl(path);

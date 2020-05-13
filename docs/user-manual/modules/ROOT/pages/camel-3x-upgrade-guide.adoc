@@ -564,9 +564,9 @@ should be rewritten as:
 
 == Upgrading Camel 3.1 to 3.2
 
-```=== JndiRegistry
+=== JndiRegistry
 
-The deprecated class `org.apache.camel.impl.JndiRegistry` was removed. `org.apache.camel.support.jndi.JndiBeanRepository` should be used instead.
+The deprecated class `org.apache.camel.impl.JndiRegistry` has been removed. The class `org.apache.camel.support.jndi.JndiBeanRepository` located in `org.apache.camel:camel-support` should be used instead.
 
 === Rest Configuration
 
@@ -1117,13 +1117,6 @@ JVM settings to be able to manage Camel remotely on localhost, port 9913:
 
 == Upgrading Camel 3.2 to 3.3
 
-=== API changes
-
-The dump model classes in package `org.apache.camel.support.dump` has been removed
-as they were not in use by Camel.
-
-In relation to the dump model classes removal, in camel-karaf the following commands were removed: `context-info`, `route-info`, `route-profile` and `route-step`.
-
 === camel-jackson
 
 The dependency on `jackson-module-jaxb-annotations` and the option `enableJaxbAnnotationModule` have been removed. To
@@ -1150,8 +1143,69 @@ context.getGlobalOptions().put(JacksonConstants.TYPE_CONVERTER_MODULE_CLASS_NAME
 this change affects also the Java DSL and as consequence the `enableJaxbAnnotationModule` option for the Json 
 DataFormat definition has been removed.
 
-=== Camel-Karaf
+=== Template components
 
-- In Camel 3.3.0, camel-undertow is not supported in OSGi anymore.
-- In Camel 3.3.0, camel-jgroups and camel-jgroups-raft are not supported in OSGi anymore.
-- In Camel 3.3.0, camel-infinispan is not supported in OSGi anymore.
+The template components which supports using a header to specify a dynamic resource to use as template, instead
+of the configured template on the endpoint is now enabled out of the box. If you want to use this feature then
+you must turn on `allowTemplateFromHeader=true` on either the endpoint or component level.
+
+This applies to the following templating components: camel-freemarker, camel-velocity, camel-mvel, camel-mustache,
+camel-string-template, camel-chunk, camel-jolt, camel-jslt, camel-robotframework.
+
+=== SupervisingRouteController
+
+The `SupervisingRouteController` has been refactored and its configuration has been simplified.
+And when configuring from spring boot, then the auto configuration parameters has
+been changed from `camel.supervising.controller` into the general `camel.springboot` which
+allows to share the same configuration across runtimes so its the same in Spring Boot, Camel Main,
+Camel K, Camel Quarkus, etc.
+
+=== Camel Karaf
+
+The following components is no longer supported in OSGi and has been removed from the Camel Karaf features file:
+camel-undertow, camel-jgroups, camel-jgroups-raft, camel-infinspan.
+
+=== camel-maven-plugin
+
+The `embedded` goal has been removed (was never really in use). Use `run` goal instead.
+
+=== API changes
+
+The dump model classes in package `org.apache.camel.support.dump` has been removed
+as they were not in use by Camel.
+
+In relation to the dump model classes removal, in camel-karaf the following commands were removed: `context-info`, `route-info`, `route-profile` and `route-step`.
+
+
+== Upgrading Camel 3.3 to 3.4
+
+=== Template components
+
+The template components which allows access to the current `Exchange` and `CamelContext` API
+from the context map available for templating has now been restricted to only the message body and headers.
+
+This option can be enabled (`allowContextMapAll=true`) for full access to the current Exchange and CamelContext.
+Doing so impose a potential security risk as this opens access to the full power of CamelContext API.
+
+This applies to the following templating components: camel-freemarker, camel-velocity, camel-mvel, camel-mustache,
+camel-string-template, camel-chunk, camel-robotframework.
+
+=== Using custom language in RouteBuilder
+
+The Java DSL `RouteBuilder` allows referring to a custom language as shown below:
+
+[source,java]
+----
+from("direct:start")
+    .filter(language("foo", "Bla bla bla"))
+      .to("mock:camel");
+----
+
+This functionality is seldom in use, as you would use the provided languages from Camel.
+If using, then the `language` method now requires a static import as shown below:
+
+[source,java]
+----
+import static org.apache.camel.builder.Builder.language;
+----
+

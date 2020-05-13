@@ -49,6 +49,7 @@ import static org.apache.camel.util.StringHelper.removeStartingCharacters;
  * JMS component which uses Spring JMS.
  */
 @Component("jms")
+@Metadata(excludeProperties = "bridgeErrorHandler")
 public class JmsComponent extends HeaderFilterStrategyComponent {
 
     private static final Logger LOG = LoggerFactory.getLogger(JmsComponent.class);
@@ -1008,7 +1009,7 @@ public class JmsComponent extends HeaderFilterStrategyComponent {
     // -------------------------------------------------------------------------
 
     @Override
-    protected void doStart() throws Exception {
+    protected void doInit() throws Exception {
         // only attempt to set connection factory if there is no transaction manager
         if (configuration.getConnectionFactory() == null && configuration.getOrCreateTransactionManager() == null && isAllowAutoWiredConnectionFactory()) {
             Set<ConnectionFactory> beans = getCamelContext().getRegistry().findByType(ConnectionFactory.class);
@@ -1033,6 +1034,8 @@ public class JmsComponent extends HeaderFilterStrategyComponent {
         if (getHeaderFilterStrategy() == null) {
             setHeaderFilterStrategy(new JmsHeaderFilterStrategy(configuration.isIncludeAllJMSXProperties()));
         }
+
+        super.doInit();
     }
 
     @Override

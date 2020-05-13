@@ -173,6 +173,33 @@ public interface KafkaEndpointBuilderFactory {
             return this;
         }
         /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option is a: <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointConsumerBuilder shutdownTimeout(int shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
+            return this;
+        }
+        /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option will be converted to a <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointConsumerBuilder shutdownTimeout(
+                String shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
+            return this;
+        }
+        /**
          * Whether to allow doing manual commits via KafkaManualCommit. If this
          * option is enabled then an instance of KafkaManualCommit is stored on
          * the Exchange message header, which allows end users to access this
@@ -1228,7 +1255,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLSv1.2,TLSv1.1,TLSv1
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointConsumerBuilder sslEnabledProtocols(
@@ -1287,7 +1314,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLS
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointConsumerBuilder sslProtocol(String sslProtocol) {
@@ -1594,6 +1621,33 @@ public interface KafkaEndpointBuilderFactory {
         default KafkaEndpointProducerBuilder reconnectBackoffMaxMs(
                 String reconnectBackoffMaxMs) {
             doSetProperty("reconnectBackoffMaxMs", reconnectBackoffMaxMs);
+            return this;
+        }
+        /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option is a: <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointProducerBuilder shutdownTimeout(int shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
+            return this;
+        }
+        /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option will be converted to a <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointProducerBuilder shutdownTimeout(
+                String shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
             return this;
         }
         /**
@@ -2814,7 +2868,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLSv1.2,TLSv1.1,TLSv1
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointProducerBuilder sslEnabledProtocols(
@@ -2912,7 +2966,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLS
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointProducerBuilder sslProtocol(String sslProtocol) {
@@ -3190,6 +3244,32 @@ public interface KafkaEndpointBuilderFactory {
             return this;
         }
         /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option is a: <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointBuilder shutdownTimeout(int shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
+            return this;
+        }
+        /**
+         * Timeout in milli seconds to wait gracefully for the consumer or
+         * producer to shutdown and terminate its worker threads.
+         * 
+         * The option will be converted to a <code>int</code> type.
+         * 
+         * Default: 30000
+         * Group: common
+         */
+        default KafkaEndpointBuilder shutdownTimeout(String shutdownTimeout) {
+            doSetProperty("shutdownTimeout", shutdownTimeout);
+            return this;
+        }
+        /**
          * URL of the Confluent Platform schema registry servers to use. The
          * format is host1:port1,host2:port2. This is known as
          * schema.registry.url in the Confluent Platform documentation. This
@@ -3439,7 +3519,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLSv1.2,TLSv1.1,TLSv1
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointBuilder sslEnabledProtocols(
@@ -3497,7 +3577,7 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
-         * Default: TLS
+         * Default: TLSv1.2
          * Group: security
          */
         default KafkaEndpointBuilder sslProtocol(String sslProtocol) {
@@ -3626,29 +3706,41 @@ public interface KafkaEndpointBuilderFactory {
          * Name of the topic to use. On the consumer you can use comma to
          * separate multiple topics. A producer can only send a message to a
          * single topic.
+         * 
+         * @param path topic
          */
         default KafkaEndpointBuilder kafka(String path) {
-            return KafkaEndpointBuilderFactory.kafka(path);
+            return KafkaEndpointBuilderFactory.endpointBuilder("kafka", path);
+        }
+        /**
+         * Kafka (camel-kafka)
+         * Sent and receive messages to/from an Apache Kafka broker.
+         * 
+         * Category: messaging
+         * Since: 2.13
+         * Maven coordinates: org.apache.camel:camel-kafka
+         * 
+         * Syntax: <code>kafka:topic</code>
+         * 
+         * Path parameter: topic (required)
+         * Name of the topic to use. On the consumer you can use comma to
+         * separate multiple topics. A producer can only send a message to a
+         * single topic.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path topic
+         */
+        default KafkaEndpointBuilder kafka(String componentName, String path) {
+            return KafkaEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * Kafka (camel-kafka)
-     * Sent and receive messages to/from an Apache Kafka broker.
-     * 
-     * Category: messaging
-     * Since: 2.13
-     * Maven coordinates: org.apache.camel:camel-kafka
-     * 
-     * Syntax: <code>kafka:topic</code>
-     * 
-     * Path parameter: topic (required)
-     * Name of the topic to use. On the consumer you can use comma to separate
-     * multiple topics. A producer can only send a message to a single topic.
-     */
-    static KafkaEndpointBuilder kafka(String path) {
+    static KafkaEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class KafkaEndpointBuilderImpl extends AbstractEndpointBuilder implements KafkaEndpointBuilder, AdvancedKafkaEndpointBuilder {
             public KafkaEndpointBuilderImpl(String path) {
-                super("kafka", path);
+                super(componentName, path);
             }
         }
         return new KafkaEndpointBuilderImpl(path);

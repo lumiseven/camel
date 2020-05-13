@@ -39,15 +39,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The GeoCoder producer.
+ * The GeoCoder producer for Google.
  */
-public class GeoCoderProducer extends DefaultProducer {
-    private static final Logger LOG = LoggerFactory.getLogger(GeoCoderProducer.class);
+public class GeoCoderGoogleProducer extends DefaultProducer {
+    private static final Logger LOG = LoggerFactory.getLogger(GeoCoderGoogleProducer.class);
 
     private GeoCoderEndpoint endpoint;
     private GeoApiContext context;
 
-    public GeoCoderProducer(GeoCoderEndpoint endpoint) {
+    public GeoCoderGoogleProducer(GeoCoderEndpoint endpoint) {
         super(endpoint);
         this.endpoint = endpoint;
     }
@@ -119,14 +119,14 @@ public class GeoCoderProducer extends DefaultProducer {
         GeolocationResult result = GeolocationApi.geolocate(context, payload).await();
 
         LOG.debug("Geolocation response {}", result);
-        //status
+        // status
         exchange.getIn().setHeader(GeoCoderConstants.STATUS, GeocoderStatus.OK);
 
-        //latlng
+        // latlng
         String resLatlng = result.location.toString();
         exchange.getIn().setHeader(GeoCoderConstants.LATLNG, resLatlng);
 
-        //address - reverse geocode
+        // address - reverse geocode
         LOG.debug("Geocode - reverse geocode for location {}", resLatlng);
         GeocodingResult[] results = GeocodingApi.reverseGeocode(context, result.location).await();
 
@@ -151,7 +151,7 @@ public class GeoCoderProducer extends DefaultProducer {
         if (!endpoint.isHeadersOnly()) {
             exchange.getIn().setBody(res);
         }
-        //no results
+        // no results
         if (res.length == 0) {
             exchange.getIn().setHeader(GeoCoderConstants.STATUS, GeocoderStatus.ZERO_RESULTS);
             return;
@@ -164,7 +164,7 @@ public class GeoCoderProducer extends DefaultProducer {
         // just grab the first element and its lat and lon
         setLatLngToExchangeHeader(first.geometry.location, exchange);
 
-        //additional details
+        // additional details
         AddressComponent country = getCountry(res);
         if (country != null) {
             exchange.getIn().setHeader(GeoCoderConstants.COUNTRY_SHORT, country.shortName);

@@ -21,8 +21,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.xml.bind.annotation.XmlTransient;
-
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Expression;
@@ -34,7 +32,6 @@ import org.apache.camel.spi.NormalizedEndpointUri;
 import org.apache.camel.support.NormalizedUri;
 import org.apache.camel.util.URISupport;
 
-@XmlTransient
 public class AbstractEndpointBuilder {
 
     protected final String scheme;
@@ -94,8 +91,8 @@ public class AbstractEndpointBuilder {
         String targetScheme = scheme;
         String targetPath = path;
         if (camelContext != null) {
-            targetScheme = camelContext.resolvePropertyPlaceholders(scheme);
-            targetPath = camelContext.resolvePropertyPlaceholders(path);
+            targetScheme = camelContext.resolvePropertyPlaceholders(targetScheme);
+            targetPath = camelContext.resolvePropertyPlaceholders(targetPath);
         }
 
         if (params.isEmpty()) {

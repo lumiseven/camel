@@ -26,7 +26,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,7 +52,6 @@ import org.apache.camel.Endpoint;
 import org.apache.camel.ErrorHandlerFactory;
 import org.apache.camel.ExchangeConstantProvider;
 import org.apache.camel.ExtendedCamelContext;
-import org.apache.camel.ExtendedStartupListener;
 import org.apache.camel.FailedToStartRouteException;
 import org.apache.camel.FluentProducerTemplate;
 import org.apache.camel.GlobalEndpointConfiguration;
@@ -129,7 +127,6 @@ import org.apache.camel.spi.ProcessorFactory;
 import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.ReactiveExecutor;
 import org.apache.camel.spi.Registry;
-import org.apache.camel.spi.ReifierStrategy;
 import org.apache.camel.spi.RestBindingJaxbDataFormatFactory;
 import org.apache.camel.spi.RestConfiguration;
 import org.apache.camel.spi.RestRegistry;
@@ -141,6 +138,7 @@ import org.apache.camel.spi.RouteStartupOrder;
 import org.apache.camel.spi.RuntimeEndpointRegistry;
 import org.apache.camel.spi.ShutdownStrategy;
 import org.apache.camel.spi.StreamCachingStrategy;
+import org.apache.camel.spi.SupervisingRouteController;
 import org.apache.camel.spi.Tracer;
 import org.apache.camel.spi.Transformer;
 import org.apache.camel.spi.TransformerRegistry;
@@ -338,6 +336,7 @@ public abstract class AbstractCamelContext extends BaseService
         this.startupListeners.add(deferStartupListener);
 
         setDefaultExtension(HealthCheckRegistry.class, this::createHealthCheckRegistry);
+        setDefaultExtension(RouteController.class, this::createRouteController);
 
         if (build) {
             try {
@@ -2503,8 +2502,8 @@ public abstract class AbstractCamelContext extends BaseService
 
     @Override
     public void doInit() throws Exception {
-        // Start the route controller
-        getRouteController();
+        // start the route controller
+        this.routeController = getRouteController();
         ServiceHelper.initService(this.routeController);
 
         // optimize - before starting routes lets check if event notifications is possible
@@ -4571,6 +4570,16 @@ public abstract class AbstractCamelContext extends BaseService
     @Override
     public RouteController getInternalRouteController() {
         return new RouteController() {
+            @Override
+            public SupervisingRouteController supervising() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public <T extends RouteController> T adapt(Class<T> type) {
+                return type.cast(this);
+            }
+
             @Override
             public Collection<Route> getControlledRoutes() {
                 return AbstractCamelContext.this.getRoutes();

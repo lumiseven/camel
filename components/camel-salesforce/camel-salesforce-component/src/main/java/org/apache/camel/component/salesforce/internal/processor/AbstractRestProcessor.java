@@ -67,21 +67,7 @@ public abstract class AbstractRestProcessor extends AbstractSalesforceProcessor 
 
     private RestClient restClient;
     private Map<String, Class<?>> classMap;
-
-    private final NotFoundBehaviour notFoundBehaviour;
-
-    public AbstractRestProcessor(SalesforceEndpoint endpoint) throws SalesforceException {
-        super(endpoint);
-
-        final SalesforceEndpointConfig configuration = endpoint.getConfiguration();
-        notFoundBehaviour = configuration.getNotFoundBehaviour();
-
-        final SalesforceComponent salesforceComponent = endpoint.getComponent();
-
-        this.restClient = salesforceComponent.createRestClientFor(endpoint);
-
-        this.classMap = endpoint.getComponent().getClassMap();
-    }
+    private NotFoundBehaviour notFoundBehaviour;
 
     // used in unit tests
     AbstractRestProcessor(final SalesforceEndpoint endpoint, final RestClient restClient, final Map<String, Class<?>> classMap) {
@@ -92,13 +78,30 @@ public abstract class AbstractRestProcessor extends AbstractSalesforceProcessor 
         notFoundBehaviour = configuration.getNotFoundBehaviour();
     }
 
+    public AbstractRestProcessor(SalesforceEndpoint endpoint) {
+        super(endpoint);
+    }
+
     @Override
-    public void start() {
+    protected void doStart() throws Exception {
+        super.doStart();
+
+        final SalesforceEndpointConfig configuration = endpoint.getConfiguration();
+        this.notFoundBehaviour = configuration.getNotFoundBehaviour();
+        final SalesforceComponent salesforceComponent = endpoint.getComponent();
+        if (restClient == null) {
+            this.restClient = salesforceComponent.createRestClientFor(endpoint);
+        }
+        if (classMap == null) {
+            this.classMap = endpoint.getComponent().getClassMap();
+        }
+
         ServiceHelper.startService(restClient);
     }
 
     @Override
-    public void stop() {
+    protected void doStop() throws Exception {
+        super.doStop();
         ServiceHelper.stopService(restClient);
     }
 

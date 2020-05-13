@@ -40,6 +40,74 @@ public interface FreemarkerEndpointBuilderFactory {
             return (AdvancedFreemarkerEndpointBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default FreemarkerEndpointBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default FreemarkerEndpointBuilder allowContextMapAll(
+                String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default FreemarkerEndpointBuilder allowTemplateFromHeader(
+                boolean allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: producer
+         */
+        default FreemarkerEndpointBuilder allowTemplateFromHeader(
+                String allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
          * Sets the Freemarker configuration to use.
          * 
          * The option is a: <code>freemarker.template.Configuration</code> type.
@@ -251,32 +319,46 @@ public interface FreemarkerEndpointBuilderFactory {
          * registry. bean will call a method on a bean to be used as the
          * resource. For bean you can specify the method name after dot, eg
          * bean:myBean.myMethod.
+         * 
+         * @param path resourceUri
          */
         default FreemarkerEndpointBuilder freemarker(String path) {
-            return FreemarkerEndpointBuilderFactory.freemarker(path);
+            return FreemarkerEndpointBuilderFactory.endpointBuilder("freemarker", path);
+        }
+        /**
+         * Freemarker (camel-freemarker)
+         * Transform messages using FreeMarker templates.
+         * 
+         * Category: transformation
+         * Since: 2.10
+         * Maven coordinates: org.apache.camel:camel-freemarker
+         * 
+         * Syntax: <code>freemarker:resourceUri</code>
+         * 
+         * Path parameter: resourceUri (required)
+         * Path to the resource. You can prefix with: classpath, file, http,
+         * ref, or bean. classpath, file and http loads the resource using these
+         * protocols (classpath is default). ref will lookup the resource in the
+         * registry. bean will call a method on a bean to be used as the
+         * resource. For bean you can specify the method name after dot, eg
+         * bean:myBean.myMethod.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path resourceUri
+         */
+        default FreemarkerEndpointBuilder freemarker(
+                String componentName,
+                String path) {
+            return FreemarkerEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * Freemarker (camel-freemarker)
-     * Transform messages using FreeMarker templates.
-     * 
-     * Category: transformation
-     * Since: 2.10
-     * Maven coordinates: org.apache.camel:camel-freemarker
-     * 
-     * Syntax: <code>freemarker:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     */
-    static FreemarkerEndpointBuilder freemarker(String path) {
+    static FreemarkerEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class FreemarkerEndpointBuilderImpl extends AbstractEndpointBuilder implements FreemarkerEndpointBuilder, AdvancedFreemarkerEndpointBuilder {
             public FreemarkerEndpointBuilderImpl(String path) {
-                super("freemarker", path);
+                super(componentName, path);
             }
         }
         return new FreemarkerEndpointBuilderImpl(path);

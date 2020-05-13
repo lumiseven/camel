@@ -119,7 +119,42 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * Domain for proxy NTML authentication.
+         * URL to the geocoder server. Mandatory for Nominatim server.
+         * 
+         * The option is a: <code>java.lang.String</code> type.
+         * 
+         * Group: producer
+         */
+        default GeoCoderEndpointBuilder serverUrl(String serverUrl) {
+            doSetProperty("serverUrl", serverUrl);
+            return this;
+        }
+        /**
+         * Type of GeoCoding server. Supported Nominatim and Google.
+         * 
+         * The option is a:
+         * <code>org.apache.camel.component.geocoder.GeoCoderType</code> type.
+         * 
+         * Group: producer
+         */
+        default GeoCoderEndpointBuilder type(GeoCoderType type) {
+            doSetProperty("type", type);
+            return this;
+        }
+        /**
+         * Type of GeoCoding server. Supported Nominatim and Google.
+         * 
+         * The option will be converted to a
+         * <code>org.apache.camel.component.geocoder.GeoCoderType</code> type.
+         * 
+         * Group: producer
+         */
+        default GeoCoderEndpointBuilder type(String type) {
+            doSetProperty("type", type);
+            return this;
+        }
+        /**
+         * Proxy Authentication Domain to access Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -130,7 +165,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * Optional host for proxy NTML authentication.
+         * Proxy Authentication Host to access Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -141,7 +176,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * Authentication method for proxy, either as Basic, Digest or NTLM.
+         * Authentication Method to Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -152,7 +187,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * Password for proxy authentication.
+         * Proxy Password to access GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -164,7 +199,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * Username for proxy authentication.
+         * Proxy Username to access GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -176,7 +211,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * The proxy host name.
+         * Proxy Host to access GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -187,7 +222,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * The proxy port number.
+         * Proxy Port to access GeoCoding server.
          * 
          * The option is a: <code>java.lang.Integer</code> type.
          * 
@@ -198,7 +233,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * The proxy port number.
+         * Proxy Port to access GeoCoding server.
          * 
          * The option will be converted to a <code>java.lang.Integer</code>
          * type.
@@ -210,7 +245,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use google apiKey.
+         * API Key to access Google. Mandatory for Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -221,7 +256,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use google premium with this client id.
+         * Client ID to access Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -232,7 +267,7 @@ public interface GeoCoderEndpointBuilderFactory {
             return this;
         }
         /**
-         * To use google premium with this client key.
+         * Client Key to access Google GeoCoding server.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -309,6 +344,15 @@ public interface GeoCoderEndpointBuilderFactory {
         }
     }
 
+    /**
+     * Proxy enum for
+     * <code>org.apache.camel.component.geocoder.GeoCoderType</code> enum.
+     */
+    enum GeoCoderType {
+        NOMINATIM,
+        GOOGLE;
+    }
+
     public interface GeoCoderBuilders {
         /**
          * Geocoder (camel-geocoder)
@@ -326,32 +370,45 @@ public interface GeoCoderEndpointBuilderFactory {
          * 
          * Path parameter: latlng
          * The geo latitude and longitude which should be prefixed with latlng:
+         * 
+         * @param path address:latlng
          */
         default GeoCoderEndpointBuilder geocoder(String path) {
-            return GeoCoderEndpointBuilderFactory.geocoder(path);
+            return GeoCoderEndpointBuilderFactory.endpointBuilder("geocoder", path);
+        }
+        /**
+         * Geocoder (camel-geocoder)
+         * Find geocodes (latitude and longitude) for a given address or the
+         * other way round.
+         * 
+         * Category: api,location
+         * Since: 2.12
+         * Maven coordinates: org.apache.camel:camel-geocoder
+         * 
+         * Syntax: <code>geocoder:address:latlng</code>
+         * 
+         * Path parameter: address
+         * The geo address which should be prefixed with address:
+         * 
+         * Path parameter: latlng
+         * The geo latitude and longitude which should be prefixed with latlng:
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path address:latlng
+         */
+        default GeoCoderEndpointBuilder geocoder(
+                String componentName,
+                String path) {
+            return GeoCoderEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * Geocoder (camel-geocoder)
-     * Find geocodes (latitude and longitude) for a given address or the other
-     * way round.
-     * 
-     * Category: api,location
-     * Since: 2.12
-     * Maven coordinates: org.apache.camel:camel-geocoder
-     * 
-     * Syntax: <code>geocoder:address:latlng</code>
-     * 
-     * Path parameter: address
-     * The geo address which should be prefixed with address:
-     * 
-     * Path parameter: latlng
-     * The geo latitude and longitude which should be prefixed with latlng:
-     */
-    static GeoCoderEndpointBuilder geocoder(String path) {
+    static GeoCoderEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class GeoCoderEndpointBuilderImpl extends AbstractEndpointBuilder implements GeoCoderEndpointBuilder, AdvancedGeoCoderEndpointBuilder {
             public GeoCoderEndpointBuilderImpl(String path) {
-                super("geocoder", path);
+                super(componentName, path);
             }
         }
         return new GeoCoderEndpointBuilderImpl(path);

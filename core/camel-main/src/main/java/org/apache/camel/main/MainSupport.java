@@ -16,8 +16,6 @@
  */
 package org.apache.camel.main;
 
-import java.util.LinkedList;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -66,7 +64,7 @@ public abstract class MainSupport extends BaseMainSupport {
 
     protected MainSupport(Class... configurationClasses) {
         this();
-        addConfigurationClass(configurationClasses);
+        configure().addConfigurationClass(configurationClasses);
     }
 
     protected MainSupport() {
@@ -77,6 +75,7 @@ public abstract class MainSupport extends BaseMainSupport {
      */
     public void run() throws Exception {
         if (!completed.get()) {
+            init();
             internalBeforeStart();
             // if we have an issue starting then propagate the exception to caller
             beforeStart();
@@ -328,43 +327,4 @@ public abstract class MainSupport extends BaseMainSupport {
             }
         }
     }
-
-    public abstract class Option {
-        private String abbreviation;
-        private String fullName;
-        private String description;
-
-        protected Option(String abbreviation, String fullName, String description) {
-            this.abbreviation = "-" + abbreviation;
-            this.fullName = "-" + fullName;
-            this.description = description;
-        }
-
-        public boolean processOption(String arg, LinkedList<String> remainingArgs) {
-            if (arg.equalsIgnoreCase(abbreviation) || fullName.startsWith(arg)) {
-                doProcess(arg, remainingArgs);
-                return true;
-            }
-            return false;
-        }
-
-        public String getAbbreviation() {
-            return abbreviation;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getFullName() {
-            return fullName;
-        }
-
-        public String getInformation() {
-            return "  " + getAbbreviation() + " or " + getFullName() + " = " + getDescription();
-        }
-
-        protected abstract void doProcess(String arg, LinkedList<String> remainingArgs);
-    }
-
 }

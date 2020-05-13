@@ -48,6 +48,74 @@ public interface RobotFrameworkEndpointBuilderFactory {
             return (AdvancedRobotFrameworkEndpointConsumerBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointConsumerBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointConsumerBuilder allowContextMapAll(
+                String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointConsumerBuilder allowTemplateFromHeader(
+                boolean allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointConsumerBuilder allowTemplateFromHeader(
+                String allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
          * A text file to read more arguments from.
          * 
          * The option is a: <code>java.io.File</code> type.
@@ -1416,6 +1484,74 @@ public interface RobotFrameworkEndpointBuilderFactory {
             return (AdvancedRobotFrameworkEndpointProducerBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointProducerBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointProducerBuilder allowContextMapAll(
+                String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointProducerBuilder allowTemplateFromHeader(
+                boolean allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointProducerBuilder allowTemplateFromHeader(
+                String allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
          * A text file to read more arguments from.
          * 
          * The option is a: <code>java.io.File</code> type.
@@ -2300,6 +2436,74 @@ public interface RobotFrameworkEndpointBuilderFactory {
             return (AdvancedRobotFrameworkEndpointBuilder) this;
         }
         /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointBuilder allowContextMapAll(
+                boolean allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Sets whether the context map should allow access to all details. By
+         * default only the message body and headers can be accessed. This
+         * option can be enabled for full access to the current Exchange and
+         * CamelContext. Doing so impose a potential security risk as this opens
+         * access to the full power of CamelContext API.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointBuilder allowContextMapAll(
+                String allowContextMapAll) {
+            doSetProperty("allowContextMapAll", allowContextMapAll);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option is a: <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointBuilder allowTemplateFromHeader(
+                boolean allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
+         * Whether to allow to use resource template from header or not (default
+         * false). Enabling this allows to specify dynamic templates via message
+         * header. However this can be seen as a potential security
+         * vulnerability if the header is coming from a malicious user, so use
+         * this with care.
+         * 
+         * The option will be converted to a <code>boolean</code> type.
+         * 
+         * Default: false
+         * Group: common
+         */
+        default RobotFrameworkEndpointBuilder allowTemplateFromHeader(
+                String allowTemplateFromHeader) {
+            doSetProperty("allowTemplateFromHeader", allowTemplateFromHeader);
+            return this;
+        }
+        /**
          * A text file to read more arguments from.
          * 
          * The option is a: <code>java.io.File</code> type.
@@ -3135,32 +3339,46 @@ public interface RobotFrameworkEndpointBuilderFactory {
          * registry. bean will call a method on a bean to be used as the
          * resource. For bean you can specify the method name after dot, eg
          * bean:myBean.myMethod.
+         * 
+         * @param path resourceUri
          */
         default RobotFrameworkEndpointBuilder robotframework(String path) {
-            return RobotFrameworkEndpointBuilderFactory.robotframework(path);
+            return RobotFrameworkEndpointBuilderFactory.endpointBuilder("robotframework", path);
+        }
+        /**
+         * Robot Framework (camel-robotframework)
+         * Pass camel exchanges to acceptence test written in Robot DSL.
+         * 
+         * Category: testing
+         * Since: 3.0
+         * Maven coordinates: org.apache.camel:camel-robotframework
+         * 
+         * Syntax: <code>robotframework:resourceUri</code>
+         * 
+         * Path parameter: resourceUri (required)
+         * Path to the resource. You can prefix with: classpath, file, http,
+         * ref, or bean. classpath, file and http loads the resource using these
+         * protocols (classpath is default). ref will lookup the resource in the
+         * registry. bean will call a method on a bean to be used as the
+         * resource. For bean you can specify the method name after dot, eg
+         * bean:myBean.myMethod.
+         * 
+         * @param componentName to use a custom component name for the endpoint
+         * instead of the default name
+         * @param path resourceUri
+         */
+        default RobotFrameworkEndpointBuilder robotframework(
+                String componentName,
+                String path) {
+            return RobotFrameworkEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
-    /**
-     * Robot Framework (camel-robotframework)
-     * Pass camel exchanges to acceptence test written in Robot DSL.
-     * 
-     * Category: testing
-     * Since: 3.0
-     * Maven coordinates: org.apache.camel:camel-robotframework
-     * 
-     * Syntax: <code>robotframework:resourceUri</code>
-     * 
-     * Path parameter: resourceUri (required)
-     * Path to the resource. You can prefix with: classpath, file, http, ref, or
-     * bean. classpath, file and http loads the resource using these protocols
-     * (classpath is default). ref will lookup the resource in the registry.
-     * bean will call a method on a bean to be used as the resource. For bean
-     * you can specify the method name after dot, eg bean:myBean.myMethod.
-     */
-    static RobotFrameworkEndpointBuilder robotframework(String path) {
+    static RobotFrameworkEndpointBuilder endpointBuilder(
+            String componentName,
+            String path) {
         class RobotFrameworkEndpointBuilderImpl extends AbstractEndpointBuilder implements RobotFrameworkEndpointBuilder, AdvancedRobotFrameworkEndpointBuilder {
             public RobotFrameworkEndpointBuilderImpl(String path) {
-                super("robotframework", path);
+                super(componentName, path);
             }
         }
         return new RobotFrameworkEndpointBuilderImpl(path);

@@ -17,6 +17,7 @@
 package org.apache.camel.component.kafka;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 import java.util.stream.StreamSupport;
@@ -62,6 +63,8 @@ public class KafkaConsumerFullTest extends BaseEmbeddedKafkaTest {
         if (producer != null) {
             producer.close();
         }
+        // clean all test topics
+        kafkaAdminClient.deleteTopics(Collections.singletonList(TOPIC));
     }
 
     @Override
@@ -102,6 +105,23 @@ public class KafkaConsumerFullTest extends BaseEmbeddedKafkaTest {
         Map<String, Object> headers = to.getExchanges().get(0).getIn().getHeaders();
         assertFalse("Should not receive skipped header", headers.containsKey(skippedHeaderKey));
         assertTrue("Should receive propagated header", headers.containsKey(propagatedHeaderKey));
+    }
+
+    @Test
+    public void kafkaRecordSpecificHeadersAreNotOverwritten() throws InterruptedException, IOException {
+        String propagatedHeaderKey = KafkaConstants.TOPIC;
+        byte[] propagatedHeaderValue = "propagated incorrect topic".getBytes();
+        to.expectedHeaderReceived(KafkaConstants.TOPIC, TOPIC);
+
+        ProducerRecord<String, String> data = new ProducerRecord<>(TOPIC, "1", "message");
+        data.headers().add(new RecordHeader(propagatedHeaderKey, propagatedHeaderValue));
+        producer.send(data);
+
+        to.assertIsSatisfied(3000);
+
+        Map<String, Object> headers = to.getExchanges().get(0).getIn().getHeaders();
+        assertTrue("Should receive KafkaEndpoint populated kafka.TOPIC header", headers.containsKey(KafkaConstants.TOPIC));
+        assertEquals("Topic name received", TOPIC, headers.get(KafkaConstants.TOPIC));
     }
 
     @Test

@@ -27,7 +27,7 @@ public interface ReactiveExecutor {
     String FACTORY = "reactive-executor";
 
     /**
-     * Schedules the task to be run
+     * Schedules the task to be run (fairly)
      *
      * @param runnable    the task
      */
@@ -41,7 +41,7 @@ public interface ReactiveExecutor {
     void scheduleMain(Runnable runnable);
 
     /**
-     * Schedules the task to run synchronously
+     * Schedules the task to run synchronously (current thread)
      *
      * @param runnable    the task
      */

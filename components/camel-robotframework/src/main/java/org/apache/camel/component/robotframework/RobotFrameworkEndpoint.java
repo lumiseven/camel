@@ -57,6 +57,16 @@ public class RobotFrameworkEndpoint extends ResourceEndpoint {
     }
 
     @Override
+    public boolean isAllowContextMapAll() {
+        return configuration.isAllowContextMapAll();
+    }
+
+    @Override
+    public void setAllowContextMapAll(boolean allowContextMapAll) {
+        configuration.setAllowContextMapAll(allowContextMapAll);
+    }
+
+    @Override
     protected void onExchange(Exchange exchange) throws Exception {
         // create robot arguments to pass
         RobotFrameworkArguments generatedArguments = new RobotFrameworkArguments();
@@ -102,7 +112,7 @@ public class RobotFrameworkEndpoint extends ResourceEndpoint {
         generatedArguments.addListToArguments(Arrays.asList((configuration.getNonCriticalTags() != null ? configuration.getNonCriticalTags() : "").split(",")), "-n");
 
         // create variables from camel exchange to pass into robot
-        List<String> variables = RobotFrameworkCamelUtils.createRobotVariablesFromCamelExchange(exchange);
+        List<String> variables = RobotFrameworkCamelUtils.createRobotVariablesFromCamelExchange(exchange, isAllowContextMapAll());
         exchange.getIn().setHeader(RobotFrameworkCamelConstants.CAMEL_ROBOT_VARIABLES, variables);
         generatedArguments.addListToArguments(variables, "-v");
 
@@ -121,7 +131,10 @@ public class RobotFrameworkEndpoint extends ResourceEndpoint {
         ObjectHelper.notNull(path, "resourceUri");
         log.debug("RobotFrameworkEndpoint resourceUri:{}", path);
 
-        String newResourceUri = exchange.getIn().getHeader(RobotFrameworkCamelConstants.CAMEL_ROBOT_RESOURCE_URI, String.class);
+        String newResourceUri = null;
+        if (getConfiguration().isAllowTemplateFromHeader()) {
+            newResourceUri = exchange.getIn().getHeader(RobotFrameworkCamelConstants.CAMEL_ROBOT_RESOURCE_URI, String.class);
+        }
         if (newResourceUri != null) {
             exchange.getIn().removeHeader(RobotFrameworkCamelConstants.CAMEL_ROBOT_RESOURCE_URI);
             log.debug("{} set to {} setting resourceUri to pass robotframework", RobotFrameworkCamelConstants.CAMEL_ROBOT_RESOURCE_URI, newResourceUri);

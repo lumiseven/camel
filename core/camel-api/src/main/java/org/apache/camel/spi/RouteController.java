@@ -30,6 +30,21 @@ import org.apache.camel.StaticService;
 public interface RouteController extends CamelContextAware, StaticService {
 
     /**
+     * Enables supervising {@link RouteController}.
+     */
+    SupervisingRouteController supervising();
+
+    /**
+     * Adapts this {@link org.apache.camel.spi.RouteController} to the specialized type.
+     * <p/>
+     * For example to adapt to <tt>SupervisingRouteController</tt>.
+     *
+     * @param type the type to adapt to
+     * @return this {@link org.apache.camel.CamelContext} adapted to the given type
+     */
+    <T extends RouteController> T adapt(Class<T> type);
+
+    /**
      * Return the list of routes controlled by this controller.
      *
      * @return the list of controlled routes
@@ -145,19 +160,4 @@ public interface RouteController extends CamelContextAware, StaticService {
      */
     void resumeRoute(String routeId) throws Exception;
 
-    /**
-     * Access the underlying concrete RouteController implementation.
-     *
-     * @param clazz the proprietary class or interface of the underlying concrete RouteController.
-     * @return an instance of the underlying concrete RouteController as the required type.
-     */
-    default <T extends RouteController> T unwrap(Class<T> clazz) {
-        if (RouteController.class.isAssignableFrom(clazz)) {
-            return clazz.cast(this);
-        }
-
-        throw new IllegalArgumentException(
-            "Unable to unwrap this RouteController type (" + getClass() + ") to the required type (" + clazz + ")"
-        );
-    }
 }

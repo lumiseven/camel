@@ -47,6 +47,10 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "BeanIntrospectionLoggingLevel": target.setBeanIntrospectionLoggingLevel(property(camelContext, org.apache.camel.LoggingLevel.class, value)); return true;
         case "caseinsensitiveheaders":
         case "CaseInsensitiveHeaders": target.setCaseInsensitiveHeaders(property(camelContext, boolean.class, value)); return true;
+        case "configurationclasses":
+        case "ConfigurationClasses": target.setConfigurationClasses(property(camelContext, java.lang.String.class, value)); return true;
+        case "configurations":
+        case "Configurations": target.setConfigurations(property(camelContext, java.util.List.class, value)); return true;
         case "consumertemplatecachesize":
         case "ConsumerTemplateCacheSize": target.setConsumerTemplateCacheSize(property(camelContext, int.class, value)); return true;
         case "durationhitexitcode":
@@ -101,10 +105,34 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "PackageScanRouteBuilders": target.setPackageScanRouteBuilders(property(camelContext, java.lang.String.class, value)); return true;
         case "producertemplatecachesize":
         case "ProducerTemplateCacheSize": target.setProducerTemplateCacheSize(property(camelContext, int.class, value)); return true;
+        case "routecontrollerbackoffdelay":
+        case "RouteControllerBackOffDelay": target.setRouteControllerBackOffDelay(property(camelContext, long.class, value)); return true;
+        case "routecontrollerbackoffmaxattempts":
+        case "RouteControllerBackOffMaxAttempts": target.setRouteControllerBackOffMaxAttempts(property(camelContext, long.class, value)); return true;
+        case "routecontrollerbackoffmaxdelay":
+        case "RouteControllerBackOffMaxDelay": target.setRouteControllerBackOffMaxDelay(property(camelContext, long.class, value)); return true;
+        case "routecontrollerbackoffmaxelapsedtime":
+        case "RouteControllerBackOffMaxElapsedTime": target.setRouteControllerBackOffMaxElapsedTime(property(camelContext, long.class, value)); return true;
+        case "routecontrollerbackoffmultiplier":
+        case "RouteControllerBackOffMultiplier": target.setRouteControllerBackOffMultiplier(property(camelContext, double.class, value)); return true;
+        case "routecontrollerexcluderoutes":
+        case "RouteControllerExcludeRoutes": target.setRouteControllerExcludeRoutes(property(camelContext, java.lang.String.class, value)); return true;
+        case "routecontrollerincluderoutes":
+        case "RouteControllerIncludeRoutes": target.setRouteControllerIncludeRoutes(property(camelContext, java.lang.String.class, value)); return true;
+        case "routecontrollerinitialdelay":
+        case "RouteControllerInitialDelay": target.setRouteControllerInitialDelay(property(camelContext, long.class, value)); return true;
+        case "routecontrollersuperviseenabled":
+        case "RouteControllerSuperviseEnabled": target.setRouteControllerSuperviseEnabled(property(camelContext, boolean.class, value)); return true;
+        case "routecontrollerthreadpoolsize":
+        case "RouteControllerThreadPoolSize": target.setRouteControllerThreadPoolSize(property(camelContext, int.class, value)); return true;
         case "routefilterexcludepattern":
         case "RouteFilterExcludePattern": target.setRouteFilterExcludePattern(property(camelContext, java.lang.String.class, value)); return true;
         case "routefilterincludepattern":
         case "RouteFilterIncludePattern": target.setRouteFilterIncludePattern(property(camelContext, java.lang.String.class, value)); return true;
+        case "routesbuilderclasses":
+        case "RoutesBuilderClasses": target.setRoutesBuilderClasses(property(camelContext, java.lang.String.class, value)); return true;
+        case "routesbuilders":
+        case "RoutesBuilders": target.setRoutesBuilders(property(camelContext, java.util.List.class, value)); return true;
         case "routescollectorenabled":
         case "RoutesCollectorEnabled": target.setRoutesCollectorEnabled(property(camelContext, boolean.class, value)); return true;
         case "shutdownloginflightexchangesontimeout":
@@ -174,6 +202,8 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         answer.put("BeanIntrospectionExtendedStatistics", boolean.class);
         answer.put("BeanIntrospectionLoggingLevel", org.apache.camel.LoggingLevel.class);
         answer.put("CaseInsensitiveHeaders", boolean.class);
+        answer.put("ConfigurationClasses", java.lang.String.class);
+        answer.put("Configurations", java.util.List.class);
         answer.put("ConsumerTemplateCacheSize", int.class);
         answer.put("DurationHitExitCode", int.class);
         answer.put("DurationMaxIdleSeconds", int.class);
@@ -201,8 +231,20 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         answer.put("Name", java.lang.String.class);
         answer.put("PackageScanRouteBuilders", java.lang.String.class);
         answer.put("ProducerTemplateCacheSize", int.class);
+        answer.put("RouteControllerBackOffDelay", long.class);
+        answer.put("RouteControllerBackOffMaxAttempts", long.class);
+        answer.put("RouteControllerBackOffMaxDelay", long.class);
+        answer.put("RouteControllerBackOffMaxElapsedTime", long.class);
+        answer.put("RouteControllerBackOffMultiplier", double.class);
+        answer.put("RouteControllerExcludeRoutes", java.lang.String.class);
+        answer.put("RouteControllerIncludeRoutes", java.lang.String.class);
+        answer.put("RouteControllerInitialDelay", long.class);
+        answer.put("RouteControllerSuperviseEnabled", boolean.class);
+        answer.put("RouteControllerThreadPoolSize", int.class);
         answer.put("RouteFilterExcludePattern", java.lang.String.class);
         answer.put("RouteFilterIncludePattern", java.lang.String.class);
+        answer.put("RoutesBuilderClasses", java.lang.String.class);
+        answer.put("RoutesBuilders", java.util.List.class);
         answer.put("RoutesCollectorEnabled", boolean.class);
         answer.put("ShutdownLogInflightExchangesOnTimeout", boolean.class);
         answer.put("ShutdownNowOnTimeout", boolean.class);
@@ -262,6 +304,10 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "BeanIntrospectionLoggingLevel": return target.getBeanIntrospectionLoggingLevel();
         case "caseinsensitiveheaders":
         case "CaseInsensitiveHeaders": return target.isCaseInsensitiveHeaders();
+        case "configurationclasses":
+        case "ConfigurationClasses": return target.getConfigurationClasses();
+        case "configurations":
+        case "Configurations": return target.getConfigurations();
         case "consumertemplatecachesize":
         case "ConsumerTemplateCacheSize": return target.getConsumerTemplateCacheSize();
         case "durationhitexitcode":
@@ -316,10 +362,34 @@ public class MainConfigurationPropertiesConfigurer extends org.apache.camel.supp
         case "PackageScanRouteBuilders": return target.getPackageScanRouteBuilders();
         case "producertemplatecachesize":
         case "ProducerTemplateCacheSize": return target.getProducerTemplateCacheSize();
+        case "routecontrollerbackoffdelay":
+        case "RouteControllerBackOffDelay": return target.getRouteControllerBackOffDelay();
+        case "routecontrollerbackoffmaxattempts":
+        case "RouteControllerBackOffMaxAttempts": return target.getRouteControllerBackOffMaxAttempts();
+        case "routecontrollerbackoffmaxdelay":
+        case "RouteControllerBackOffMaxDelay": return target.getRouteControllerBackOffMaxDelay();
+        case "routecontrollerbackoffmaxelapsedtime":
+        case "RouteControllerBackOffMaxElapsedTime": return target.getRouteControllerBackOffMaxElapsedTime();
+        case "routecontrollerbackoffmultiplier":
+        case "RouteControllerBackOffMultiplier": return target.getRouteControllerBackOffMultiplier();
+        case "routecontrollerexcluderoutes":
+        case "RouteControllerExcludeRoutes": return target.getRouteControllerExcludeRoutes();
+        case "routecontrollerincluderoutes":
+        case "RouteControllerIncludeRoutes": return target.getRouteControllerIncludeRoutes();
+        case "routecontrollerinitialdelay":
+        case "RouteControllerInitialDelay": return target.getRouteControllerInitialDelay();
+        case "routecontrollersuperviseenabled":
+        case "RouteControllerSuperviseEnabled": return target.isRouteControllerSuperviseEnabled();
+        case "routecontrollerthreadpoolsize":
+        case "RouteControllerThreadPoolSize": return target.getRouteControllerThreadPoolSize();
         case "routefilterexcludepattern":
         case "RouteFilterExcludePattern": return target.getRouteFilterExcludePattern();
         case "routefilterincludepattern":
         case "RouteFilterIncludePattern": return target.getRouteFilterIncludePattern();
+        case "routesbuilderclasses":
+        case "RoutesBuilderClasses": return target.getRoutesBuilderClasses();
+        case "routesbuilders":
+        case "RoutesBuilders": return target.getRoutesBuilders();
         case "routescollectorenabled":
         case "RoutesCollectorEnabled": return target.isRoutesCollectorEnabled();
         case "shutdownloginflightexchangesontimeout":

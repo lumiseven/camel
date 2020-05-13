@@ -64,7 +64,6 @@ import org.apache.camel.support.service.ServiceHelper;
 import org.apache.camel.util.CastUtils;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.KeyValueHolder;
-import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.StopWatch;
 import org.apache.camel.util.concurrent.AsyncCompletionService;
 import org.slf4j.Logger;
@@ -75,8 +74,6 @@ import static org.apache.camel.util.ObjectHelper.notNull;
 /**
  * Implements the Multicast pattern to send a message exchange to a number of
  * endpoints, each endpoint receiving a copy of the message exchange.
- *
- * @see Pipeline
  */
 public class MulticastProcessor extends AsyncProcessorSupport implements Navigate<Processor>, Traceable, IdAware, RouteIdAware {
 
@@ -179,9 +176,9 @@ public class MulticastProcessor extends AsyncProcessorSupport implements Navigat
                               ExecutorService executorService, boolean shutdownExecutorService, boolean streaming, boolean stopOnException, long timeout, Processor onPrepare,
                               boolean shareUnitOfWork, boolean parallelAggregate) {
         this(camelContext, route, processors, aggregationStrategy, parallelProcessing, executorService, shutdownExecutorService, streaming, stopOnException, timeout, onPrepare,
-             shareUnitOfWork, parallelAggregate, false);
+                shareUnitOfWork, parallelAggregate, false);
     }
-    
+
     public MulticastProcessor(CamelContext camelContext, Route route, Collection<Processor> processors, AggregationStrategy aggregationStrategy,
                               boolean parallelProcessing, ExecutorService executorService, boolean shutdownExecutorService, boolean streaming,
                               boolean stopOnException, long timeout, Processor onPrepare, boolean shareUnitOfWork,
@@ -262,7 +259,7 @@ public class MulticastProcessor extends AsyncProcessorSupport implements Navigat
             return true;
         }
 
-        MulticastState state = new MulticastState(exchange, pairs, callback);
+        MulticastTask state = new MulticastTask(exchange, pairs, callback);
         if (isParallelProcessing()) {
             executorService.submit(() -> reactiveExecutor.schedule(state));
         } else {
@@ -287,7 +284,7 @@ public class MulticastProcessor extends AsyncProcessorSupport implements Navigat
         }
     }
 
-    protected class MulticastState implements Runnable {
+    protected class MulticastTask implements Runnable {
 
         final Exchange original;
         final Iterable<ProcessorExchangePair> pairs;
@@ -301,7 +298,7 @@ public class MulticastProcessor extends AsyncProcessorSupport implements Navigat
         final AtomicBoolean allSent = new AtomicBoolean();
         final AtomicBoolean done = new AtomicBoolean();
 
-        MulticastState(Exchange original, Iterable<ProcessorExchangePair> pairs, AsyncCallback callback) {
+        MulticastTask(Exchange original, Iterable<ProcessorExchangePair> pairs, AsyncCallback callback) {
             this.original = original;
             this.pairs = pairs;
             this.callback = callback;
@@ -661,10 +658,10 @@ public class MulticastProcessor extends AsyncProcessorSupport implements Navigat
             }
 
             // If the multi-cast processor has an aggregation strategy
-            // then the StreamCache created by the child routes must not be 
-            // closed by the unit of work of the child route, but by the unit of 
+            // then the StreamCache created by the child routes must not be
+            // closed by the unit of work of the child route, but by the unit of
             // work of the parent route or grand parent route or grand grand parent route ...(in case of nesting).
-            // Set therefore the unit of work of the  parent route as stream cache unit of work, 
+            // Set therefore the unit of work of the  parent route as stream cache unit of work,
             // if it is not already set.
             if (copy.getProperty(Exchange.STREAM_CACHE_UNIT_OF_WORK) == null) {
                 copy.setProperty(Exchange.STREAM_CACHE_UNIT_OF_WORK, exchange.getUnitOfWork());

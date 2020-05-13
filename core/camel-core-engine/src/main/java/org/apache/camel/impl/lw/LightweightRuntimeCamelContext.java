@@ -117,6 +117,7 @@ import org.apache.camel.spi.RouteStartupOrder;
 import org.apache.camel.spi.RuntimeEndpointRegistry;
 import org.apache.camel.spi.ShutdownStrategy;
 import org.apache.camel.spi.StreamCachingStrategy;
+import org.apache.camel.spi.SupervisingRouteController;
 import org.apache.camel.spi.Tracer;
 import org.apache.camel.spi.Transformer;
 import org.apache.camel.spi.TransformerRegistry;
@@ -1749,61 +1750,85 @@ public class LightweightRuntimeCamelContext implements ExtendedCamelContext, Cat
     public RouteController getInternalRouteController() {
         return new RouteController() {
             @Override
+            public SupervisingRouteController supervising() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public <T extends RouteController> T adapt(Class<T> type) {
+                return type.cast(this);
+            }
+
+            @Override
             public Collection<Route> getControlledRoutes() {
                 return routes;
             }
+
             @Override
             public void startAllRoutes() throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public boolean isStartingRoutes() {
                 return false;
             }
+
             @Override
             public ServiceStatus getRouteStatus(String routeId) {
                 return ServiceStatus.Started;
             }
+
             @Override
             public void startRoute(String routeId) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void stopRoute(String routeId) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void stopRoute(String routeId, long timeout, TimeUnit timeUnit) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public boolean stopRoute(String routeId, long timeout, TimeUnit timeUnit, boolean abortAfterTimeout) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void suspendRoute(String routeId) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void suspendRoute(String routeId, long timeout, TimeUnit timeUnit) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void resumeRoute(String routeId) throws Exception {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void setCamelContext(CamelContext camelContext) {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public CamelContext getCamelContext() {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void start() {
                 throw new UnsupportedOperationException();
             }
+
             @Override
             public void stop() {
                 throw new UnsupportedOperationException();

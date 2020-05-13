@@ -16,6 +16,8 @@
  */
 package org.apache.camel.component.robotframework;
 
+import java.io.File;
+
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -111,6 +113,9 @@ public class RobotFrameworkComponentTest extends CamelTestSupport {
     protected RouteBuilder createRouteBuilder() throws Exception {
         return new RouteBuilder() {
             public void configure() {
+                RobotFrameworkComponent rf = context.getComponent("robotframework", RobotFrameworkComponent.class);
+                rf.getConfiguration().setOutputDirectory(new File("target"));
+
                 from("direct:setVariableCamelBody").to("robotframework:src/test/resources/org/apache/camel/component/robotframework/set_variable_camel_body.robot?xunitFile=target/out.xml")
                     .to("mock:result");
 
@@ -125,12 +130,12 @@ public class RobotFrameworkComponentTest extends CamelTestSupport {
                 from("direct:setVariableCamelBodyAndHeader").to("robotframework:src/test/resources/org/apache/camel/component/robotframework/set_variable_camel_header.robot?xunitFile=target/out.xml")
                     .to("mock:resultHeader");
                 
-                from("direct:setVariableCamelBodyAndProperty").to("robotframework:src/test/resources/org/apache/camel/component/robotframework/set_variable_camel_property.robot?xunitFile=target/out.xml")
+                from("direct:setVariableCamelBodyAndProperty").to("robotframework:src/test/resources/org/apache/camel/component/robotframework/set_variable_camel_property.robot?xunitFile=target/out.xml&allowContextMapAll=true")
                     .to("mock:resultProperty");
                 
                 from("direct:setVariableCamelBodyResourceUri")
                     .setHeader(RobotFrameworkCamelConstants.CAMEL_ROBOT_RESOURCE_URI).constant("src/test/resources/org/apache/camel/component/robotframework/set_variable_camel_body.robot")
-                    .to("robotframework:dummy?xunitFile=target/out.xml")
+                    .to("robotframework:dummy?xunitFile=target/out.xml&allowTemplateFromHeader=true")
                     .to("mock:resultResourceUri");
             }
         };

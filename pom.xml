@@ -28,7 +28,7 @@
 
     <groupId>org.apache.camel</groupId>
     <artifactId>camel</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Camel</name>
@@ -126,7 +126,7 @@
         <errorprone-version>2.5</errorprone-version>
         <mycila-license-version>3.0</mycila-license-version>
         <gmavenplus-plugin-version>1.6.2</gmavenplus-plugin-version>
-        <groovy-version>3.0.3</groovy-version>
+        <groovy-version>3.0.4</groovy-version>
 
         <camel.javadoc.offline>false</camel.javadoc.offline>
     </properties>
@@ -323,6 +323,7 @@
                             </exclude>
                             <exclude>**/META-INF/MANIFEST.MF</exclude>
                             <exclude>**/openapi.yaml</exclude>
+                            <exclude>**/ignite/work/**/*</exclude>
                             <!-- Maven Wrapper -->
                             <exclude>.mvn/**/*</exclude>
                         </excludes>

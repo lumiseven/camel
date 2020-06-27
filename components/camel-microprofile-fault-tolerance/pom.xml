@@ -23,14 +23,14 @@
     <parent>
         <groupId>org.apache.camel</groupId>
         <artifactId>components</artifactId>
-        <version>3.3.0-SNAPSHOT</version>
+        <version>3.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-microprofile-fault-tolerance</artifactId>
     <packaging>jar</packaging>
 
-    <name>Camel :: Microprofile :: Fault Tolerance</name>
-    <description>Circuit Breaker EIP using Microprofile Fault Tolerance</description>
+    <name>Camel :: MicroProfile :: Fault Tolerance</name>
+    <description>Circuit Breaker EIP using MicroProfile Fault Tolerance</description>
 
     <properties>
         <firstVersion>3.3.0</firstVersion>
@@ -60,6 +60,11 @@
         <dependency>
             <groupId>org.apache.camel</groupId>
             <artifactId>camel-test-spring</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-management</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

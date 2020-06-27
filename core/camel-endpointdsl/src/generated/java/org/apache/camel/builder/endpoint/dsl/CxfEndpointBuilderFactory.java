@@ -689,12 +689,16 @@ public interface CxfEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedCxfEndpointConsumerBuilder properties(
-                Map<String, Object> properties) {
-            doSetProperty("properties", properties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("properties", "properties." + key, value);
             return this;
         }
         /**
@@ -702,14 +706,16 @@ public interface CxfEndpointBuilderFactory {
          * For example to turn on stacktraces in SOAP faults,
          * properties.faultStackTraceEnabled=true.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedCxfEndpointConsumerBuilder properties(String properties) {
-            doSetProperty("properties", properties);
+        default AdvancedCxfEndpointConsumerBuilder properties(Map values) {
+            doSetMultiValueProperties("properties", "properties.", values);
             return this;
         }
         /**
@@ -1498,12 +1504,16 @@ public interface CxfEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedCxfEndpointProducerBuilder properties(
-                Map<String, Object> properties) {
-            doSetProperty("properties", properties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("properties", "properties." + key, value);
             return this;
         }
         /**
@@ -1511,14 +1521,16 @@ public interface CxfEndpointBuilderFactory {
          * For example to turn on stacktraces in SOAP faults,
          * properties.faultStackTraceEnabled=true.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedCxfEndpointProducerBuilder properties(String properties) {
-            doSetProperty("properties", properties);
+        default AdvancedCxfEndpointProducerBuilder properties(Map values) {
+            doSetMultiValueProperties("properties", "properties.", values);
             return this;
         }
         /**
@@ -2128,12 +2140,14 @@ public interface CxfEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedCxfEndpointBuilder properties(
-                Map<String, Object> properties) {
-            doSetProperty("properties", properties);
+        default AdvancedCxfEndpointBuilder properties(String key, Object value) {
+            doSetMultiValueProperty("properties", "properties." + key, value);
             return this;
         }
         /**
@@ -2141,14 +2155,16 @@ public interface CxfEndpointBuilderFactory {
          * For example to turn on stacktraces in SOAP faults,
          * properties.faultStackTraceEnabled=true.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the properties(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedCxfEndpointBuilder properties(String properties) {
-            doSetProperty("properties", properties);
+        default AdvancedCxfEndpointBuilder properties(Map values) {
+            doSetMultiValueProperties("properties", "properties.", values);
             return this;
         }
         /**

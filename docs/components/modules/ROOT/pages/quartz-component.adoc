@@ -95,8 +95,8 @@ with the following path and query parameters:
 [width="100%",cols="2,5,^1,2",options="header"]
 |===
 | Name | Description | Default | Type
-| *groupName* | The quartz group name to use. The combination of group name and timer name should be unique. | Camel | String
-| *triggerName* | *Required* The quartz timer name to use. The combination of group name and timer name should be unique. |  | String
+| *groupName* | The quartz group name to use. The combination of group name and trigger name should be unique. | Camel | String
+| *triggerName* | *Required* The quartz trigger name to use. The combination of group name and trigger name should be unique. |  | String
 |===
 
 

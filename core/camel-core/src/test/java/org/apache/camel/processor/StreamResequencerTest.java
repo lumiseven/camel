@@ -31,7 +31,9 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.impl.engine.DefaultRoute;
 import org.apache.camel.processor.errorhandler.DefaultErrorHandler;
 import org.apache.camel.support.service.ServiceHelper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class StreamResequencerTest extends ContextTestSupport {
 
@@ -96,7 +98,7 @@ public class StreamResequencerTest extends ContextTestSupport {
         return new RouteBuilder() {
             public void configure() {
                 // START SNIPPET: example
-                from("direct:start").resequence(header("seqnum")).stream().timeout(100).deliveryAttemptInterval(10).to("mock:result");
+                from("direct:start").resequence(header("seqnum")).stream().timeout(1000).deliveryAttemptInterval(10).to("mock:result");
                 // END SNIPPET: example
             }
         };
@@ -114,7 +116,7 @@ public class StreamResequencerTest extends ContextTestSupport {
 
     protected void doTestStreamResequencerType() throws Exception {
         List<Route> list = getRouteList(createRouteBuilder());
-        assertEquals("Number of routes created: " + list, 1, list.size());
+        assertEquals(1, list.size(), "Number of routes created: " + list);
 
         Route route = list.get(0);
         DefaultRoute consumerRoute = assertIsInstanceOf(DefaultRoute.class, route);
@@ -146,7 +148,7 @@ public class StreamResequencerTest extends ContextTestSupport {
             for (long i = start; i < end; i += increment) {
                 try {
                     // let's sleep randomly
-                    Thread.sleep(random.nextInt(20));
+                    Thread.sleep(random.nextInt(10));
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -220,7 +221,7 @@ public abstract class AbstractApiEndpoint<E extends ApiName, T>
     public final void setInBody(String inBody) throws IllegalArgumentException {
         // validate property name
         ObjectHelper.notNull(inBody, "inBody");
-        if (!getPropertiesHelper().getValidEndpointProperties(getConfiguration()).contains(inBody)) {
+        if (!getPropertiesHelper().getValidEndpointProperties(getCamelContext(), getConfiguration()).contains(inBody)) {
             throw new IllegalArgumentException("Unknown property " + inBody);
         }
         this.inBody = inBody;

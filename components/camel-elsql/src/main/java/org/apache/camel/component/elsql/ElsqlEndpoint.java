@@ -19,12 +19,15 @@ package org.apache.camel.component.elsql;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.StreamSupport;
 
 import javax.sql.DataSource;
 
 import com.opengamma.elsql.ElSql;
 import com.opengamma.elsql.ElSqlConfig;
 import com.opengamma.elsql.SpringSqlParams;
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
@@ -49,7 +52,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
  * Use ElSql to define SQL queries. Extends the SQL Component.
  */
 @UriEndpoint(firstVersion = "2.16.0", scheme = "elsql", title = "ElSQL", syntax = "elsql:elsqlName:resourceUri",
-        label = "database,sql")
+        category = {Category.DATABASE, Category.SQL})
 public class ElsqlEndpoint extends DefaultSqlEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(ElsqlEndpoint.class);
@@ -109,8 +112,8 @@ public class ElsqlEndpoint extends DefaultSqlEndpoint {
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
+    protected void doInit() throws Exception {
+        super.doInit();
 
         org.apache.camel.util.ObjectHelper.notNull(resourceUri, "resourceUri", this);
 
@@ -120,16 +123,35 @@ public class ElsqlEndpoint extends DefaultSqlEndpoint {
             elSqlConfig = ElSqlDatabaseVendor.Default.asElSqlConfig();
         }
 
+        // load and parse the sources which are from classpath
+        parseResources(resourceUri, uri-> ResourceHelper.isClasspathUri(uri));
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        super.doStart();
+
+        // load and parse the sources which are not from classpath
+        parseResources(resourceUri, uri-> !ResourceHelper.isClasspathUri(uri));
+    }
+
+    private void parseResources(String resourceUri, Predicate<String> predicate) throws Exception {
         // there can be multiple resources
         // so we have all this lovely code to turn that into an URL[]
         final List<URL> list = new ArrayList<>();
-        final Iterable it = ObjectHelper.createIterable(resourceUri);
-        for (final Object path : it) {
-            final URL url = ResourceHelper.resolveMandatoryResourceAsUrl(getCamelContext().getClassResolver(), path.toString());
-            list.add(url);
+        final Iterable<String> it = ObjectHelper.createIterable(resourceUri);
+
+        for (final String path : it) {
+            if (predicate.test(path)) {
+                final URL url = ResourceHelper.resolveMandatoryResourceAsUrl(getCamelContext().getClassResolver(), path);
+                list.add(url);
+            }
         }
-        final URL[] urls = list.toArray(new URL[list.size()]);
-        elSql = ElSql.parse(elSqlConfig, urls);
+
+        if (list.size() > 0) {
+            final URL[] urls = list.toArray(new URL[list.size()]);
+            elSql = ElSql.parse(elSqlConfig, urls);
+        }
     }
 
     /**

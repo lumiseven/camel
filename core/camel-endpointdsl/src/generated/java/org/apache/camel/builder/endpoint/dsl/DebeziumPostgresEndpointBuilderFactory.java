@@ -52,12 +52,16 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
         default DebeziumPostgresEndpointBuilder additionalProperties(
-                Map<String, Object> additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("additionalProperties", "additionalProperties." + key, value);
             return this;
         }
         /**
@@ -68,15 +72,16 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * additionalProperties.. E.g:
          * additionalProperties.transactional.id=12345&additionalProperties.schema.registry.url=http://localhost:8811/avro.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
-        default DebeziumPostgresEndpointBuilder additionalProperties(
-                String additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+        default DebeziumPostgresEndpointBuilder additionalProperties(Map values) {
+            doSetMultiValueProperties("additionalProperties", "additionalProperties.", values);
             return this;
         }
         /**
@@ -171,7 +176,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 5000
+         * Default: 5s
          * Group: consumer
          */
         default DebeziumPostgresEndpointBuilder offsetCommitTimeoutMs(
@@ -187,7 +192,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 5000
+         * Default: 5s
          * Group: consumer
          */
         default DebeziumPostgresEndpointBuilder offsetCommitTimeoutMs(
@@ -200,7 +205,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 60000
+         * Default: 60s
          * Group: consumer
          */
         default DebeziumPostgresEndpointBuilder offsetFlushIntervalMs(
@@ -213,7 +218,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 60000
+         * Default: 60s
          * Group: consumer
          */
         default DebeziumPostgresEndpointBuilder offsetFlushIntervalMs(
@@ -618,7 +623,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder heartbeatIntervalMs(
@@ -633,7 +638,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder heartbeatIntervalMs(
@@ -810,7 +815,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 500
+         * Default: 500ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder pollIntervalMs(
@@ -824,7 +829,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 500
+         * Default: 500ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder pollIntervalMs(
@@ -997,7 +1002,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder slotRetryDelayMs(
@@ -1011,7 +1016,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder slotRetryDelayMs(
@@ -1054,7 +1059,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder snapshotDelayMs(
@@ -1067,7 +1072,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder snapshotDelayMs(
@@ -1108,7 +1113,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder snapshotLockTimeoutMs(
@@ -1123,7 +1128,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder snapshotLockTimeoutMs(
@@ -1198,7 +1203,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder statusUpdateIntervalMs(
@@ -1212,7 +1217,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 10000
+         * Default: 10s
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder statusUpdateIntervalMs(
@@ -1327,7 +1332,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder xminFetchIntervalMs(
@@ -1347,7 +1352,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: postgres
          */
         default DebeziumPostgresEndpointBuilder xminFetchIntervalMs(
@@ -1487,7 +1492,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * Debezium PostgresSQL Connector (camel-debezium-postgres)
          * Capture changes from a PostgresSQL database.
          * 
-         * Category: database,sql,postgres
+         * Category: database,sql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-postgres
          * 
@@ -1506,7 +1511,7 @@ public interface DebeziumPostgresEndpointBuilderFactory {
          * Debezium PostgresSQL Connector (camel-debezium-postgres)
          * Capture changes from a PostgresSQL database.
          * 
-         * Category: database,sql,postgres
+         * Category: database,sql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-postgres
          * 

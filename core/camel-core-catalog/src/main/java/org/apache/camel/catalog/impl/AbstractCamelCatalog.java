@@ -20,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -142,7 +143,7 @@ public abstract class AbstractCamelCatalog {
     }
 
     public boolean validateTimePattern(String pattern) {
-        return validateInteger(pattern);
+        return validateDuration(pattern);
     }
 
     public EndpointValidationResult validateEndpointProperties(String uri) {
@@ -295,6 +296,15 @@ public abstract class AbstractCamelCatalog {
                     boolean bool = "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
                     if (!bool) {
                         result.addInvalidBoolean(name, value);
+                    }
+                }
+
+                // is duration
+                if (!multiValue && !valuePlaceholder && !lookup && "duration".equals(row.getType())) {
+                    // value must be convertable to a duration
+                    boolean valid = validateDuration(value);
+                    if (!valid) {
+                        result.addInvalidDuration(name, value);
                     }
                 }
 
@@ -923,6 +933,10 @@ public abstract class AbstractCamelCatalog {
         } else if (key.startsWith("main.")
                 || key.startsWith("hystrix.")
                 || key.startsWith("resilience4j.")
+                || key.startsWith("faulttolerance.")
+                || key.startsWith("threadpool.")
+                || key.startsWith("lra.")
+                || key.startsWith("health.")
                 || key.startsWith("rest.")) {
             int idx = key.indexOf('.');
             String name = key.substring(0, idx);
@@ -997,6 +1011,15 @@ public abstract class AbstractCamelCatalog {
                 boolean bool = "true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value);
                 if (!bool) {
                     result.addInvalidBoolean(longKey, value);
+                }
+            }
+
+            // is duration
+            if (!optionPlaceholder && !lookup && "duration".equals(row.getType())) {
+                // value must be convertable to a duration
+                boolean valid = validateDuration(value);
+                if (!valid) {
+                    result.addInvalidDuration(longKey, value);
                 }
             }
 
@@ -1084,6 +1107,10 @@ public abstract class AbstractCamelCatalog {
             || key.startsWith("camel.main.")
             || key.startsWith("camel.hystrix.")
             || key.startsWith("camel.resilience4j.")
+            || key.startsWith("camel.faulttolerance.")
+            || key.startsWith("camel.threadpool.")
+            || key.startsWith("camel.health.")
+            || key.startsWith("camel.lra.")
             || key.startsWith("camel.rest.");
     }
 
@@ -1273,10 +1300,26 @@ public abstract class AbstractCamelCatalog {
         } catch (Exception e) {
             // ignore
         }
+        return valid;
+    }
+
+    private static boolean validateDuration(String value) {
+        boolean valid = false;
+        try {
+            Long.parseLong(value);
+            valid = true;
+        } catch (Exception e) {
+            // ignore
+        }
         if (!valid) {
-            // it may be a time pattern, such as 5s for 5 seconds = 5000
             try {
-                TimePatternConverter.toMilliSeconds(value);
+                if (value.startsWith("P") || value.startsWith("-P") || value.startsWith("p") || value.startsWith("-p")) {
+                    // its a duration
+                    Duration.parse(value);
+                } else {
+                    // it may be a time pattern, such as 5s for 5 seconds = 5000
+                    TimePatternConverter.toMilliSeconds(value);
+                }
                 valid = true;
             } catch (Exception e) {
                 // ignore

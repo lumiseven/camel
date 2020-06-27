@@ -59,25 +59,31 @@ public interface WordpressEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
         default WordpressEndpointConsumerBuilder criteria(
-                Map<String, Object> criteria) {
-            doSetProperty("criteria", criteria);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("criteria", "criteria." + key, value);
             return this;
         }
         /**
          * The criteria to use with complex searches.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default WordpressEndpointConsumerBuilder criteria(String criteria) {
-            doSetProperty("criteria", criteria);
+        default WordpressEndpointConsumerBuilder criteria(Map values) {
+            doSetMultiValueProperties("criteria", "criteria.", values);
             return this;
         }
         /**
@@ -380,25 +386,31 @@ public interface WordpressEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
         default WordpressEndpointProducerBuilder criteria(
-                Map<String, Object> criteria) {
-            doSetProperty("criteria", criteria);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("criteria", "criteria." + key, value);
             return this;
         }
         /**
          * The criteria to use with complex searches.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default WordpressEndpointProducerBuilder criteria(String criteria) {
-            doSetProperty("criteria", criteria);
+        default WordpressEndpointProducerBuilder criteria(Map values) {
+            doSetMultiValueProperties("criteria", "criteria.", values);
             return this;
         }
         /**
@@ -649,24 +661,29 @@ public interface WordpressEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default WordpressEndpointBuilder criteria(Map<String, Object> criteria) {
-            doSetProperty("criteria", criteria);
+        default WordpressEndpointBuilder criteria(String key, Object value) {
+            doSetMultiValueProperty("criteria", "criteria." + key, value);
             return this;
         }
         /**
          * The criteria to use with complex searches.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the criteria(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default WordpressEndpointBuilder criteria(String criteria) {
-            doSetProperty("criteria", criteria);
+        default WordpressEndpointBuilder criteria(Map values) {
+            doSetMultiValueProperties("criteria", "criteria.", values);
             return this;
         }
         /**
@@ -850,7 +867,7 @@ public interface WordpressEndpointBuilderFactory {
          * Wordpress (camel-wordpress)
          * Manage posts and users using Wordpress API.
          * 
-         * Category: cms
+         * Category: cloud,api,cms
          * Since: 2.21
          * Maven coordinates: org.apache.camel:camel-wordpress
          * 
@@ -874,7 +891,7 @@ public interface WordpressEndpointBuilderFactory {
          * Wordpress (camel-wordpress)
          * Manage posts and users using Wordpress API.
          * 
-         * Category: cms
+         * Category: cloud,api,cms
          * Since: 2.21
          * Maven coordinates: org.apache.camel:camel-wordpress
          * 

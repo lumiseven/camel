@@ -915,12 +915,16 @@ public interface RabbitMQEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
         default AdvancedRabbitMQEndpointConsumerBuilder args(
-                Map<String, Object> args) {
-            doSetProperty("args", args);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("args", "arg." + key, value);
             return this;
         }
         /**
@@ -930,14 +934,16 @@ public interface RabbitMQEndpointBuilderFactory {
          * message ttl argument:
          * http://localhost:5672/exchange/queueargs=arg.queue.x-message-ttl=60000.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
-        default AdvancedRabbitMQEndpointConsumerBuilder args(String args) {
-            doSetProperty("args", args);
+        default AdvancedRabbitMQEndpointConsumerBuilder args(Map values) {
+            doSetMultiValueProperties("args", "arg.", values);
             return this;
         }
         /**
@@ -2175,12 +2181,16 @@ public interface RabbitMQEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
         default AdvancedRabbitMQEndpointProducerBuilder args(
-                Map<String, Object> args) {
-            doSetProperty("args", args);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("args", "arg." + key, value);
             return this;
         }
         /**
@@ -2190,14 +2200,16 @@ public interface RabbitMQEndpointBuilderFactory {
          * message ttl argument:
          * http://localhost:5672/exchange/queueargs=arg.queue.x-message-ttl=60000.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
-        default AdvancedRabbitMQEndpointProducerBuilder args(String args) {
-            doSetProperty("args", args);
+        default AdvancedRabbitMQEndpointProducerBuilder args(Map values) {
+            doSetMultiValueProperties("args", "arg.", values);
             return this;
         }
         /**
@@ -3105,11 +3117,14 @@ public interface RabbitMQEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
-        default AdvancedRabbitMQEndpointBuilder args(Map<String, Object> args) {
-            doSetProperty("args", args);
+        default AdvancedRabbitMQEndpointBuilder args(String key, Object value) {
+            doSetMultiValueProperty("args", "arg." + key, value);
             return this;
         }
         /**
@@ -3119,14 +3134,16 @@ public interface RabbitMQEndpointBuilderFactory {
          * message ttl argument:
          * http://localhost:5672/exchange/queueargs=arg.queue.x-message-ttl=60000.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the args(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: advanced
          */
-        default AdvancedRabbitMQEndpointBuilder args(String args) {
-            doSetProperty("args", args);
+        default AdvancedRabbitMQEndpointBuilder args(Map values) {
+            doSetMultiValueProperties("args", "arg.", values);
             return this;
         }
         /**
@@ -3494,9 +3511,9 @@ public interface RabbitMQEndpointBuilderFactory {
          * Syntax: <code>rabbitmq:exchangeName</code>
          * 
          * Path parameter: exchangeName (required)
-         * The exchange name determines which exchange produced messages will
-         * sent to. In the case of consumers, the exchange name determines which
-         * exchange the queue will bind to.
+         * The exchange name determines the exchange to which the produced
+         * messages will be sent to. In the case of consumers, the exchange name
+         * determines the exchange the queue will be bound to.
          * 
          * @param path exchangeName
          */
@@ -3514,9 +3531,9 @@ public interface RabbitMQEndpointBuilderFactory {
          * Syntax: <code>rabbitmq:exchangeName</code>
          * 
          * Path parameter: exchangeName (required)
-         * The exchange name determines which exchange produced messages will
-         * sent to. In the case of consumers, the exchange name determines which
-         * exchange the queue will bind to.
+         * The exchange name determines the exchange to which the produced
+         * messages will be sent to. In the case of consumers, the exchange name
+         * determines the exchange the queue will be bound to.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

@@ -203,6 +203,35 @@ public interface TelegramEndpointBuilderFactory {
             return this;
         }
         /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option is a:
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointConsumerBuilder proxyType(
+                TelegramProxyType proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option will be converted to a
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointConsumerBuilder proxyType(String proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
          * The number of subsequent error polls (failed due some error) that
          * should happen before the backoffMultipler should kick-in.
          * 
@@ -468,27 +497,32 @@ public interface TelegramEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default TelegramEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default TelegramEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default TelegramEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -911,6 +945,35 @@ public interface TelegramEndpointBuilderFactory {
             return this;
         }
         /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option is a:
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointProducerBuilder proxyType(
+                TelegramProxyType proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option will be converted to a
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointProducerBuilder proxyType(String proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
          * The authorization token for using the bot (ask the BotFather).
          * 
          * The option is a: <code>java.lang.String</code> type.
@@ -1105,6 +1168,34 @@ public interface TelegramEndpointBuilderFactory {
             return this;
         }
         /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option is a:
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointBuilder proxyType(TelegramProxyType proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
+         * HTTP proxy type which could be used when sending out the message.
+         * 
+         * The option will be converted to a
+         * <code>org.apache.camel.component.telegram.TelegramProxyType</code>
+         * type.
+         * 
+         * Default: HTTP
+         * Group: proxy
+         */
+        default TelegramEndpointBuilder proxyType(String proxyType) {
+            doSetProperty("proxyType", proxyType);
+            return this;
+        }
+        /**
          * The authorization token for using the bot (ask the BotFather).
          * 
          * The option is a: <code>java.lang.String</code> type.
@@ -1249,12 +1340,22 @@ public interface TelegramEndpointBuilderFactory {
         }
     }
 
+    /**
+     * Proxy enum for
+     * <code>org.apache.camel.component.telegram.TelegramProxyType</code> enum.
+     */
+    enum TelegramProxyType {
+        HTTP,
+        SOCKS4,
+        SOCKS5;
+    }
+
     public interface TelegramBuilders {
         /**
          * Telegram (camel-telegram)
          * Send and receive messages acting as a Telegram Bot Telegram Bot API.
          * 
-         * Category: chat
+         * Category: cloud,api,chat
          * Since: 2.18
          * Maven coordinates: org.apache.camel:camel-telegram
          * 
@@ -1273,7 +1374,7 @@ public interface TelegramEndpointBuilderFactory {
          * Telegram (camel-telegram)
          * Send and receive messages acting as a Telegram Bot Telegram Bot API.
          * 
-         * Category: chat
+         * Category: cloud,api,chat
          * Since: 2.18
          * Maven coordinates: org.apache.camel:camel-telegram
          * 

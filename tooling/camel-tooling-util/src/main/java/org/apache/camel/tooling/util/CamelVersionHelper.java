@@ -58,6 +58,27 @@ public final class CamelVersionHelper {
         return ver2.compareTo(ver1) >= 0;
     }
 
+    /**
+     * Returns the previous minor version number
+     *
+     * @param base  the version
+     * @return the previous minor version, eg 3.3.0 as input, returns 3.2.0 as output
+     */
+    public static String prevMinor(String base) {
+        if (base == null || base.isEmpty()) {
+            throw new IllegalArgumentException("Empty base version");
+        }
+
+        // strip suffix/qualifier as we dont support that
+        base = base.replaceAll("[^\\d|^\\.]", "");
+        if (!base.matches("[0-9]+(\\.[0-9]+)*")) {
+            throw new IllegalArgumentException("Invalid version format");
+        }
+
+        Version ver = new Version(base);
+        return ver.prevMinor();
+    }
+
     private static final class Version implements Comparable<Version> {
 
         private final String version;
@@ -79,8 +100,8 @@ public final class CamelVersionHelper {
             String[] thatParts = that.getVersion().split("\\.");
             int length = Math.max(thisParts.length, thatParts.length);
             for (int i = 0; i < length; i++) {
-                int thisPart = i < thisParts.length ? Integer.parseInt(thisParts[i]) : 0;
-                int thatPart = i < thatParts.length ? Integer.parseInt(thatParts[i]) : 0;
+                long thisPart = i < thisParts.length ? Long.parseLong(thisParts[i]) : 0;
+                long thatPart = i < thatParts.length ? Long.parseLong(thatParts[i]) : 0;
                 if (thisPart < thatPart) {
                     return -1;
                 } else if (thisPart > thatPart) {
@@ -90,6 +111,24 @@ public final class CamelVersionHelper {
             return 0;
         }
 
+        public String prevMinor() {
+            String[] parts = this.getVersion().split("\\.");
+            int major = Integer.parseInt(parts[0]);
+            int minor = Integer.parseInt(parts[1]);
+            int patch = parts.length == 3 ? Integer.parseInt(parts[2]) : 0;
+
+            if (minor > 0) {
+                minor -= 1;
+            }
+
+            String prev = major + "." + minor + "." + patch;
+            return prev;
+        }
+
+        @Override
+        public String toString() {
+            return version;
+        }
     }
 
 }

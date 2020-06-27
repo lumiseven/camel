@@ -8,12 +8,14 @@
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The CW component allows messages to be sent to an
+The AWS2 Cloudwatch component allows messages to be sent to an
 https://aws.amazon.com/cloudwatch/[Amazon CloudWatch] metrics. The
 implementation of the Amazon API is provided by
 the https://aws.amazon.com/sdkforjava/[AWS SDK].

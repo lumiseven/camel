@@ -17,6 +17,7 @@
 package org.apache.camel.builder.endpoint;
 
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,6 +38,8 @@ public class AbstractEndpointBuilder {
     protected final String scheme;
     protected final String path;
     protected final Map<String, Object> properties = new LinkedHashMap<>();
+    protected final Map<String, Map<String, Object>> multivalues = new HashMap<>();
+    private volatile Endpoint resolvedEndpoint;
 
     public AbstractEndpointBuilder(String scheme, String path) {
         this.scheme = scheme;
@@ -44,6 +47,10 @@ public class AbstractEndpointBuilder {
     }
 
     public Endpoint resolve(CamelContext context) throws NoSuchEndpointException {
+        if (resolvedEndpoint != null) {
+            return resolvedEndpoint;
+        }
+
         Map<String, Object> remaining = new LinkedHashMap<>();
         // we should not bind complex objects to registry as we create the endpoint via the properties as-is
         NormalizedEndpointUri uri = computeUri(remaining, context, false);
@@ -52,7 +59,14 @@ public class AbstractEndpointBuilder {
         if (endpoint == null) {
             throw new NoSuchEndpointException(uri.getUri());
         }
+
+        resolvedEndpoint = endpoint;
         return endpoint;
+    }
+
+    public <T extends Endpoint> T resolve(CamelContext context, Class<T> endpointType) throws NoSuchEndpointException {
+        Endpoint answer = resolve(context);
+        return endpointType.cast(answer);
     }
 
     public String getUri() {
@@ -64,24 +78,10 @@ public class AbstractEndpointBuilder {
 
         // sort parameters so it can be regarded as normalized
         Map<String, Object> params = new TreeMap<>();
-        for (Map.Entry<String, Object> entry : properties.entrySet()) {
-            String key = entry.getKey();
-            Object val = entry.getValue();
-            if (val instanceof String) {
-                String text = val.toString();
-                if (camelContext != null) {
-                    text = camelContext.resolvePropertyPlaceholders(text);
-                }
-                params.put(key, text);
-            } else if (val instanceof Number || val instanceof Boolean || val instanceof Enum<?>) {
-                params.put(key, val.toString());
-            } else if (camelContext != null && bindToRegistry) {
-                String hash = Integer.toHexString(val.hashCode());
-                params.put(key, "#" + hash);
-                camelContext.getRegistry().bind(hash, val);
-            } else {
-                remaining.put(key, val);
-            }
+        // compute from properties and multivalues
+        computeProperties(remaining, camelContext, bindToRegistry, params, properties);
+        for (Map<String, Object> map : multivalues.values()) {
+            computeProperties(remaining, camelContext, bindToRegistry, params, map);
         }
         if (!remaining.isEmpty()) {
             params.put("hash", Integer.toHexString(remaining.hashCode()));
@@ -109,6 +109,29 @@ public class AbstractEndpointBuilder {
         return answer;
     }
 
+    private static void computeProperties(Map<String, Object> remaining, CamelContext camelContext, boolean bindToRegistry,
+                                          Map<String, Object> params, Map<String, Object> properties) {
+        for (Map.Entry<String, Object> entry : properties.entrySet()) {
+            String key = entry.getKey();
+            Object val = entry.getValue();
+            if (val instanceof String) {
+                String text = val.toString();
+                if (camelContext != null) {
+                    text = camelContext.resolvePropertyPlaceholders(text);
+                }
+                params.put(key, text);
+            } else if (val instanceof Number || val instanceof Boolean || val instanceof Enum<?>) {
+                params.put(key, val.toString());
+            } else if (camelContext != null && bindToRegistry) {
+                String hash = Integer.toHexString(val.hashCode());
+                params.put(key, "#" + hash);
+                camelContext.getRegistry().bind(hash, val);
+            } else {
+                remaining.put(key, val);
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return getUri();
@@ -116,6 +139,17 @@ public class AbstractEndpointBuilder {
 
     public void doSetProperty(String key, Object value) {
         this.properties.put(key, value);
+    }
+
+    public void doSetMultiValueProperty(String name, String key, Object value) {
+        Map<String, Object> map = multivalues.computeIfAbsent(name, k -> new LinkedHashMap<>());
+        map.put(key, value);
+    }
+
+    public void doSetMultiValueProperties(String name, String prefix, Map<String, Object> values) {
+        values.forEach((k, v) -> {
+            doSetMultiValueProperty(name, prefix + k, v);
+        });
     }
 
     public Expression expr() {

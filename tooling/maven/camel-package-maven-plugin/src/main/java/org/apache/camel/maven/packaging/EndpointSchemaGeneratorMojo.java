@@ -47,6 +47,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.camel.Category;
 import org.apache.camel.maven.packaging.generics.ClassUtil;
 import org.apache.camel.maven.packaging.generics.GenericsUtil;
 import org.apache.camel.spi.Metadata;
@@ -149,7 +150,15 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
             String scheme = uriEndpoint.scheme();
             String extendsScheme = uriEndpoint.extendsScheme();
             String title = uriEndpoint.title();
-            final String label = uriEndpoint.label();
+            Category[] categories = uriEndpoint.category();
+            String label;
+            if (categories.length > 0) {
+                label = Arrays.stream(categories)
+                        .map(Category::getValue)
+                        .collect(Collectors.joining(","));
+            } else {
+                label = uriEndpoint.label();
+            }
             validateSchemaName(scheme, classElement);
             // support multiple schemes separated by comma, which maps to
             // the exact same component
@@ -582,6 +591,10 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     fields.stream().anyMatch(f -> f.getAnnotation(Metadata.class) != null)
                     || methods.stream().anyMatch(m -> m.getAnnotation(Metadata.class) != null);
 
+            if (methods.size() > 0 && !annotationBasedOptions) {
+                getLog().warn("Component class " + classElement.getName() + " has not been marked up with @Metadata for " + methods.size() + " options.");
+            }
+
             for (Method method : methods) {
                 String methodName = method.getName();
                 Metadata metadata = method.getAnnotation(Metadata.class);
@@ -681,8 +694,14 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                 }
 
                 // the field type may be overloaded by another type
+                boolean isDuration = false;
                 if (metadata != null && !Strings.isNullOrEmpty(metadata.javaType())) {
-                    fieldTypeName = metadata.javaType();
+                    String mjt = metadata.javaType();
+                    if ("java.time.Duration".equals(mjt)) {
+                        isDuration = true;
+                    } else {
+                        fieldTypeName = mjt;
+                    }
                 }
 
                 if (isNullOrEmpty(defaultValue) && "boolean".equals(fieldTypeName)) {
@@ -719,7 +738,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     option.setKind("property");
                     option.setName(name);
                     option.setDisplayName(displayName);
-                    option.setType(getType(fieldTypeName, false));
+                    option.setType(getType(fieldTypeName, false, isDuration));
                     option.setJavaType(fieldTypeName);
                     option.setRequired(required);
                     option.setDefaultValue(defaultValue);
@@ -828,8 +847,14 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     }
 
                     // the field type may be overloaded by another type
+                    boolean isDuration = false;
                     if (!Strings.isNullOrEmpty(path.javaType())) {
-                        fieldTypeName = path.javaType();
+                        String mjt = path.javaType();
+                        if ("java.time.Duration".equals(mjt)) {
+                            isDuration = true;
+                        } else {
+                            fieldTypeName = mjt;
+                        }
                     }
                     if (isNullOrEmpty(defaultValue) && "boolean".equals(fieldTypeName)) {
                         defaultValue = false;
@@ -849,7 +874,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                     option.setName(name);
                     option.setKind("path");
                     option.setDisplayName(displayName);
-                    option.setType(getType(fieldTypeName, false));
+                    option.setType(getType(fieldTypeName, false, isDuration));
                     option.setJavaType(fieldTypeName);
                     option.setRequired(required);
                     option.setDefaultValue(defaultValue);
@@ -939,8 +964,14 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                         }
 
                         // the field type may be overloaded by another type
+                        boolean isDuration = false;
                         if (!Strings.isNullOrEmpty(param.javaType())) {
-                            fieldTypeName = param.javaType();
+                            String jt = param.javaType();
+                            if ("java.time.Duration".equals(jt)) {
+                                isDuration = true;
+                            } else {
+                                fieldTypeName = param.javaType();
+                            }
                         }
 
                         if (isNullOrEmpty(defaultValue) && "boolean".equals(fieldTypeName)) {
@@ -960,7 +991,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
                         }
                         option.setName(name);
                         option.setDisplayName(displayName);
-                        option.setType(getType(fieldTypeName, false));
+                        option.setType(getType(fieldTypeName, false, isDuration));
                         option.setJavaType(fieldTypeName);
                         option.setRequired(required);
                         option.setDefaultValue(defaultValue);
@@ -1255,15 +1286,17 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
     }
 
     /**
-     * Gets the JSon schema type.
+     * Gets the JSON schema type.
      *
      * @param type the java type
      * @return the json schema type, is never null, but returns <tt>object</tt>
      *         as the generic type
      */
-    public static String getType(String type, boolean enumType) {
+    public static String getType(String type, boolean enumType, boolean isDuration) {
         if (enumType) {
             return "enum";
+        } else if (isDuration) {
+            return "duration";
         } else if (type == null) {
             // return generic type for unknown type
             return "object";
@@ -1288,7 +1321,7 @@ public class EndpointSchemaGeneratorMojo extends AbstractGeneratorMojo {
     }
 
     /**
-     * Gets the JSon schema primitive type.
+     * Gets the JSON schema primitive type.
      *
      * @param name the java type
      * @return the json schema primitive type, or <tt>null</tt> if not a

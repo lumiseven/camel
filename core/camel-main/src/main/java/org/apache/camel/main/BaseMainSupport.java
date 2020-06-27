@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,9 +33,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
@@ -45,19 +45,25 @@ import org.apache.camel.PropertyBindingException;
 import org.apache.camel.RoutesBuilder;
 import org.apache.camel.RuntimeCamelException;
 import org.apache.camel.builder.ThreadPoolProfileBuilder;
+import org.apache.camel.health.HealthCheck;
+import org.apache.camel.health.HealthCheckConfiguration;
+import org.apache.camel.health.HealthCheckRegistry;
+import org.apache.camel.health.HealthCheckRepository;
 import org.apache.camel.model.FaultToleranceConfigurationDefinition;
 import org.apache.camel.model.HystrixConfigurationDefinition;
 import org.apache.camel.model.Model;
 import org.apache.camel.model.ModelCamelContext;
 import org.apache.camel.model.Resilience4jConfigurationDefinition;
 import org.apache.camel.model.RouteDefinition;
+import org.apache.camel.saga.CamelSagaService;
 import org.apache.camel.spi.CamelBeanPostProcessor;
 import org.apache.camel.spi.DataFormat;
-import org.apache.camel.spi.ExecutorServiceManager;
 import org.apache.camel.spi.Language;
 import org.apache.camel.spi.PropertiesComponent;
 import org.apache.camel.spi.PropertyConfigurer;
+import org.apache.camel.spi.PropertyConfigurerGetter;
 import org.apache.camel.spi.RestConfiguration;
+import org.apache.camel.spi.ThreadPoolProfile;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.support.LifecycleStrategySupport;
 import org.apache.camel.support.PropertyBindingSupport;
@@ -70,12 +76,11 @@ import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.OrderedProperties;
 import org.apache.camel.util.PropertiesHelper;
 import org.apache.camel.util.StringHelper;
-import org.apache.camel.util.concurrent.ThreadPoolRejectedPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.camel.main.MainHelper.lookupPropertyFromSysOrEnv;
 import static org.apache.camel.main.MainHelper.loadEnvironmentVariablesAsProperties;
+import static org.apache.camel.main.MainHelper.lookupPropertyFromSysOrEnv;
 import static org.apache.camel.support.ObjectHelper.invokeMethod;
 import static org.apache.camel.util.ReflectionHelper.findMethod;
 import static org.apache.camel.util.StringHelper.matches;
@@ -93,10 +98,6 @@ public abstract class BaseMainSupport extends BaseService {
 
     private static final String SENSITIVE_KEYS = "passphrase|password|secretkey|accesstoken|clientsecret|authorizationtoken|sasljaasconfig";
 
-    private static final String VALID_THREAD_POOL_KEYS = "id|poolSize|maxPoolSize|keepAliveTime|timeUnit|maxQueueSize|allowCoreThreadTimeout|rejectedPolicy";
-
-    protected final AtomicBoolean completed = new AtomicBoolean(false);
-
     protected volatile CamelContext camelContext;
     protected volatile ProducerTemplate camelTemplate;
 
@@ -113,6 +114,58 @@ public abstract class BaseMainSupport extends BaseService {
         // as we ignore case for property names we should use keys in same case and without dashes
         key = StringHelper.dashToCamelCase(key);
         return key;
+    }
+
+    protected static boolean setPropertiesOnTarget(CamelContext context, Object target, Object source) throws Exception {
+        ObjectHelper.notNull(context, "context");
+        ObjectHelper.notNull(target, "target");
+
+        boolean rc = false;
+
+        PropertyConfigurer targetConfigurer = null;
+        if (target instanceof Component) {
+            // the component needs to be initialized to have the configurer ready
+            ServiceHelper.initService(target);
+            targetConfigurer = ((Component) target).getComponentPropertyConfigurer();
+        }
+        if (targetConfigurer == null) {
+            String name = target.getClass().getSimpleName();
+            if (target instanceof ExtendedCamelContext) {
+                // special for camel context itself as we have an extended configurer
+                name = "ExtendedCamelContext";
+            }
+            // see if there is a configurer for it
+            targetConfigurer = context.adapt(ExtendedCamelContext.class)
+                    .getConfigurerResolver().resolvePropertyConfigurer(name, context);
+        }
+
+        PropertyConfigurer sourceConfigurer = null;
+        if (source instanceof Component) {
+            // the component needs to be initialized to have the configurer ready
+            ServiceHelper.initService(source);
+            sourceConfigurer = ((Component) source).getComponentPropertyConfigurer();
+        }
+        if (sourceConfigurer == null) {
+            String name = source.getClass().getSimpleName();
+            if (source instanceof ExtendedCamelContext) {
+                // special for camel context itself as we have an extended configurer
+                name = "ExtendedCamelContext";
+            }
+            // see if there is a configurer for it
+            sourceConfigurer = context.adapt(ExtendedCamelContext.class)
+                    .getConfigurerResolver().resolvePropertyConfigurer(name, context);
+        }
+
+        if (targetConfigurer != null && sourceConfigurer instanceof PropertyConfigurerGetter) {
+            PropertyConfigurerGetter getter = (PropertyConfigurerGetter) sourceConfigurer;
+            for (String key : getter.getAllOptions(source).keySet()) {
+                Object value = getter.getOptionValue(source, key, true);
+                if (value != null) {
+                    rc |= targetConfigurer.configure(context, target, key, value, true);
+                }
+            }
+        }
+        return rc;
     }
 
     protected static boolean setPropertiesOnTarget(CamelContext context, Object target, Map<String, Object> properties,
@@ -406,7 +459,11 @@ public abstract class BaseMainSupport extends BaseService {
 
         if (mainConfigurationProperties.getPackageScanRouteBuilders() != null) {
             String[] pkgs = mainConfigurationProperties.getPackageScanRouteBuilders().split(",");
-            Set<Class<?>> set = camelContext.getExtension(ExtendedCamelContext.class).getPackageScanClassResolver().findImplementations(RoutesBuilder.class, pkgs);
+            Set<Class<?>> set = camelContext.adapt(ExtendedCamelContext.class)
+                    .getPackageScanClassResolver()
+                    .findImplementations(RoutesBuilder.class, pkgs)
+                    .stream().filter(c -> !Modifier.isAbstract(c.getModifiers()))
+                    .collect(Collectors.toSet());
             for (Class<?> routeClazz : set) {
                 Object builder = camelContext.getInjector().newInstance(routeClazz);
                 if (builder instanceof RoutesBuilder) {
@@ -662,7 +719,7 @@ public abstract class BaseMainSupport extends BaseService {
         // configure the common/default options
         DefaultConfigurationConfigurer.configure(camelContext, config);
         // lookup and configure SPI beans
-        DefaultConfigurationConfigurer.afterPropertiesSet(camelContext);
+        DefaultConfigurationConfigurer.afterConfigure(camelContext);
 
         // now configure context/hystrix/resilience4j/rest with additional properties
         Properties prop = camelContext.getPropertiesComponent().loadProperties(name -> name.startsWith("camel."));
@@ -685,6 +742,8 @@ public abstract class BaseMainSupport extends BaseService {
         Map<String, Object> faultToleranceProperties = new LinkedHashMap<>();
         Map<String, Object> restProperties = new LinkedHashMap<>();
         Map<String, Object> threadPoolProperties = new LinkedHashMap<>();
+        Map<String, Object> healthProperties = new LinkedHashMap<>();
+        Map<String, Object> lraProperties = new LinkedHashMap<>();
         Map<String, Object> beansProperties = new LinkedHashMap<>();
         for (String key : prop.stringPropertyNames()) {
             if (key.startsWith("camel.context.")) {
@@ -717,12 +776,24 @@ public abstract class BaseMainSupport extends BaseService {
                 String option = key.substring(11);
                 validateOptionAndValue(key, option, value);
                 restProperties.put(optionKey(option), value);
-            } else if (key.startsWith("camel.threadpool")) {
+            } else if (key.startsWith("camel.threadpool.")) {
                 // grab the value
                 String value = prop.getProperty(key);
-                String option = key.substring(16);
+                String option = key.substring(17);
                 validateOptionAndValue(key, option, value);
                 threadPoolProperties.put(optionKey(option), value);
+            } else if (key.startsWith("camel.health.")) {
+                // grab the value
+                String value = prop.getProperty(key);
+                String option = key.substring(13);
+                validateOptionAndValue(key, option, value);
+                healthProperties.put(optionKey(option), value);
+            } else if (key.startsWith("camel.lra.")) {
+                // grab the value
+                String value = prop.getProperty(key);
+                String option = key.substring(10);
+                validateOptionAndValue(key, option, value);
+                lraProperties.put(optionKey(option), value);
             } else if (key.startsWith("camel.beans.")) {
                 // grab the value
                 String value = prop.getProperty(key);
@@ -732,64 +803,78 @@ public abstract class BaseMainSupport extends BaseService {
             }
         }
 
+        ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
+
         // create beans first as they may be used later
         if (!beansProperties.isEmpty()) {
             LOG.debug("Creating and binding beans to registry from loaded properties: {}", beansProperties.size());
             bindBeansToRegistry(camelContext, beansProperties, "camel.beans.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
-
         if (!contextProperties.isEmpty()) {
             LOG.debug("Auto-configuring CamelContext from loaded properties: {}", contextProperties.size());
             setPropertiesOnTarget(camelContext, camelContext, contextProperties, "camel.context.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
+
+        HystrixConfigurationProperties hystrix = mainConfigurationProperties.hystrix();
         if (!hystrixProperties.isEmpty()) {
             LOG.debug("Auto-configuring Hystrix Circuit Breaker EIP from loaded properties: {}", hystrixProperties.size());
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            HystrixConfigurationDefinition hystrix = model.getHystrixConfiguration(null);
-            if (hystrix == null) {
-                hystrix = new HystrixConfigurationDefinition();
-                model.setHystrixConfiguration(hystrix);
-            }
             setPropertiesOnTarget(camelContext, hystrix, hystrixProperties, "camel.hystrix.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
+        HystrixConfigurationDefinition hystrixModel = model.getHystrixConfiguration(null);
+        if (hystrixModel == null) {
+            hystrixModel = new HystrixConfigurationDefinition();
+            model.setHystrixConfiguration(hystrixModel);
+        }
+        setPropertiesOnTarget(camelContext, hystrixModel, hystrix);
+
+        Resilience4jConfigurationProperties resilience4j = mainConfigurationProperties.resilience4j();
         if (!resilience4jProperties.isEmpty()) {
             LOG.debug("Auto-configuring Resilience4j Circuit Breaker EIP from loaded properties: {}", resilience4jProperties.size());
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            Resilience4jConfigurationDefinition resilience4j = model.getResilience4jConfiguration(null);
-            if (resilience4j == null) {
-                resilience4j = new Resilience4jConfigurationDefinition();
-                model.setResilience4jConfiguration(resilience4j);
-            }
             setPropertiesOnTarget(camelContext, resilience4j, resilience4jProperties, "camel.resilience4j.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
+        Resilience4jConfigurationDefinition resilience4jModel = model.getResilience4jConfiguration(null);
+        if (resilience4jModel == null) {
+            resilience4jModel = new Resilience4jConfigurationDefinition();
+            model.setResilience4jConfiguration(resilience4jModel);
+        }
+        setPropertiesOnTarget(camelContext, resilience4jModel, resilience4j);
+
+        FaultToleranceConfigurationProperties faultTolerance = mainConfigurationProperties.faultTolerance();
         if (!faultToleranceProperties.isEmpty()) {
             LOG.debug("Auto-configuring MicroProfile Fault Tolerance Circuit Breaker EIP from loaded properties: {}", faultToleranceProperties.size());
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            FaultToleranceConfigurationDefinition faultTolerance = model.getFaultToleranceConfiguration(null);
-            if (faultTolerance == null) {
-                faultTolerance = new FaultToleranceConfigurationDefinition();
-                model.setFaultToleranceConfiguration(faultTolerance);
-            }
             setPropertiesOnTarget(camelContext, faultTolerance, faultToleranceProperties, "camel.faulttolerance.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
+        FaultToleranceConfigurationDefinition faultToleranceModel = model.getFaultToleranceConfiguration(null);
+        if (faultToleranceModel == null) {
+            faultToleranceModel = new FaultToleranceConfigurationDefinition();
+            model.setFaultToleranceConfiguration(faultToleranceModel);
+        }
+        setPropertiesOnTarget(camelContext, faultToleranceModel, faultTolerance);
+
+        RestConfigurationProperties rest = mainConfigurationProperties.rest();
         if (!restProperties.isEmpty()) {
             LOG.debug("Auto-configuring Rest DSL from loaded properties: {}", restProperties.size());
-            RestConfiguration rest = camelContext.getRestConfiguration();
-            if (rest == null) {
-                rest = new RestConfiguration();
-                camelContext.setRestConfiguration(rest);
-            }
             setPropertiesOnTarget(camelContext, rest, restProperties, "camel.rest.",
                     mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
         }
+        camelContext.setRestConfiguration(rest);
+
         if (!threadPoolProperties.isEmpty()) {
             LOG.debug("Auto-configuring Thread Pool from loaded properties: {}", threadPoolProperties.size());
-            setThreadPoolProfileProperties(camelContext, threadPoolProperties, mainConfigurationProperties.isAutoConfigurationFailFast(), autoConfiguredProperties);
+            setThreadPoolProperties(camelContext, threadPoolProperties, mainConfigurationProperties.isAutoConfigurationFailFast(), autoConfiguredProperties);
+        }
+        if (!healthProperties.isEmpty()) {
+            LOG.debug("Auto-configuring HealthCheck from loaded properties: {}", healthProperties.size());
+            setHealthCheckProperties(camelContext, healthProperties, mainConfigurationProperties.isAutoConfigurationFailFast(), autoConfiguredProperties);
+        }
+        if (!lraProperties.isEmpty()) {
+            LOG.debug("Auto-configuring Saga LRA from loaded properties: {}", lraProperties.size());
+            setLraCheckProperties(camelContext, lraProperties, mainConfigurationProperties.isAutoConfigurationFailFast(), autoConfiguredProperties);
         }
 
         // log which options was not set
@@ -804,114 +889,223 @@ public abstract class BaseMainSupport extends BaseService {
             });
         }
         if (!hystrixProperties.isEmpty()) {
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            HystrixConfigurationDefinition hystrix = model.getHystrixConfiguration(null);
             hystrixProperties.forEach((k, v) -> {
                 LOG.warn("Property not auto-configured: camel.hystrix.{}={} on bean: {}", k, v, hystrix);
             });
         }
         if (!resilience4jProperties.isEmpty()) {
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            Resilience4jConfigurationDefinition resilience4j = model.getResilience4jConfiguration(null);
             resilience4jProperties.forEach((k, v) -> {
                 LOG.warn("Property not auto-configured: camel.resilience4j.{}={} on bean: {}", k, v, resilience4j);
             });
         }
         if (!faultToleranceProperties.isEmpty()) {
-            ModelCamelContext model = camelContext.adapt(ModelCamelContext.class);
-            FaultToleranceConfigurationDefinition faulttolerance = model.getFaultToleranceConfiguration(null);
             faultToleranceProperties.forEach((k, v) -> {
-                LOG.warn("Property not auto-configured: camel.faulttolerance.{}={} on bean: {}", k, v, faulttolerance);
+                LOG.warn("Property not auto-configured: camel.faulttolerance.{}={} on bean: {}", k, v, faultTolerance);
             });
         }
         if (!restProperties.isEmpty()) {
-            RestConfiguration rest = camelContext.getRestConfiguration();
             restProperties.forEach((k, v) -> {
                 LOG.warn("Property not auto-configured: camel.rest.{}={} on bean: {}", k, v, rest);
             });
         }
         if (!threadPoolProperties.isEmpty()) {
             threadPoolProperties.forEach((k, v) -> {
-                LOG.warn("Property not auto-configured: camel.threadpool{}={} on bean: ThreadPoolProfileBuilder", k, v);
+                LOG.warn("Property not auto-configured: camel.threadpool.{}={}", k, v);
             });
+        }
+        if (!healthProperties.isEmpty()) {
+            healthProperties.forEach((k, v) -> {
+                LOG.warn("Property not auto-configured: camel.health.{}={}", k, v);
+            });
+        }
+        if (!lraProperties.isEmpty()) {
+            lraProperties.forEach((k, v) -> {
+                LOG.warn("Property not auto-configured: camel.lra.{}={}", k, v);
+            });
+        }
+
+        // and call after all properties are set
+        DefaultConfigurationConfigurer.afterPropertiesSet(camelContext);
+    }
+
+    private void setThreadPoolProperties(CamelContext camelContext, Map<String, Object> threadPoolProperties,
+                                         boolean failIfNotSet, Map<String, String> autoConfiguredProperties) throws Exception {
+
+        ThreadPoolConfigurationProperties tp = mainConfigurationProperties.threadPool();
+
+        // extract all config to know their parent ids so we can set the values afterwards
+        Map<String, Object> hcConfig = PropertiesHelper.extractProperties(threadPoolProperties, "config", false);
+        Map<String, ThreadPoolProfileConfigurationProperties> tpConfigs = new HashMap<>();
+        // build set of configuration objects
+        for (Map.Entry<String, Object> entry : hcConfig.entrySet()) {
+            String id = StringHelper.between(entry.getKey(), "[", "]");
+            if (id != null) {
+                ThreadPoolProfileConfigurationProperties tcp = tpConfigs.get(id);
+                if (tcp == null) {
+                    tcp = new ThreadPoolProfileConfigurationProperties();
+                    tcp.setId(id);
+                    tpConfigs.put(id, tcp);
+                }
+            }
+        }
+        if (tp.getConfig() != null) {
+            tp.getConfig().putAll(tpConfigs);
+        } else {
+            tp.setConfig(tpConfigs);
+        }
+
+        setPropertiesOnTarget(camelContext, tp, threadPoolProperties, "camel.threadpool.",
+                mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
+
+        // okay we have all properties set so we should be able to create thread pool profiles and register them on camel
+        final ThreadPoolProfile dp = new ThreadPoolProfileBuilder("default")
+                .poolSize(tp.getPoolSize())
+                .maxPoolSize(tp.getMaxPoolSize())
+                .keepAliveTime(tp.getKeepAliveTime(), tp.getTimeUnit())
+                .maxQueueSize(tp.getMaxQueueSize())
+                .allowCoreThreadTimeOut(tp.getAllowCoreThreadTimeOut())
+                .rejectedPolicy(tp.getRejectedPolicy()).build();
+
+        for (ThreadPoolProfileConfigurationProperties config : tp.getConfig().values()) {
+            ThreadPoolProfileBuilder builder = new ThreadPoolProfileBuilder(config.getId(), dp);
+            final ThreadPoolProfile tpp = builder.poolSize(config.getPoolSize())
+                    .maxPoolSize(config.getMaxPoolSize())
+                    .keepAliveTime(config.getKeepAliveTime(), config.getTimeUnit())
+                    .maxQueueSize(config.getMaxQueueSize())
+                    .allowCoreThreadTimeOut(config.getAllowCoreThreadTimeOut())
+                    .rejectedPolicy(config.getRejectedPolicy()).build();
+            if (!tpp.isEmpty()) {
+                camelContext.getExecutorServiceManager().registerThreadPoolProfile(tpp);
+            }
+        }
+
+        if (!dp.isEmpty()) {
+            dp.setDefaultProfile(true);
+            camelContext.getExecutorServiceManager().setDefaultThreadPoolProfile(dp);
+        }
+
+    }
+
+    private void setHealthCheckProperties(CamelContext camelContext, Map<String, Object> healthCheckProperties,
+                                          boolean failIfNotSet, Map<String, String> autoConfiguredProperties) throws Exception {
+
+        HealthCheckRegistry hcr = camelContext.getExtension(HealthCheckRegistry.class);
+        if (hcr == null) {
+            LOG.warn("Cannot find HealthCheckRegistry from classpath. Add camel-health to classpath.");
+            return;
+        }
+
+        HealthConfigurationProperties health = mainConfigurationProperties.health();
+
+        // extract all config to know their parent ids so we can set the values afterwards
+        Map<String, Object> hcConfig = PropertiesHelper.extractProperties(healthCheckProperties, "config", false);
+        Map<String, HealthCheckConfigurationProperties> hcConfigs = new HashMap<>();
+        // build set of configuration objects
+        for (Map.Entry<String, Object> entry : hcConfig.entrySet()) {
+            String parent = StringHelper.between(entry.getKey(), "[", "]");
+            if (parent != null) {
+                HealthCheckConfigurationProperties hcp = hcConfigs.get(parent);
+                if (hcp == null) {
+                    hcp = new HealthCheckConfigurationProperties();
+                    hcConfigs.put(parent, hcp);
+                }
+            }
+        }
+        if (health.getConfig() != null) {
+            health.getConfig().putAll(hcConfigs);
+        } else {
+            health.setConfig(hcConfigs);
+        }
+
+        setPropertiesOnTarget(camelContext, health, healthCheckProperties, "camel.health.",
+                mainConfigurationProperties.isAutoConfigurationFailFast(), true, autoConfiguredProperties);
+
+        if (health.getEnabled() != null) {
+            hcr.setEnabled(health.getEnabled());
+        }
+        // context is enabled by default
+        if (hcr.isEnabled() && (!health.getConfig().containsKey("context") || health.getContextEnabled() != null)) {
+            HealthCheck hc = (HealthCheck) hcr.resolveById("context");
+            if (hc != null) {
+                if (health.getContextEnabled() != null) {
+                    hc.getConfiguration().setEnabled(health.getContextEnabled());
+                }
+                hcr.register(hc);
+            }
+        }
+        // routes is enabled by default
+        if (hcr.isEnabled() && (!health.getConfig().containsKey("routes") || health.getRoutesEnabled() != null)) {
+            HealthCheckRepository hc = hcr.getRepository("routes").orElse((HealthCheckRepository) hcr.resolveById("routes"));
+            if (hc != null) {
+                if (health.getRoutesEnabled() != null) {
+                    hc.setEnabled(health.getRoutesEnabled());
+                }
+                hcr.register(hc);
+            }
+        }
+        // registry is enabled by default
+        if (hcr.isEnabled() && (!health.getConfig().containsKey("registry") || health.getRegistryEnabled() != null)) {
+            hcr.getRepository("registry").ifPresent(h -> {
+                if (health.getRegistryEnabled() != null) {
+                    h.setEnabled(health.getRegistryEnabled());
+                }
+            });
+        }
+
+        // configure health checks configurations
+        for (String id : health.getConfig().keySet()) {
+            HealthCheckConfiguration hcc = health.getConfig().get(id);
+            String parent = hcc.getParent();
+            // lookup health check by id
+            Object hc = hcr.getCheck(parent).orElse(null);
+            if (hc == null) {
+                hc = hcr.resolveById(parent);
+                if (hc == null) {
+                    LOG.warn("Cannot resolve HealthCheck with id: " + parent + " from classpath.");
+                    continue;
+                }
+                hcr.register(hc);
+                if (hc instanceof HealthCheck) {
+                    ((HealthCheck) hc).getConfiguration().setParent(hcc.getParent());
+                    ((HealthCheck) hc).getConfiguration().setEnabled(hcc.isEnabled());
+                    ((HealthCheck) hc).getConfiguration().setFailureThreshold(hcc.getFailureThreshold());
+                    ((HealthCheck) hc).getConfiguration().setInterval(hcc.getInterval());
+                } else if (hc instanceof HealthCheckRepository) {
+                    ((HealthCheckRepository) hc).setEnabled(hcc.isEnabled());
+                    ((HealthCheckRepository) hc).addConfiguration(id, hcc);
+                }
+            }
         }
     }
 
-    private void setThreadPoolProfileProperties(CamelContext camelContext, Map<String, Object> threadPoolProperties,
-                                                boolean failIfNotSet, Map<String, String> autoConfiguredProperties) {
+    private void setLraCheckProperties(CamelContext camelContext, Map<String, Object> lraProperties,
+                                       boolean failIfNotSet, Map<String, String> autoConfiguredProperties) throws Exception {
 
-        Map<String, Map<String, String>> profiles = new LinkedHashMap<>();
-        // the id of the profile is in the key [xx]
-        threadPoolProperties.forEach((k, v) -> {
-            String id = StringHelper.between(k, "[", "].");
-            if (id == null) {
-                throw new IllegalArgumentException("Invalid syntax for key: camel.threadpool" + k + " should be: camel.threadpool[id]");
-            }
-            String key = StringHelper.after(k, "].");
-            String value = v.toString();
-            if (key == null) {
-                throw new PropertyBindingException("ThreadPoolProfileBuilder", k, value);
-            }
-            Map<String, String> map = profiles.computeIfAbsent(id, o -> new HashMap<>());
-            map.put(optionKey(key), value);
-
-            if (failIfNotSet && !VALID_THREAD_POOL_KEYS.contains(key)) {
-                throw new PropertyBindingException("ThreadPoolProfileBuilder", key, value);
-            }
-
-            autoConfiguredProperties.put(k, value);
-        });
-
-        // now build profiles from those options
-        for (String id : profiles.keySet()) {
-            Map<String, String> map = profiles.get(id);
-            // camel-main will lower-case keys
-            String overrideId = map.remove("id");
-            String poolSize = map.remove("poolSize");
-            String maxPoolSize = map.remove("maxPoolSize");
-            String keepAliveTime = map.remove("keepAliveTime");
-            String timeUnit = map.remove("timeUnit");
-            String maxQueueSize = map.remove("maxQueueSize");
-            String allowCoreThreadTimeOut = map.remove("allowCoreThreadTimeout");
-            String rejectedPolicy = map.remove("rejectedPolicy");
-
-            if (overrideId != null) {
-                id = CamelContextHelper.parseText(camelContext, overrideId);
-            }
-            ThreadPoolProfileBuilder builder = new ThreadPoolProfileBuilder(id);
-            if ("default".equals(id)) {
-                builder.defaultProfile(true);
-            }
-            if (poolSize != null) {
-                builder.poolSize(CamelContextHelper.parseInteger(camelContext, poolSize));
-            }
-            if (maxPoolSize != null) {
-                builder.maxPoolSize(CamelContextHelper.parseInteger(camelContext, maxPoolSize));
-            }
-            if (keepAliveTime != null && timeUnit != null) {
-                String text = CamelContextHelper.parseText(camelContext, timeUnit);
-                builder.keepAliveTime(CamelContextHelper.parseLong(camelContext, keepAliveTime), camelContext.getTypeConverter().convertTo(TimeUnit.class, text));
-            }
-            if (keepAliveTime != null && timeUnit == null) {
-                builder.keepAliveTime(CamelContextHelper.parseLong(camelContext, keepAliveTime));
-            }
-            if (maxQueueSize != null) {
-                builder.maxQueueSize(CamelContextHelper.parseInteger(camelContext, maxQueueSize));
-            }
-            if (allowCoreThreadTimeOut != null) {
-                builder.allowCoreThreadTimeOut(CamelContextHelper.parseBoolean(camelContext, allowCoreThreadTimeOut));
-            }
-            if (rejectedPolicy != null) {
-                String text = CamelContextHelper.parseText(camelContext, rejectedPolicy);
-                builder.rejectedPolicy(camelContext.getTypeConverter().convertTo(ThreadPoolRejectedPolicy.class, text));
-            }
-            ExecutorServiceManager esm = camelContext.adapt(ExtendedCamelContext.class).getExecutorServiceManager();
-            if ("default".equals(id)) {
-                esm.setDefaultThreadPoolProfile(builder.build());
-            } else {
-                esm.registerThreadPoolProfile(builder.build());
-            }
+        Object obj = lraProperties.get("enabled");
+        if (obj != null) {
+            autoConfiguredProperties.put("camel.lra.enabled", obj.toString());
         }
+        boolean enabled = obj != null ? CamelContextHelper.parseBoolean(camelContext, obj.toString()) : true;
+        if (enabled) {
+            CamelSagaService css = resolveLraSagaService(camelContext);
+            setPropertiesOnTarget(camelContext, css, lraProperties, "camel.lra.", failIfNotSet, true, autoConfiguredProperties);
+        }
+    }
+
+    private static CamelSagaService resolveLraSagaService(CamelContext camelContext) throws Exception {
+        // lookup in service registry first
+        Set<CamelSagaService> set = camelContext.getRegistry().findByType(CamelSagaService.class);
+        if (set.size() == 1) {
+            return set.iterator().next();
+        }
+        CamelSagaService answer = camelContext.adapt(ExtendedCamelContext.class).getDefaultFactoryFinder()
+                .newInstance("lra-saga-service", CamelSagaService.class)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find LRASagaService on classpath. "
+                        + "Add camel-lra to classpath."));
+
+        // add as service so its discover by saga eip
+        camelContext.addService(answer, true, false);
+        return answer;
     }
 
     private void bindBeansToRegistry(CamelContext camelContext, Map<String, Object> properties,
@@ -985,6 +1179,9 @@ public abstract class BaseMainSupport extends BaseService {
         // load properties from ENV (override existing)
         if (mainConfigurationProperties.isAutoConfigurationEnvironmentVariablesEnabled()) {
             Properties propENV = loadEnvironmentVariablesAsProperties(new String[]{"camel.main."});
+            propENV.remove(INITIAL_PROPERTIES_LOCATION.replace('-', '.'));
+            propENV.remove(OVERRIDE_PROPERTIES_LOCATION.replace('-', '.'));
+            propENV.remove(PROPERTY_PLACEHOLDER_LOCATION.replace('-', '.'));
             if (!propENV.isEmpty()) {
                 prop.putAll(propENV);
             }

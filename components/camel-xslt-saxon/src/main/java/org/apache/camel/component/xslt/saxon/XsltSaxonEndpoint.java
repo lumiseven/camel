@@ -36,6 +36,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import net.sf.saxon.Configuration;
 import net.sf.saxon.TransformerFactoryImpl;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.api.management.ManagedAttribute;
 import org.apache.camel.api.management.ManagedResource;
@@ -47,6 +48,7 @@ import org.apache.camel.spi.Metadata;
 import org.apache.camel.spi.UriEndpoint;
 import org.apache.camel.spi.UriParam;
 import org.apache.camel.support.EndpointHelper;
+import org.apache.camel.support.ResourceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * Transform XML payloads using an XSLT template using Saxon.
  */
 @ManagedResource(description = "Managed XsltSaxonEndpoint")
-@UriEndpoint(firstVersion = "3.0.0", scheme = "xslt-saxon", title = "XSLT Saxon", syntax = "xslt-saxon:resourceUri", producerOnly = true, label = "core,transformation")
+@UriEndpoint(firstVersion = "3.0.0", scheme = "xslt-saxon", title = "XSLT Saxon", syntax = "xslt-saxon:resourceUri", producerOnly = true, category = {Category.CORE, Category.TRANSFORMATION})
 public class XsltSaxonEndpoint extends XsltEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(XsltSaxonEndpoint.class);
@@ -148,10 +150,28 @@ public class XsltSaxonEndpoint extends XsltEndpoint {
     }
 
     @Override
-    protected void doStart() throws Exception {
+    protected void doInit() throws Exception {
+        super.doInit();
+
         // the processor is the xslt builder
         setXslt(createXsltBuilder());
+
+        // must load resource first which sets a template and do a stylesheet compilation to catch errors early
+        // load resource from classpath otherwise load in doStart()
+        if (ResourceHelper.isClasspathUri(getResourceUri())) {
+            loadResource(getResourceUri(), getXslt());
+        }
+
         setProcessor(getXslt());
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        super.doStart();
+
+        if (!ResourceHelper.isClasspathUri(getResourceUri())) {
+            loadResource(getResourceUri(), getXslt());
+        }
     }
 
     protected XsltSaxonBuilder createXsltBuilder() throws Exception {
@@ -207,9 +227,6 @@ public class XsltSaxonEndpoint extends XsltEndpoint {
             Map<String, Object> copy = new HashMap<>(getParameters());
             xslt.setParameters(copy);
         }
-
-        // must load resource first which sets a template and do a stylesheet compilation to catch errors early
-        loadResource(getResourceUri(), xslt);
 
         return xslt;
     }

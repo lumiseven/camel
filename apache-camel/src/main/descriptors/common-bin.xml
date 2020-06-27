@@ -40,6 +40,7 @@
         <include>org.apache.camel:camel-core-catalog</include>
         <include>org.apache.camel:camel-cloud</include>
         <include>org.apache.camel:camel-cluster</include>
+        <include>org.apache.camel:camel-health</include>
         <include>org.apache.camel:camel-xml-jaxp</include>
         <include>org.apache.camel:camel-main</include>
         <include>org.apache.camel:camel-tooling-model</include>
@@ -86,6 +87,7 @@
         <include>org.apache.camel:camel-aws-swf</include>
         <include>org.apache.camel:camel-aws-translate</include>
         <include>org.apache.camel:camel-aws-xray</include>
+        <include>org.apache.camel:camel-aws2-athena</include>
         <include>org.apache.camel:camel-aws2-cw</include>
         <include>org.apache.camel:camel-aws2-ddb</include>
         <include>org.apache.camel:camel-aws2-ec2</include>
@@ -236,6 +238,7 @@
         <include>org.apache.camel:camel-jsonapi</include>
         <include>org.apache.camel:camel-jsonpath</include>
         <include>org.apache.camel:camel-jt400</include>
+        <include>org.apache.camel:camel-jta</include>
         <include>org.apache.camel:camel-kafka</include>
         <include>org.apache.camel:camel-kubernetes</include>
         <include>org.apache.camel:camel-kudu</include>
@@ -302,6 +305,7 @@
         <include>org.apache.camel:camel-rest</include>
         <include>org.apache.camel:camel-rest-openapi</include>
         <include>org.apache.camel:camel-rest-swagger</include>
+        <include>org.apache.camel:camel-resteasy</include>
         <include>org.apache.camel:camel-ribbon</include>
         <include>org.apache.camel:camel-robotframework</include>
         <include>org.apache.camel:camel-rss</include>

@@ -1,19 +1,21 @@
 [[aws2-ec2-component]]
-= AWS 2 EC2 Component
+= AWS 2 Elastic Compute Cloud (EC2) Component
 //THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-ec2/src/main/docs/aws2-ec2-component.adoc
-:docTitle: AWS 2 EC2
+:docTitle: AWS 2 Elastic Compute Cloud (EC2)
 :artifactId: camel-aws2-ec2
 :description: Manage AWS EC2 instances using AWS SDK version 2.x.
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The EC2 component supports the ability to create, run, start, stop and terminate
+The AWS2 EC2 component supports the ability to create, run, start, stop and terminate
 https://aws.amazon.com/ec2/[AWS EC2] instances.
 
 Prerequisites
@@ -41,7 +43,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 EC2 component supports 12 options, which are listed below.
+The AWS 2 Elastic Compute Cloud (EC2) component supports 12 options, which are listed below.
 
 
 
@@ -67,7 +69,7 @@ The AWS 2 EC2 component supports 12 options, which are listed below.
 
 
 // endpoint options: START
-The AWS 2 EC2 endpoint is configured using URI syntax:
+The AWS 2 Elastic Compute Cloud (EC2) endpoint is configured using URI syntax:
 
 ----
 aws2-ec2:label

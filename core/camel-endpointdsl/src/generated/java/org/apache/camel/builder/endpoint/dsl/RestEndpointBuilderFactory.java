@@ -16,6 +16,7 @@
  */
 package org.apache.camel.builder.endpoint.dsl;
 
+import java.util.Map;
 import javax.annotation.Generated;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.builder.EndpointConsumerBuilder;
@@ -358,7 +359,7 @@ public interface RestEndpointBuilderFactory {
         }
         /**
          * The openapi api doc resource to use. The resource is loaded from
-         * classpath by default and must be in JSon format.
+         * classpath by default and must be in JSON format.
          * 
          * The option is a: <code>java.lang.String</code> type.
          * 
@@ -476,12 +477,30 @@ public interface RestEndpointBuilderFactory {
          * Query parameters for the HTTP service to call.
          * 
          * The option is a: <code>java.lang.String</code> type.
+         * The option is multivalued, and you can use the
+         * queryParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: producer
          */
         default RestEndpointProducerBuilder queryParameters(
-                String queryParameters) {
-            doSetProperty("queryParameters", queryParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("queryParameters", "null" + key, value);
+            return this;
+        }
+        /**
+         * Query parameters for the HTTP service to call.
+         * 
+         * The option is a: <code>java.lang.String</code> type.
+         * The option is multivalued, and you can use the
+         * queryParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
+         * 
+         * Group: producer
+         */
+        default RestEndpointProducerBuilder queryParameters(Map values) {
+            doSetMultiValueProperties("queryParameters", "null", values);
             return this;
         }
     }

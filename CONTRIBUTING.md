@@ -5,7 +5,7 @@ There are many ways you can help make Camel a better piece of software - please 
 - Download the code & try it out and see what you think.
 - Browse the source code. Got an itch to scratch, want to tune some operation or add some feature?
 - Want to do some hacking on Camel? Try surfing the our [issue tracker](https://issues.apache.org/jira/browse/CAMEL) for open issues or features that need to be implemented, take ownership of an issue and try fix it.
-- If you are a new Camel rider and would like to help us, you can also find [some easy to resolve issues.](https://issues.apache.org/jira/secure/IssueNavigator.jspa?mode=hide&requestId=12316782)
+- If you are a new Camel rider and would like to help us, you can also find [some easy to resolve issues.](https://issues.apache.org/jira/issues/?filter=12348074)
 - Leave a comment on the issue to let us know you are working on it and add yourself as a watcher to get informed about all modifications.
 
 
@@ -30,9 +30,8 @@ There are many ways you can help make Camel a better piece of software - please 
 ## Getting in touch
 
 There are various ways of communicating with the Camel community.
-- Join us on the [Discussion Forums](http://camel.apache.org/discussion-forums.html) and take part in any conversations
-- Pop by on [IRC](http://camel.apache.org/irc-room.html) and say hi
-- Add some comments to the [wiki](http://camel.apache.org/navigation.html)
+- Join us on the [Discussion Forums](https://camel.465427.n5.nabble.com) and take part in any conversations
+- Pop by on [Gitter](https://gitter.im/apache/apache-camel) and say hi
 
 
 ## Improving the documentation

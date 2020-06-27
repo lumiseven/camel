@@ -22,6 +22,7 @@ import org.apache.camel.AsyncProcessor;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
@@ -80,6 +81,7 @@ public class KinesisConsumerClosedShardWithFailTest {
         when(kinesisClient.getShardIterator(any(GetShardIteratorRequest.class))).thenReturn(GetShardIteratorResponse.builder().shardIterator("shardIterator").build());
     }
 
+    @Test
     public void itObtainsAShardIteratorOnFirstPoll() throws Exception {
         assertThrows(ReachedClosedStatusException.class, () -> {
             undertest.poll();
@@ -94,6 +96,6 @@ public class KinesisConsumerClosedShardWithFailTest {
         verify(kinesisClient).getShardIterator(getShardIteratorReqCap.capture());
         assertThat(getShardIteratorReqCap.getValue().streamName(), is("streamName"));
         assertThat(getShardIteratorReqCap.getValue().shardId(), is("shardId"));
-        assertThat(getShardIteratorReqCap.getValue().shardIteratorType(), is("LATEST"));
+        assertThat(getShardIteratorReqCap.getValue().shardIteratorType(), is(ShardIteratorType.LATEST));
     }
 }

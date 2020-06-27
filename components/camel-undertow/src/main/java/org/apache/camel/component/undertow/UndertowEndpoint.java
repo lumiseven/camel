@@ -29,6 +29,7 @@ import javax.net.ssl.SSLContext;
 import io.undertow.server.HttpServerExchange;
 import io.undertow.server.handlers.accesslog.AccessLogReceiver;
 import org.apache.camel.AsyncEndpoint;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -61,7 +62,7 @@ import org.xnio.Options;
  * Expose HTTP and WebSocket endpoints and access external HTTP/WebSocket servers.
  */
 @UriEndpoint(firstVersion = "2.16.0", scheme = "undertow", title = "Undertow", syntax = "undertow:httpURI",
-        label = "http,websocket", lenientProperties = true)
+        category = {Category.HTTP, Category.WEBSOCKET}, lenientProperties = true)
 public class UndertowEndpoint extends DefaultEndpoint implements AsyncEndpoint, HeaderFilterStrategyAware, DiscoverableService {
 
     private static final Logger LOG = LoggerFactory.getLogger(UndertowEndpoint.class);
@@ -475,8 +476,8 @@ public class UndertowEndpoint extends DefaultEndpoint implements AsyncEndpoint, 
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
+    protected void doInit() throws Exception {
+        super.doInit();
 
         if (this.securityProvider == null) {
             initSecurityProvider();
@@ -603,8 +604,8 @@ public class UndertowEndpoint extends DefaultEndpoint implements AsyncEndpoint, 
     }
 
     /**
-     * Which Undertow AccessLogReciever should be used
-     * Will use JBossLoggingAccessLogReceiver if not specifid
+     * Which Undertow AccessLogReceiver should be used
+     * Will use JBossLoggingAccessLogReceiver if not specified
      */
     public void setAccessLogReceiver(AccessLogReceiver accessLogReceiver) {
         this.accessLogReceiver = accessLogReceiver;

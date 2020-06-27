@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.camel.spi.Metadata;
 import org.apache.camel.tooling.model.JsonMapper;
 import org.apache.camel.tooling.model.MainModel;
 import org.apache.camel.tooling.model.MainModel.MainGroupModel;
@@ -37,6 +38,7 @@ import org.apache.maven.plugins.annotations.ResolutionScope;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 import org.jboss.forge.roaster.Roaster;
+import org.jboss.forge.roaster.model.source.AnnotationSource;
 import org.jboss.forge.roaster.model.source.FieldSource;
 import org.jboss.forge.roaster.model.source.JavaClassSource;
 import org.jboss.forge.roaster.model.source.MethodSource;
@@ -46,13 +48,13 @@ import org.sonatype.plexus.build.incremental.BuildContext;
  * Prepares camel-main by generating Camel Main configuration metadata for
  * tooling support.
  */
-@Mojo(name = "prepare-main", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
+@Mojo(name = "prepare-main-doc", defaultPhase = LifecyclePhase.PROCESS_CLASSES, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class PrepareCamelMainMojo extends AbstractGeneratorMojo {
 
     /**
      * The output directory for generated spring boot tooling file
      */
-    @Parameter(defaultValue = "${project.basedir}/src/generated/resources")
+    @Parameter(defaultValue = "${project.basedir}/src/main/doc")
     protected File outFolder;
 
     /**
@@ -73,17 +75,25 @@ public class PrepareCamelMainMojo extends AbstractGeneratorMojo {
         // filter out final or static fields
         fields = fields.stream().filter(f -> !f.isFinal() && !f.isStatic()).collect(Collectors.toList());
         fields.forEach(f -> {
+            AnnotationSource as = f.getAnnotation(Metadata.class);
             String name = f.getName();
             String javaType = f.getType().getQualifiedName();
             String sourceType = clazz.getQualifiedName();
             String defaultValue = f.getStringInitializer();
+            if (as != null) {
+                defaultValue = as.getStringValue("defaultValue");
+            }
+            if (defaultValue != null && defaultValue.startsWith("new ")) {
+                // skip constructors
+                defaultValue = null;
+            }
 
             // the field must have a setter
             String setterName = "set" + Character.toUpperCase(name.charAt(0)) + name.substring(1);
             MethodSource<?> setter = clazz.getMethod(setterName, javaType);
             if (setter != null) {
                 String desc = setter.getJavaDoc().getFullText();
-                boolean deprecated = setter.getAnnotation(Deprecated.class) != null;
+                boolean deprecated = clazz.getAnnotation(Deprecated.class) != null || setter.getAnnotation(Deprecated.class) != null;
                 String type = fromMainToType(javaType);
                 MainModel.MainOptionModel model = new MainModel.MainOptionModel();
                 model.setName(name);
@@ -103,6 +113,14 @@ public class PrepareCamelMainMojo extends AbstractGeneratorMojo {
                     enums = Arrays.asList("auto,off,json,xml,json_xml".split(","));
                 } else if ("org.apache.camel.spi.RestHostNameResolver".equals(javaType)) {
                     enums = Arrays.asList("allLocalIp,localIp,localHostName".split(","));
+                } else if ("org.apache.camel.util.concurrent.ThreadPoolRejectedPolicy".equals(javaType)) {
+                    enums = Arrays.asList("Abort,CallerRuns,DiscardOldest,Discard".split(","));
+                }
+                if (enums == null && as != null) {
+                    String text = as.getStringValue("enums");
+                    if (text != null) {
+                        enums = Arrays.asList(text.split(","));
+                    }
                 }
                 model.setEnums(enums);
                 answer.add(model);
@@ -171,6 +189,15 @@ public class PrepareCamelMainMojo extends AbstractGeneratorMojo {
                     prefix = "camel.faulttolerance.";
                 } else if (file.getName().contains("Rest")) {
                     prefix = "camel.rest.";
+                } else if (file.getName().contains("Health")) {
+                    prefix = "camel.health.";
+                } else if (file.getName().contains("Lra")) {
+                    prefix = "camel.lra.";
+                } else if (file.getName().contains("ThreadPoolProfileConfigurationProperties")) {
+                    // skip this file
+                    continue;
+                } else if (file.getName().contains("ThreadPoolConfigurationProperties")) {
+                    prefix = "camel.threadpool.";
                 } else {
                     prefix = "camel.main.";
                 }
@@ -212,6 +239,9 @@ public class PrepareCamelMainMojo extends AbstractGeneratorMojo {
             model.getGroups().add(new MainGroupModel("camel.hystrix", "camel-hystrix configurations.", "org.apache.camel.main.HystrixConfigurationProperties"));
             model.getGroups().add(new MainGroupModel("camel.resilience4j", "camel-resilience4j configurations.", "org.apache.camel.main.Resilience4jConfigurationProperties"));
             model.getGroups().add(new MainGroupModel("camel.rest", "camel-rest configurations.", "org.apache.camel.spi.RestConfiguration"));
+            model.getGroups().add(new MainGroupModel("camel.health", "camel-health configurations.", "org.apache.camel.main.HealthConfigurationProperties"));
+            model.getGroups().add(new MainGroupModel("camel.lra", "camel-lra configurations.", "org.apache.camel.main.LraConfigurationProperties"));
+            model.getGroups().add(new MainGroupModel("camel.threadpool", "camel-threadpool configurations.", "org.apache.camel.main.ThreadPoolConfigurationProperties"));
 
             String json = JsonMapper.createJsonSchema(model);
 

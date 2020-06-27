@@ -8,12 +8,14 @@
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The DynamoDB component supports storing and retrieving data from/to
+The AWS2 DynamoDB component supports storing and retrieving data from/to
 https://aws.amazon.com/dynamodb[Amazon's DynamoDB] service.
 
 Prerequisites

@@ -16,6 +16,7 @@
  */
 package org.apache.camel.model;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -1714,6 +1715,23 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      *
      * @param samplePeriod this is the sample interval, only one exchange is
      *            allowed through in this interval
+     * @return the builder
+     */
+    public SamplingDefinition sample(Duration samplePeriod) {
+        SamplingDefinition answer = new SamplingDefinition(samplePeriod);
+        addOutput(answer);
+        return answer;
+    }
+
+    /**
+     * <a href="http://camel.apache.org/sampling.html">Sampling Throttler</a>
+     * Creates a sampling throttler allowing you to extract a sample of
+     * exchanges from the traffic through a route. It is configured with a
+     * sampling period during which only a single exchange is allowed to pass
+     * through. All other exchanges will be stopped.
+     *
+     * @param samplePeriod this is the sample interval, only one exchange is
+     *            allowed through in this interval
      * @param unit this is the units for the samplePeriod e.g. Seconds
      * @return the builder
      */
@@ -2783,6 +2801,25 @@ public abstract class ProcessorDefinition<Type extends ProcessorDefinition<Type>
      */
     public Type setProperty(String name, Expression expression) {
         SetPropertyDefinition answer = new SetPropertyDefinition(name, expression);
+        addOutput(answer);
+        return asType();
+    }
+
+    /**
+     * Adds a processor which sets the exchange property
+     *
+     * @param name the property name
+     * @param supplier the supplier used to set the property
+     * @return the builder
+     */
+    public Type setProperty(String name, final Supplier<Object> supplier) {
+        SetPropertyDefinition answer = new SetPropertyDefinition(name, new ExpressionAdapter() {
+            @Override
+            public Object evaluate(Exchange exchange) {
+                return supplier.get();
+            }
+        });
+
         addOutput(answer);
         return asType();
     }

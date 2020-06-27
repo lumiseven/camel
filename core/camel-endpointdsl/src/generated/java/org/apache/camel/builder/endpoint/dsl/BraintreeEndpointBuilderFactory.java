@@ -19,7 +19,6 @@ package org.apache.camel.builder.endpoint.dsl;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import javax.annotation.Generated;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.LoggingLevel;
@@ -149,19 +148,7 @@ public interface BraintreeEndpointBuilderFactory {
         /**
          * Set logging level for http calls, see java.util.logging.Level.
          * 
-         * The option is a: <code>java.util.logging.Level</code> type.
-         * 
-         * Group: logging
-         */
-        default BraintreeEndpointConsumerBuilder httpLogLevel(Level httpLogLevel) {
-            doSetProperty("httpLogLevel", httpLogLevel);
-            return this;
-        }
-        /**
-         * Set logging level for http calls, see java.util.logging.Level.
-         * 
-         * The option will be converted to a
-         * <code>java.util.logging.Level</code> type.
+         * The option is a: <code>java.lang.String</code> type.
          * 
          * Group: logging
          */
@@ -515,27 +502,32 @@ public interface BraintreeEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default BraintreeEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default BraintreeEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default BraintreeEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -922,19 +914,7 @@ public interface BraintreeEndpointBuilderFactory {
         /**
          * Set logging level for http calls, see java.util.logging.Level.
          * 
-         * The option is a: <code>java.util.logging.Level</code> type.
-         * 
-         * Group: logging
-         */
-        default BraintreeEndpointProducerBuilder httpLogLevel(Level httpLogLevel) {
-            doSetProperty("httpLogLevel", httpLogLevel);
-            return this;
-        }
-        /**
-         * Set logging level for http calls, see java.util.logging.Level.
-         * 
-         * The option will be converted to a
-         * <code>java.util.logging.Level</code> type.
+         * The option is a: <code>java.lang.String</code> type.
          * 
          * Group: logging
          */
@@ -1196,19 +1176,7 @@ public interface BraintreeEndpointBuilderFactory {
         /**
          * Set logging level for http calls, see java.util.logging.Level.
          * 
-         * The option is a: <code>java.util.logging.Level</code> type.
-         * 
-         * Group: logging
-         */
-        default BraintreeEndpointBuilder httpLogLevel(Level httpLogLevel) {
-            doSetProperty("httpLogLevel", httpLogLevel);
-            return this;
-        }
-        /**
-         * Set logging level for http calls, see java.util.logging.Level.
-         * 
-         * The option will be converted to a
-         * <code>java.util.logging.Level</code> type.
+         * The option is a: <code>java.lang.String</code> type.
          * 
          * Group: logging
          */
@@ -1427,7 +1395,7 @@ public interface BraintreeEndpointBuilderFactory {
          * Braintree (camel-braintree)
          * Process payments using Braintree Payments.
          * 
-         * Category: api,cloud,payment
+         * Category: cloud,payment
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-braintree
          * 
@@ -1453,7 +1421,7 @@ public interface BraintreeEndpointBuilderFactory {
          * Braintree (camel-braintree)
          * Process payments using Braintree Payments.
          * 
-         * Category: api,cloud,payment
+         * Category: cloud,payment
          * Since: 2.17
          * Maven coordinates: org.apache.camel:camel-braintree
          * 

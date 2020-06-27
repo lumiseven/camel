@@ -1,19 +1,21 @@
 [[aws2-ses-component]]
-= AWS 2 Simple Email Service Component
+= AWS 2 Simple Email Service (SES) Component
 //THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-ses/src/main/docs/aws2-ses-component.adoc
-:docTitle: AWS 2 Simple Email Service
+:docTitle: AWS 2 Simple Email Service (SES)
 :artifactId: camel-aws2-ses
 :description: Send e-mails through AWS SES service using AWS SDK version 2.x.
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The ses component supports sending emails with
+The AWS2 SES component supports sending emails with
 https://aws.amazon.com/ses[Amazon's SES] service.
 
 Prerequisites
@@ -36,7 +38,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 Simple Email Service component supports 14 options, which are listed below.
+The AWS 2 Simple Email Service (SES) component supports 14 options, which are listed below.
 
 
 
@@ -64,7 +66,7 @@ The AWS 2 Simple Email Service component supports 14 options, which are listed b
 
 
 // endpoint options: START
-The AWS 2 Simple Email Service endpoint is configured using URI syntax:
+The AWS 2 Simple Email Service (SES) endpoint is configured using URI syntax:
 
 ----
 aws2-ses:from

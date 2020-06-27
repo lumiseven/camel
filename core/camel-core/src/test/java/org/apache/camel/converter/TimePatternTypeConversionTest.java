@@ -18,7 +18,9 @@ package org.apache.camel.converter;
 
 import org.apache.camel.ContextTestSupport;
 import org.apache.camel.util.TimeUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TimePatternTypeConversionTest extends ContextTestSupport {
 
@@ -44,5 +46,23 @@ public class TimePatternTypeConversionTest extends ContextTestSupport {
     public void testMTimePattern() throws Exception {
         long milliseconds = TimeUtils.toMilliSeconds("30m55s");
         assertEquals(1855000, milliseconds);
+    }
+
+    @Test
+    public void testSecondsPattern() throws Exception {
+        long milliseconds = TimeUtils.toMilliSeconds("300 sec");
+        assertEquals(300000, milliseconds);
+    }
+
+    @Test
+    public void testDotSecPattern() throws Exception {
+        long milliseconds = TimeUtils.toMilliSeconds("0.300second");
+        assertEquals(300, milliseconds);
+    }
+
+    @Test
+    public void testMillisPattern() throws Exception {
+        long milliseconds = TimeUtils.toMilliSeconds("300ms");
+        assertEquals(300, milliseconds);
     }
 }

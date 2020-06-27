@@ -16,10 +16,8 @@
  */
 package org.apache.camel.generator.openapi;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -37,8 +35,8 @@ import io.apicurio.datamodels.openapi.v3.models.Oas30ServerVariable;
 import org.apache.camel.CamelContext;
 import org.apache.camel.impl.DefaultCamelContext;
 import org.apache.camel.model.rest.RestsDefinition;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -203,7 +201,7 @@ public class RestDslGeneratorTest {
         assertThat(RestDslGenerator.resolveVariablesIn("before {var} after", server)).isEqualTo("before value after");
     }
 
-    @BeforeClass
+    @BeforeAll
     public static void readOpenApiDoc() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
         try (InputStream is = RestDslGeneratorTest.class.getResourceAsStream("openapi-v2.json")) {

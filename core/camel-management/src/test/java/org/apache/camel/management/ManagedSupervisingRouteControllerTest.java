@@ -33,9 +33,12 @@ import org.apache.camel.component.seda.SedaConsumer;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.impl.engine.DefaultSupervisingRouteController;
 import org.apache.camel.spi.SupervisingRouteController;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ManagedSupervisingRouteControllerTest extends ManagementTestSupport {
 
@@ -44,8 +47,8 @@ public class ManagedSupervisingRouteControllerTest extends ManagementTestSupport
         CamelContext context = super.createCamelContext();
         SupervisingRouteController src = new DefaultSupervisingRouteController();
         src.setThreadPoolSize(2);
-        src.setBackOffDelay(250);
-        src.setBackOffMaxAttempts(100);
+        src.setBackOffDelay(100);
+        src.setBackOffMaxAttempts(50);
         context.setRouteController(src);
         return context;
     }
@@ -71,7 +74,7 @@ public class ManagedSupervisingRouteControllerTest extends ManagementTestSupport
         assertEquals(2, threadPoolSize.intValue());
 
         Long backOffDelay = (Long) mbeanServer.getAttribute(on, "BackOffDelay");
-        assertEquals(250, backOffDelay.intValue());
+        assertEquals(100, backOffDelay.intValue());
 
         Integer routes = (Integer) mbeanServer.getAttribute(on, "NumberOfControlledRoutes");
         assertEquals(3, routes.intValue());
@@ -81,9 +84,15 @@ public class ManagedSupervisingRouteControllerTest extends ManagementTestSupport
             assertEquals(2, restarting.intValue());
         });
 
-        TabularData data = (TabularData) mbeanServer.invoke(on, "routeStatus", new Object[]{true, true}, new String[]{"boolean", "boolean"});
+        // wait for routes to be exhausted
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            Integer exhausted = (Integer) mbeanServer.getAttribute(on, "NumberOfExhaustedRoutes");
+            assertEquals(2, exhausted.intValue());
+        });
+
+        TabularData data = (TabularData) mbeanServer.invoke(on, "routeStatus", new Object[]{true, true, true}, new String[]{"boolean", "boolean", "boolean"});
         assertNotNull(data);
-        assertEquals(2, data.size());
+        assertEquals(3, data.size());
     }
 
     @Override

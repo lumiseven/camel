@@ -741,27 +741,32 @@ public interface JpaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default JpaEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default JpaEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default JpaEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -918,12 +923,16 @@ public interface JpaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the parameters(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: consumer (advanced)
          */
         default AdvancedJpaEndpointConsumerBuilder parameters(
-                Map<String, Object> parameters) {
-            doSetProperty("parameters", parameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("parameters", "null" + key, value);
             return this;
         }
         /**
@@ -935,14 +944,16 @@ public interface JpaEndpointBuilderFactory {
          * value. It allows you to retrieve parameter values from the message
          * body, header and etc.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the parameters(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: consumer (advanced)
          */
-        default AdvancedJpaEndpointConsumerBuilder parameters(String parameters) {
-            doSetProperty("parameters", parameters);
+        default AdvancedJpaEndpointConsumerBuilder parameters(Map values) {
+            doSetMultiValueProperties("parameters", "null", values);
             return this;
         }
         /**
@@ -1010,26 +1021,32 @@ public interface JpaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedJpaEndpointConsumerBuilder entityManagerProperties(
-                Map<String, Object> entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("entityManagerProperties", "emf." + key, value);
             return this;
         }
         /**
          * Additional properties for the entity manager to use.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedJpaEndpointConsumerBuilder entityManagerProperties(
-                String entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+                Map values) {
+            doSetMultiValueProperties("entityManagerProperties", "emf.", values);
             return this;
         }
         /**
@@ -1492,26 +1509,32 @@ public interface JpaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedJpaEndpointProducerBuilder entityManagerProperties(
-                Map<String, Object> entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("entityManagerProperties", "emf." + key, value);
             return this;
         }
         /**
          * Additional properties for the entity manager to use.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedJpaEndpointProducerBuilder entityManagerProperties(
-                String entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+                Map values) {
+            doSetMultiValueProperties("entityManagerProperties", "emf.", values);
             return this;
         }
         /**
@@ -1764,26 +1787,31 @@ public interface JpaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedJpaEndpointBuilder entityManagerProperties(
-                Map<String, Object> entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("entityManagerProperties", "emf." + key, value);
             return this;
         }
         /**
          * Additional properties for the entity manager to use.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * entityManagerProperties(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedJpaEndpointBuilder entityManagerProperties(
-                String entityManagerProperties) {
-            doSetProperty("entityManagerProperties", entityManagerProperties);
+        default AdvancedJpaEndpointBuilder entityManagerProperties(Map values) {
+            doSetMultiValueProperties("entityManagerProperties", "emf.", values);
             return this;
         }
         /**

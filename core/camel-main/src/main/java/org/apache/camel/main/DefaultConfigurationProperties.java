@@ -16,8 +16,10 @@
  */
 package org.apache.camel.main;
 
+import org.apache.camel.Experimental;
 import org.apache.camel.LoggingLevel;
 import org.apache.camel.ManagementStatisticsLevel;
+import org.apache.camel.spi.Metadata;
 import org.apache.camel.support.PatternHelper;
 
 /**
@@ -66,6 +68,7 @@ public abstract class DefaultConfigurationProperties<T> {
     private boolean endpointBasicPropertyBinding;
     private boolean useDataType;
     private boolean useBreadcrumb;
+    @Metadata(defaultValue = "Default")
     private ManagementStatisticsLevel jmxManagementStatisticsLevel = ManagementStatisticsLevel.Default;
     private String jmxManagementNamePattern = "#name#";
     private boolean useMdcLogging;
@@ -81,6 +84,9 @@ public abstract class DefaultConfigurationProperties<T> {
     private String xmlRoutes = "classpath:camel/*.xml";
     private String xmlRests = "classpath:camel-rest/*.xml";
     private boolean lightweight;
+    // route controller
+    @Metadata(defaultValue = "INFO")
+    private LoggingLevel routeControllerRouteStartupLoggingLevel = LoggingLevel.INFO;
     private boolean routeControllerSuperviseEnabled;
     private String routeControllerIncludeRoutes;
     private String routeControllerExcludeRoutes;
@@ -91,6 +97,7 @@ public abstract class DefaultConfigurationProperties<T> {
     private long routeControllerBackOffMaxElapsedTime;
     private long routeControllerBackOffMaxAttempts;
     private double routeControllerBackOffMultiplier;
+    private boolean routeControllerUnhealthyOnExhausted;
 
     // getter and setters
     // --------------------------------------------------------------
@@ -887,17 +894,33 @@ public abstract class DefaultConfigurationProperties<T> {
         this.xmlRests = xmlRests;
     }
 
+    @Experimental
     public boolean isLightweight() {
         return lightweight;
     }
 
     /**
-     * Configure the context to be lightweight.  This will trigger some optimizations
-     * and memory reduction options.  Lightweight context have some limitations.  At
-     * this moment, dynamic endpoint destinations are not supported.
+     * Experimental: Configure the context to be lightweight.
+     * This will trigger some optimizations and memory reduction options.
+     * Lightweight context have some limitations.
+     * At this moment, dynamic endpoint destinations are not supported.
      */
+    @Experimental
     public void setLightweight(boolean lightweight) {
         this.lightweight = lightweight;
+    }
+
+    public LoggingLevel getRouteControllerRouteStartupLoggingLevel() {
+        return routeControllerRouteStartupLoggingLevel;
+    }
+
+    /**
+     * Sets the logging level used for logging route startup activity.
+     * By default INFO level is used. You can use this to change the level for example to OFF if
+     * this kind of logging is not wanted.
+     */
+    public void setRouteControllerRouteStartupLoggingLevel(LoggingLevel routeControllerRouteStartupLoggingLevel) {
+        this.routeControllerRouteStartupLoggingLevel = routeControllerRouteStartupLoggingLevel;
     }
 
     public boolean isRouteControllerSuperviseEnabled() {
@@ -1039,6 +1062,22 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public void setRouteControllerBackOffMultiplier(double routeControllerBackOffMultiplier) {
         this.routeControllerBackOffMultiplier = routeControllerBackOffMultiplier;
+    }
+
+    public boolean isRouteControllerUnhealthyOnExhausted() {
+        return routeControllerUnhealthyOnExhausted;
+    }
+
+    /**
+     * Whether to mark the route as unhealthy (down) when all restarting attempts (backoff) have failed
+     * and the route is not successfully started and the route manager is giving up.
+     *
+     * Setting this to true allows health checks to know about this and can report the Camel application as DOWN.
+     *
+     * The default is false.
+     */
+    public void setRouteControllerUnhealthyOnExhausted(boolean routeControllerUnhealthyOnExhausted) {
+        this.routeControllerUnhealthyOnExhausted = routeControllerUnhealthyOnExhausted;
     }
 
     // fluent builders
@@ -1690,6 +1729,16 @@ public abstract class DefaultConfigurationProperties<T> {
     }
 
     /**
+     * Sets the logging level used for logging route startup activity.
+     * By default INFO level is used. You can use this to change the level for example to OFF if
+     * this kind of logging is not wanted.
+     */
+    public T withRouteStartupLoggingLevel(LoggingLevel routeStartupLoggingLevel) {
+        this.routeControllerRouteStartupLoggingLevel = routeStartupLoggingLevel;
+        return (T) this;
+    }
+
+    /**
      * To enable using supervising route controller which allows Camel to startup
      * and then the controller takes care of starting the routes in a safe manner.
      *
@@ -1765,6 +1814,19 @@ public abstract class DefaultConfigurationProperties<T> {
      */
     public T withRouteControllerThreadPoolSize(int routeControllerThreadPoolSize) {
         this.routeControllerThreadPoolSize = routeControllerThreadPoolSize;
+        return (T) this;
+    }
+
+    /**
+     * Whether to mark the route as unhealthy (down) when all restarting attempts (backoff) have failed
+     * and the route is not successfully started and the route manager is giving up.
+     *
+     * Setting this to true allows health checks to know about this and can report the Camel application as DOWN.
+     *
+     * The default is false.
+     */
+    public T withRouteControllerUnhealthyOnExhausted(boolean unhealthyOnExhausted) {
+        this.routeControllerUnhealthyOnExhausted = unhealthyOnExhausted;
         return (T) this;
     }
 

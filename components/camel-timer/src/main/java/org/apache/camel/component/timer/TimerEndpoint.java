@@ -19,6 +19,7 @@ package org.apache.camel.component.timer;
 import java.util.Date;
 import java.util.Timer;
 
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.MultipleConsumersSupport;
@@ -39,13 +40,13 @@ import org.apache.camel.support.DefaultEndpoint;
  * This component is similar to the scheduler component, but has much less functionality.
  */
 @ManagedResource(description = "Managed TimerEndpoint")
-@UriEndpoint(firstVersion = "1.0.0", scheme = "timer", title = "Timer", syntax = "timer:timerName", consumerOnly = true, label = "core,scheduling")
+@UriEndpoint(firstVersion = "1.0.0", scheme = "timer", title = "Timer", syntax = "timer:timerName", consumerOnly = true, category = {Category.CORE, Category.SCHEDULING})
 public class TimerEndpoint extends DefaultEndpoint implements MultipleConsumersSupport {
     @UriPath @Metadata(required = true)
     private String timerName;
-    @UriParam(defaultValue = "1000", description = "If greater than 0, generate periodic events every period milliseconds.")
+    @UriParam(defaultValue = "1s", description = "If greater than 0, generate periodic events every period.", javaType = "java.time.Duration")
     private long period = 1000;
-    @UriParam(defaultValue = "1000", description = "Milliseconds before first event is triggered.")
+    @UriParam(defaultValue = "1s", description = "Delay before first event is triggered.", javaType = "java.time.Duration")
     private long delay = 1000;
     @UriParam(defaultValue = "0")
     private long repeatCount;
@@ -92,8 +93,8 @@ public class TimerEndpoint extends DefaultEndpoint implements MultipleConsumersS
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
+    protected void doInit() throws Exception {
+        super.doInit();
         if (timerName == null) {
             timerName = getEndpointUri();
         }

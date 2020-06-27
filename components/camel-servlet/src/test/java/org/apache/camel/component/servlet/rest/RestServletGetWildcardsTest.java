@@ -16,15 +16,13 @@
  */
 package org.apache.camel.component.servlet.rest;
 
-import com.meterware.httpunit.GetMethodWebRequest;
-import com.meterware.httpunit.WebRequest;
-import com.meterware.httpunit.WebResponse;
-import com.meterware.servletunit.ServletUnitClient;
 import org.apache.camel.BindToRegistry;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.servlet.ServletCamelRouterTestSupport;
 import org.apache.camel.component.servlet.ServletRestHttpBinding;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class RestServletGetWildcardsTest extends ServletCamelRouterTestSupport {
 
@@ -33,10 +31,8 @@ public class RestServletGetWildcardsTest extends ServletCamelRouterTestSupport {
 
     @Test
     public void testServletProducerGet() throws Exception {
-        WebRequest req = new GetMethodWebRequest(CONTEXT_URL + "/services/users/123/basic");
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(false);
-        WebResponse response = client.getResponse(req);
+        WebRequest req = new GetMethodWebRequest(contextUrl + "/services/users/123/basic");
+        WebResponse response = query(req, false);
 
         assertEquals(200, response.getResponseCode());
 
@@ -45,10 +41,8 @@ public class RestServletGetWildcardsTest extends ServletCamelRouterTestSupport {
 
     @Test
     public void testServletProducerGetWildcards() throws Exception {
-        WebRequest req = new GetMethodWebRequest(CONTEXT_URL + "/services/users/456/name=g*");
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(false);
-        WebResponse response = client.getResponse(req);
+        WebRequest req = new GetMethodWebRequest(contextUrl + "/services/users/456/name=g*");
+        WebResponse response = query(req, false);
 
         assertEquals(200, response.getResponseCode());
 

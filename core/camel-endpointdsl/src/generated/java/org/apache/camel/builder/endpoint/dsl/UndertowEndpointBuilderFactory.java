@@ -478,8 +478,8 @@ public interface UndertowEndpointBuilderFactory {
             return this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option is a:
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>
@@ -493,8 +493,8 @@ public interface UndertowEndpointBuilderFactory {
             return this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option will be converted to a
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>
@@ -770,12 +770,14 @@ public interface UndertowEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
-        default UndertowEndpointProducerBuilder options(
-                Map<String, Object> options) {
-            doSetProperty("options", options);
+        default UndertowEndpointProducerBuilder options(String key, Object value) {
+            doSetMultiValueProperty("options", "option." + key, value);
             return this;
         }
         /**
@@ -784,14 +786,16 @@ public interface UndertowEndpointBuilderFactory {
          * prefix each option with option., such as
          * option.close-abort=true&option.send-buffer=8192.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
-        default UndertowEndpointProducerBuilder options(String options) {
-            doSetProperty("options", options);
+        default UndertowEndpointProducerBuilder options(Map values) {
+            doSetMultiValueProperties("options", "option.", values);
             return this;
         }
         /**
@@ -1118,8 +1122,8 @@ public interface UndertowEndpointBuilderFactory {
             return (UndertowEndpointProducerBuilder) this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option is a:
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>
@@ -1133,8 +1137,8 @@ public interface UndertowEndpointBuilderFactory {
             return this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option will be converted to a
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>
@@ -1418,8 +1422,8 @@ public interface UndertowEndpointBuilderFactory {
             return (UndertowEndpointBuilder) this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option is a:
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>
@@ -1433,8 +1437,8 @@ public interface UndertowEndpointBuilderFactory {
             return this;
         }
         /**
-         * Which Undertow AccessLogReciever should be used Will use
-         * JBossLoggingAccessLogReceiver if not specifid.
+         * Which Undertow AccessLogReceiver should be used Will use
+         * JBossLoggingAccessLogReceiver if not specified.
          * 
          * The option will be converted to a
          * <code>io.undertow.server.handlers.accesslog.AccessLogReceiver</code>

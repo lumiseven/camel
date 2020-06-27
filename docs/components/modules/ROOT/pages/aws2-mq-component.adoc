@@ -8,12 +8,14 @@
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The MQ component supports create, run, start, stop and terminate
+The AWS2 MQ component supports create, run, start, stop and terminate
 https://aws.amazon.com/amazon-mq/[AWS MQ] instances.
 
 Prerequisites

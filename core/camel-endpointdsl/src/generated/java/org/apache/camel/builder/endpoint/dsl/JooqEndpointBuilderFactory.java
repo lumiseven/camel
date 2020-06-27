@@ -427,27 +427,32 @@ public interface JooqEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default JooqEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default JooqEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default JooqEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -984,7 +989,7 @@ public interface JooqEndpointBuilderFactory {
          * JOOQ (camel-jooq)
          * Store and retrieve Java objects from an SQL database using JOOQ.
          * 
-         * Category: database
+         * Category: database,sql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-jooq
          * 
@@ -1002,7 +1007,7 @@ public interface JooqEndpointBuilderFactory {
          * JOOQ (camel-jooq)
          * Store and retrieve Java objects from an SQL database using JOOQ.
          * 
-         * Category: database
+         * Category: database,sql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-jooq
          * 

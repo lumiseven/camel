@@ -8,13 +8,15 @@
 :since: 2.20
 :supportLevel: Stable
 :component-header: Both producer and consumer are supported
+//Manually maintained attributes
+:group: Kubernetes
 
 *Since Camel {since}*
 
 *{component-header}*
 
 The Kubernetes Deployments component is one of xref:kubernetes-summary.adoc[Kubernetes Components] which
-provides a producer to execute kubernetes secret operations.
+provides a producer to execute Kubernetes Deployments operations and a consumer to consume events related to Deployments objects.
 
 
 

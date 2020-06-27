@@ -202,7 +202,7 @@ over xref:components::jms-component.adoc[JMS] where the queue name is dynamic de
   <get uri="/hello//{language}">
     <toD uri="jms:queue:hello-${header.language}"/>
   </get>
-<rest>
+</rest>
 ----
 
 See more details at Message Endpoint about
@@ -405,6 +405,17 @@ restConfiguration().component("netty-http").host("localhost").port(portNum).bind
 rest("/users/")
     .post().type(UserPojo.class).outType(CountryPojo.class)
         .to("direct:newUser");
+----
+
+== And in XML DSL
+
+[source,xml]
+----
+<rest uri="/users/">
+  <post type="UserPojo" outType="CountryPojo">
+    <to uri="direct:newUser"/>
+  </post>
+</rest>
 ----
 
 To specify input and/or output using an array, append `[]` to the end
@@ -765,7 +776,7 @@ onException(JsonParseException.class)
     .setBody().constant("Invalid json data");
 ----
 
-== Query Parameter default Values
+== Query/Header Parameter default Values
 
 You can specify default values for parameters in the rest-dsl, such as
 the verbose parameter below:
@@ -786,6 +797,18 @@ the `/customers/id/orders` do not include a query parameter with
 key `verbose` then Camel will now include a header with key `verbose`
 and the value `false` because it was declared as the default value. This
 functionality is only applicable for query parameters.
+
+From *Camel 3.3* onwards request headers may also be defaulted in the same way.
+
+[source,java]
+----
+  rest("/customers/")
+      .get("/{id}").to("direct:customerDetail")
+      .get("/{id}/orders")
+        .param().name("indicator").type(RestParamType.header).defaultValue("disabled").description("Feature Enabled Indicator").endParam()
+          .to("direct:customerOrders")
+      .post("/neworder").to("direct:customerNewOrder");
+----
 
 
 == Client Request Validation

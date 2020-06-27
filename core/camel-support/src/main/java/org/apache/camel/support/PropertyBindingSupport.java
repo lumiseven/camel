@@ -18,6 +18,7 @@ package org.apache.camel.support;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -27,12 +28,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.ExtendedCamelContext;
 import org.apache.camel.PropertyBindingException;
+import org.apache.camel.spi.GeneratedPropertyConfigurer;
 import org.apache.camel.spi.PropertyConfigurer;
 import org.apache.camel.spi.PropertyConfigurerGetter;
 import org.apache.camel.support.service.ServiceHelper;
@@ -50,12 +53,15 @@ import static org.apache.camel.util.ObjectHelper.isNotEmpty;
  *     <li>map</li> - Properties can lookup in Map's using map syntax, eg foo[bar] where foo is the name of the property that is a Map instance, and bar is the name of the key.</li>
  *     <li>list</li> - Properties can refer or add to in List's using list syntax, eg foo[0] where foo is the name of the property that is a
  *                     List instance, and 0 is the index. To refer to the last element, then use last as key.</li>
+ *     <li>reference by property placeholder id - Values can refer to a property placeholder key with #property:myKey</li>
  *     <li>reference by bean id - Values can refer to other beans in the registry by prefixing with with # or #bean: eg #myBean or #bean:myBean</li>
  *     <li>reference by type - Values can refer to singleton beans by their type in the registry by prefixing with #type: syntax, eg #type:com.foo.MyClassType</li>
  *     <li>autowire by type - Values can refer to singleton beans by auto wiring by setting the value to #autowired</li>
  *     <li>reference new class - Values can refer to creating new beans by their class name by prefixing with #class, eg #class:com.foo.MyClassType.
  *                               The class is created using a default no-arg constructor, however if you need to create the instance via a factory method
  *                               then you specify the method as shown: #class:com.foo.MyClassType#myFactoryMethod.
+ *                               And if the factory method requires parameters they can be specified as follows:
+ *                               #class:com.foo.MyClassType#myFactoryMethod('Hello World', 5, true).
  *                               Or if you need to create the instance via constructor parameters then you can specify the parameters as shown:
  *                               #class:com.foo.MyClass('Hello World', 5, true)</li>.
  *     <li>ignore case - Whether to ignore case for property keys<li>
@@ -636,7 +642,8 @@ public final class PropertyBindingSupport {
     private static Object resolveValue(CamelContext context, Object target, String name, Object value,
                                        boolean ignoreCase, boolean fluentBuilder, boolean allowPrivateSetter) throws Exception {
         if (value instanceof String) {
-            if (value.toString().equals("#autowired")) {
+            String str = value.toString();
+            if (str.equals("#autowired")) {
                 // we should get the type from the setter
                 Method method = findBestSetterMethod(context, target.getClass(), name, fluentBuilder, allowPrivateSetter, ignoreCase);
                 if (method != null) {
@@ -651,6 +658,16 @@ public final class PropertyBindingSupport {
                     }
                 } else {
                     throw new IllegalStateException("Cannot find setter method with name: " + name + " on class: " + target.getClass().getName() + " to use for autowiring");
+                }
+            } else if (str.startsWith("#property:")) {
+                String key = str.substring(10);
+                // the key may have property placeholder so resolve those first
+                key = context.resolvePropertyPlaceholders(key);
+                Optional<String> resolved = context.getPropertiesComponent().resolveProperty(key);
+                if (resolved.isPresent()) {
+                    value = resolved.get();
+                } else {
+                    throw new IllegalArgumentException("Property with key " + key + " not found by properties component");
                 }
             } else {
                 value = resolveBean(context, name, value);
@@ -731,7 +748,16 @@ public final class PropertyBindingSupport {
                 value = resolveValue(context, target, name, value, ignoreCase, fluentBuilder, allowPrivateSetter);
             }
         }
-        boolean hit = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setProperty(context, context.getTypeConverter(), target, name, value, refName, fluentBuilder, allowPrivateSetter, ignoreCase);
+        // use configurer if possible
+        boolean hit = false;
+        GeneratedPropertyConfigurer configurer = context.adapt(ExtendedCamelContext.class).getConfigurerResolver().resolvePropertyConfigurer(target.getClass().getSimpleName(), context);
+        if (configurer != null) {
+            hit = configurer.configure(context, target, name, value, ignoreCase);
+        }
+        if (!hit) {
+            // fallback to reflection based
+            hit = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setProperty(context, context.getTypeConverter(), target, name, value, refName, fluentBuilder, allowPrivateSetter, ignoreCase);
+        }
         if (!hit && mandatory) {
             // there is no setter with this given name, so lets report this as a problem
             throw new IllegalArgumentException("Cannot find setter method: " + name + " on bean: " + target + " of type: " + target.getClass().getName() + " when binding property: " + ognlPath);
@@ -750,7 +776,19 @@ public final class PropertyBindingSupport {
             key = property.substring(0, pos);
         }
 
-        Object answer = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().getOrElseProperty(target, key, defaultValue, ignoreCase);
+        // use configurer if possible
+        Object answer = null;
+        GeneratedPropertyConfigurer configurer = context.adapt(ExtendedCamelContext.class).getConfigurerResolver().resolvePropertyConfigurer(target.getClass().getSimpleName(), context);
+        if (configurer instanceof PropertyConfigurerGetter) {
+            answer = ((PropertyConfigurerGetter) configurer).getOptionValue(target, key, ignoreCase);
+            if (answer == null) {
+                answer = defaultValue;
+            }
+        }
+        if (answer == null) {
+            // fallback to reflection based
+            answer = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().getOrElseProperty(target, key, defaultValue, ignoreCase);
+        }
         if (answer instanceof Map && lookupKey != null) {
             Map map = (Map) answer;
             answer = map.getOrDefault(lookupKey, defaultValue);
@@ -834,7 +872,16 @@ public final class PropertyBindingSupport {
             String value = v != null ? v.toString() : null;
             if (isReferenceParameter(value)) {
                 try {
-                    boolean hit = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setProperty(context, context.getTypeConverter(), target, name, null, value, true, false, false);
+                    // use configurer if possible
+                    boolean hit = false;
+                    GeneratedPropertyConfigurer configurer = context.adapt(ExtendedCamelContext.class).getConfigurerResolver().resolvePropertyConfigurer(target.getClass().getSimpleName(), context);
+                    if (configurer != null) {
+                        hit = configurer.configure(context, target, name, value, false);
+                    }
+                    if (!hit) {
+                        // fallback to reflection
+                        hit = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setProperty(context, context.getTypeConverter(), target, name, null, value, true, false, false);
+                    }
                     if (hit) {
                         // must remove as its a valid option and we could configure it
                         it.remove();
@@ -853,7 +900,25 @@ public final class PropertyBindingSupport {
      * @return <tt>true</tt> if its a reference parameter
      */
     private static boolean isReferenceParameter(String parameter) {
-        return parameter != null && parameter.trim().startsWith("#");
+        if (parameter == null) {
+            return false;
+        }
+        parameter = parameter.trim();
+        if (!parameter.startsWith("#")) {
+            return false;
+        }
+
+        // non reference parameters are
+        // #bean: #class: #type: #property: #autowired
+        if (parameter.equals("#autowired")
+                || parameter.startsWith("#bean:")
+                || parameter.startsWith("#class:")
+                || parameter.startsWith("#type")
+                || parameter.startsWith("#property")) {
+            return false;
+        }
+
+        return true;
     }
 
     private static Object newInstanceConstructorParameters(CamelContext camelContext, Class<?> type, String parameters) throws Exception {
@@ -923,6 +988,92 @@ public final class PropertyBindingSupport {
 
             if (matches) {
                 candidates.add(ctr);
+            }
+        }
+
+        return candidates.size() == 1 ? candidates.get(0) : fallbackCandidate;
+    }
+
+    private static Object newInstanceFactoryParameters(CamelContext camelContext, Class<?> type, String factoryMethod, String parameters) throws Exception {
+        String[] params = StringQuoteHelper.splitSafeQuote(parameters, ',');
+        Method found = findMatchingFactoryMethod(type.getMethods(), factoryMethod, params);
+        if (found != null) {
+            Object[] arr = new Object[found.getParameterCount()];
+            for (int i = 0; i < found.getParameterCount(); i++) {
+                Class<?> paramType = found.getParameterTypes()[i];
+                Object param = params[i];
+                Object val = camelContext.getTypeConverter().convertTo(paramType, param);
+                // unquote text
+                if (val instanceof String) {
+                    val = StringHelper.removeLeadingAndEndingQuotes((String) val);
+                }
+                arr[i] = val;
+            }
+
+            return found.invoke(null, arr);
+        }
+        return null;
+    }
+
+    /**
+     * Finds the best matching factory methods for the given parameters.
+     * <p/>
+     * This implementation is similar to the logic in camel-bean.
+     *
+     * @param methods       the methods
+     * @param factoryMethod the name of the factory method
+     * @param params        the parameters
+     * @return the constructor, or null if no matching constructor can be found
+     */
+    private static Method findMatchingFactoryMethod(Method[] methods, String factoryMethod, String[] params) {
+        List<Method> candidates = new ArrayList<>();
+        Method fallbackCandidate = null;
+
+        for (Method method : methods) {
+            // must match factory method name
+            if (!factoryMethod.equals(method.getName())) {
+                continue;
+            }
+            // must be a public static method that returns something
+            if (!Modifier.isStatic(method.getModifiers()) 
+                || !Modifier.isPublic(method.getModifiers())
+                || method.getReturnType() == Void.TYPE) {
+                continue;
+            }
+            // must match number of parameters
+            if (method.getParameterCount() != params.length) {
+                continue;
+            }
+
+            boolean matches = true;
+            for (int i = 0; i < method.getParameterCount(); i++) {
+                String parameter = params[i];
+                if (parameter != null) {
+                    // must trim
+                    parameter = parameter.trim();
+                }
+
+                Class<?> parameterType = getValidParameterType(parameter);
+                Class<?> expectedType = method.getParameterTypes()[i];
+
+                if (parameterType != null && expectedType != null) {
+                    // skip java.lang.Object type, when we have multiple possible methods we want to avoid it if possible
+                    if (Object.class.equals(expectedType)) {
+                        fallbackCandidate = method;
+                        matches = false;
+                        break;
+                    }
+
+                    boolean matchingTypes = isParameterMatchingType(parameterType, expectedType);
+                    if (!matchingTypes) {
+                        matches = false;
+                        break;
+                    }
+                }
+            }
+
+            if (matches) {
+                candidates.add(method);
             }
         }
 
@@ -1030,7 +1181,15 @@ public final class PropertyBindingSupport {
             }
             Class<?> type = camelContext.getClassResolver().resolveMandatoryClass(className);
             if (factoryMethod != null) {
-                value = camelContext.getInjector().newInstance(type, factoryMethod);
+                if (parameters != null) {
+                    // special to support factory method parameters
+                    value = newInstanceFactoryParameters(camelContext, type, factoryMethod, parameters);
+                } else {
+                    value = camelContext.getInjector().newInstance(type, factoryMethod);
+                }
+                if (value == null) {
+                    throw new IllegalStateException("Cannot create bean instance using factory method: " + className + "#" + factoryMethod);
+                }
             } else if (parameters != null) {
                 // special to support constructor parameters
                 value = newInstanceConstructorParameters(camelContext, type, parameters);

@@ -228,6 +228,10 @@ public class NettyHttpComponent extends NettyComponent implements HeaderFilterSt
         configuration.setProtocol("tcp");
         configuration.setTextline(false);
 
+        if ("https".equals(uri.getScheme())) {
+            configuration.setSsl(true);
+        }
+
         if (configuration instanceof NettyHttpConfiguration) {
             final NettyHttpConfiguration httpConfiguration = (NettyHttpConfiguration) configuration;
 
@@ -464,8 +468,8 @@ public class NettyHttpComponent extends NettyComponent implements HeaderFilterSt
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
+    protected void doInit() throws Exception {
+        super.doInit();
 
         RestConfiguration config = CamelContextHelper.getRestConfiguration(getCamelContext(), "netty-http");
 

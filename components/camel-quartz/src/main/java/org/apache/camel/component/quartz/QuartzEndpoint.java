@@ -24,6 +24,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.camel.AsyncProcessor;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -56,7 +57,7 @@ import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
 /**
  * Schedule sending of messages using the Quartz 2.x scheduler.
  */
-@UriEndpoint(firstVersion = "2.12.0", scheme = "quartz", title = "Quartz", syntax = "quartz:groupName/triggerName", consumerOnly = true, label = "scheduling")
+@UriEndpoint(firstVersion = "2.12.0", scheme = "quartz", title = "Quartz", syntax = "quartz:groupName/triggerName", consumerOnly = true, category = {Category.SCHEDULING})
 public class QuartzEndpoint extends DefaultEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(QuartzEndpoint.class);
@@ -69,9 +70,9 @@ public class QuartzEndpoint extends DefaultEndpoint {
     private final AtomicBoolean jobAdded = new AtomicBoolean(false);
     private final AtomicBoolean jobPaused = new AtomicBoolean(false);
 
-    @UriPath(description = "The quartz group name to use. The combination of group name and timer name should be unique.", defaultValue = "Camel")
+    @UriPath(description = "The quartz group name to use. The combination of group name and trigger name should be unique.", defaultValue = "Camel")
     private String groupName;
-    @UriPath @Metadata(required = true)
+    @UriPath(description = "The quartz trigger name to use. The combination of group name and trigger name should be unique.") @Metadata(required = true)
     private String triggerName;
     @UriParam
     private String cron;
@@ -87,7 +88,7 @@ public class QuartzEndpoint extends DefaultEndpoint {
     private boolean durableJob;
     @UriParam
     private boolean recoverableJob;
-    @UriParam(label = "scheduler", defaultValue = "500")
+    @UriParam(label = "scheduler", defaultValue = "500", javaType = "java.time.Duration")
     private long triggerStartDelay = 500;
     @UriParam(label = "scheduler")
     private int startDelayedSeconds;
@@ -109,16 +110,13 @@ public class QuartzEndpoint extends DefaultEndpoint {
     }
 
     public String getGroupName() {
-        return triggerKey.getName();
+        return triggerKey.getGroup();
     }
 
     public String getTriggerName() {
         return triggerKey.getName();
     }
 
-    /**
-     * The quartz timer name to use. The combination of group name and timer name should be unique.
-     */
     public void setTriggerName(String triggerName) {
         this.triggerName = triggerName;
     }

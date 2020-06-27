@@ -18,6 +18,7 @@ package org.apache.camel.component.snmp;
 
 import java.net.URI;
 
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -37,7 +38,7 @@ import org.snmp4j.security.SecurityLevel;
 /**
  * Receive traps and poll SNMP (Simple Network Management Protocol) capable devices.
  */
-@UriEndpoint(firstVersion = "2.1.0", scheme = "snmp", title = "SNMP", syntax = "snmp:host:port", label = "monitoring")
+@UriEndpoint(firstVersion = "2.1.0", scheme = "snmp", title = "SNMP", syntax = "snmp:host:port", category = {Category.MONITORING})
 public class SnmpEndpoint extends DefaultPollingEndpoint {
 
     public static final String DEFAULT_COMMUNITY = "public";
@@ -65,7 +66,7 @@ public class SnmpEndpoint extends DefaultPollingEndpoint {
     private String snmpCommunity = DEFAULT_COMMUNITY;
     @UriParam
     private SnmpActionType type;
-    @UriParam(label = "consumer", defaultValue = "60000")
+    @UriParam(label = "consumer", defaultValue = "60000", javaType = "java.time.Duration")
     private long delay = 60000;
     @UriParam(defaultValue = "" + SecurityLevel.AUTH_PRIV, enums = "1,2,3", label = "security")
     private int securityLevel = SecurityLevel.AUTH_PRIV;
@@ -264,8 +265,8 @@ public class SnmpEndpoint extends DefaultPollingEndpoint {
     }
 
     @Override
-    protected void doStart() throws Exception {
-        super.doStart();
+    protected void doInit() throws Exception {
+        super.doInit();
 
         URI uri = URI.create(getEndpointUri());
         String host = uri.getHost();

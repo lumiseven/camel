@@ -52,12 +52,16 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
         default DebeziumMongodbEndpointBuilder additionalProperties(
-                Map<String, Object> additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("additionalProperties", "additionalProperties." + key, value);
             return this;
         }
         /**
@@ -68,15 +72,16 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * additionalProperties.. E.g:
          * additionalProperties.transactional.id=12345&additionalProperties.schema.registry.url=http://localhost:8811/avro.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
-        default DebeziumMongodbEndpointBuilder additionalProperties(
-                String additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+        default DebeziumMongodbEndpointBuilder additionalProperties(Map values) {
+            doSetMultiValueProperties("additionalProperties", "additionalProperties.", values);
             return this;
         }
         /**
@@ -171,7 +176,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 5000
+         * Default: 5s
          * Group: consumer
          */
         default DebeziumMongodbEndpointBuilder offsetCommitTimeoutMs(
@@ -187,7 +192,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 5000
+         * Default: 5s
          * Group: consumer
          */
         default DebeziumMongodbEndpointBuilder offsetCommitTimeoutMs(
@@ -200,7 +205,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 60000
+         * Default: 60s
          * Group: consumer
          */
         default DebeziumMongodbEndpointBuilder offsetFlushIntervalMs(
@@ -213,7 +218,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 60000
+         * Default: 60s
          * Group: consumer
          */
         default DebeziumMongodbEndpointBuilder offsetFlushIntervalMs(
@@ -345,7 +350,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 1000
+         * Default: 1s
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder connectBackoffInitialDelayMs(
@@ -360,7 +365,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 1000
+         * Default: 1s
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder connectBackoffInitialDelayMs(
@@ -375,7 +380,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 120000
+         * Default: 2m
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder connectBackoffMaxDelayMs(
@@ -390,7 +395,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 120000
+         * Default: 2m
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder connectBackoffMaxDelayMs(
@@ -501,7 +506,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder heartbeatIntervalMs(
@@ -516,7 +521,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder heartbeatIntervalMs(
@@ -761,7 +766,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 500
+         * Default: 500ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder pollIntervalMs(
@@ -775,7 +780,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 500
+         * Default: 500ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder pollIntervalMs(
@@ -802,7 +807,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder snapshotDelayMs(
@@ -815,7 +820,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbEndpointBuilder snapshotDelayMs(
@@ -1044,7 +1049,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Debezium MongoDB Connector (camel-debezium-mongodb)
          * Capture changes from a MongoDB database.
          * 
-         * Category: database,nosql,mongodb
+         * Category: database,nosql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mongodb
          * 
@@ -1063,7 +1068,7 @@ public interface DebeziumMongodbEndpointBuilderFactory {
          * Debezium MongoDB Connector (camel-debezium-mongodb)
          * Capture changes from a MongoDB database.
          * 
-         * Category: database,nosql,mongodb
+         * Category: database,nosql
          * Since: 3.0
          * Maven coordinates: org.apache.camel:camel-debezium-mongodb
          * 

@@ -438,27 +438,32 @@ public interface BoxEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default BoxEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default BoxEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default BoxEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -1622,7 +1627,7 @@ public interface BoxEndpointBuilderFactory {
          * Upload, download and manage files, folders, groups, collaborations,
          * etc. on box.com.
          * 
-         * Category: api,file,cloud
+         * Category: cloud,file,api
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-box
          * 
@@ -1646,7 +1651,7 @@ public interface BoxEndpointBuilderFactory {
          * Upload, download and manage files, folders, groups, collaborations,
          * etc. on box.com.
          * 
-         * Category: api,file,cloud
+         * Category: cloud,file,api
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-box
          * 

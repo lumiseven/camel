@@ -249,7 +249,7 @@ public interface WorkdayEndpointBuilderFactory {
          * Workday (camel-workday)
          * Detect and parse documents using Workday.
          * 
-         * Category: hcm
+         * Category: cloud,api,hcm
          * Since: 3.1
          * Maven coordinates: org.apache.camel:camel-workday
          * 
@@ -257,7 +257,7 @@ public interface WorkdayEndpointBuilderFactory {
          * 
          * Path parameter: entity (required)
          * The entity to be requested or subscribed via API.
-         * The value can be one of: report
+         * The value can be one of: report, commonAPI
          * 
          * Path parameter: path (required)
          * The API path to access an entity structure.
@@ -271,7 +271,7 @@ public interface WorkdayEndpointBuilderFactory {
          * Workday (camel-workday)
          * Detect and parse documents using Workday.
          * 
-         * Category: hcm
+         * Category: cloud,api,hcm
          * Since: 3.1
          * Maven coordinates: org.apache.camel:camel-workday
          * 
@@ -279,7 +279,7 @@ public interface WorkdayEndpointBuilderFactory {
          * 
          * Path parameter: entity (required)
          * The entity to be requested or subscribed via API.
-         * The value can be one of: report
+         * The value can be one of: report, commonAPI
          * 
          * Path parameter: path (required)
          * The API path to access an entity structure.

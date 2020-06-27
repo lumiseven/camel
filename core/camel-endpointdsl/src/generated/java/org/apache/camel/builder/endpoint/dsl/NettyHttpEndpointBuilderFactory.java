@@ -577,27 +577,32 @@ public interface NettyHttpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * securityOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: security
          */
         default NettyHttpEndpointConsumerBuilder securityOptions(
-                Map<String, Object> securityOptions) {
-            doSetProperty("securityOptions", securityOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("securityOptions", "securityConfiguration." + key, value);
             return this;
         }
         /**
          * To configure NettyHttpSecurityConfiguration using key/value pairs
          * from the map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * securityOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: security
          */
-        default NettyHttpEndpointConsumerBuilder securityOptions(
-                String securityOptions) {
-            doSetProperty("securityOptions", securityOptions);
+        default NettyHttpEndpointConsumerBuilder securityOptions(Map values) {
+            doSetMultiValueProperties("securityOptions", "securityConfiguration.", values);
             return this;
         }
         /**
@@ -1644,12 +1649,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedNettyHttpEndpointConsumerBuilder options(
-                Map<String, Object> options) {
-            doSetProperty("options", options);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("options", "option." + key, value);
             return this;
         }
         /**
@@ -1658,14 +1667,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * child.keepAlive=false. See the Netty documentation for possible
          * options that can be used.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedNettyHttpEndpointConsumerBuilder options(String options) {
-            doSetProperty("options", options);
+        default AdvancedNettyHttpEndpointConsumerBuilder options(Map values) {
+            doSetMultiValueProperties("options", "option.", values);
             return this;
         }
         /**
@@ -3120,12 +3131,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedNettyHttpEndpointProducerBuilder options(
-                Map<String, Object> options) {
-            doSetProperty("options", options);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("options", "option." + key, value);
             return this;
         }
         /**
@@ -3134,14 +3149,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * child.keepAlive=false. See the Netty documentation for possible
          * options that can be used.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedNettyHttpEndpointProducerBuilder options(String options) {
-            doSetProperty("options", options);
+        default AdvancedNettyHttpEndpointProducerBuilder options(Map values) {
+            doSetMultiValueProperties("options", "option.", values);
             return this;
         }
         /**
@@ -4178,12 +4195,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedNettyHttpEndpointBuilder options(
-                Map<String, Object> options) {
-            doSetProperty("options", options);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("options", "option." + key, value);
             return this;
         }
         /**
@@ -4192,14 +4213,16 @@ public interface NettyHttpEndpointBuilderFactory {
          * child.keepAlive=false. See the Netty documentation for possible
          * options that can be used.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the options(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedNettyHttpEndpointBuilder options(String options) {
-            doSetProperty("options", options);
+        default AdvancedNettyHttpEndpointBuilder options(Map values) {
+            doSetMultiValueProperties("options", "option.", values);
             return this;
         }
         /**
@@ -4450,7 +4473,7 @@ public interface NettyHttpEndpointBuilderFactory {
          * Netty HTTP (camel-netty-http)
          * Netty HTTP server and client using the Netty 4.x.
          * 
-         * Category: http
+         * Category: networking,http
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-netty-http
          * 
@@ -4480,7 +4503,7 @@ public interface NettyHttpEndpointBuilderFactory {
          * Netty HTTP (camel-netty-http)
          * Netty HTTP server and client using the Netty 4.x.
          * 
-         * Category: http
+         * Category: networking,http
          * Since: 2.14
          * Maven coordinates: org.apache.camel:camel-netty-http
          * 

@@ -18,6 +18,9 @@ package org.apache.camel.component.olingo4;
 
 import java.util.Iterator;
 
+import org.apache.camel.CamelContext;
+import org.apache.camel.ExtendedCamelContext;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.olingo.client.api.domain.ClientCollectionValue;
@@ -26,8 +29,16 @@ import org.apache.olingo.client.api.domain.ClientEntity;
 import org.apache.olingo.client.api.domain.ClientEntitySet;
 import org.apache.olingo.client.api.domain.ClientPrimitiveValue;
 import org.apache.olingo.client.api.domain.ClientProperty;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 
+import static org.apache.camel.test.junit5.TestSupport.assertIsInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+@TestInstance(TestInstance.Lifecycle.PER_METHOD)
 public class Olingo4ComponentConsumerTest extends AbstractOlingo4TestSupport {
 
     private static final String PEOPLE = "People";
@@ -38,14 +49,17 @@ public class Olingo4ComponentConsumerTest extends AbstractOlingo4TestSupport {
         setUseRouteBuilder(false);
     }
 
-    @Override
-    public boolean isCreateCamelContextPerClass() {
-        return false;
-    }
-
     private void addRouteAndStartContext(RouteBuilder builder) throws Exception {
         context().addRoutes(builder);
         startCamelContext();
+    }
+
+    @Override
+    protected CamelContext createCamelContext() throws Exception {
+        CamelContext context = super.createCamelContext();
+        context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setLoggingLevel(LoggingLevel.INFO);
+        context.adapt(ExtendedCamelContext.class).getBeanIntrospection().setExtendedStatistics(true);
+        return context;
     }
 
     @Test
@@ -77,6 +91,10 @@ public class Olingo4ComponentConsumerTest extends AbstractOlingo4TestSupport {
                 assertEquals("russellwhyte", nameProp.getValue().toString());
             }
         }
+
+        // should be reflection free
+        long counter = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().getInvokedCounter();
+        assertEquals(0, counter);
     }
 
     /**
@@ -261,6 +279,10 @@ public class Olingo4ComponentConsumerTest extends AbstractOlingo4TestSupport {
         ClientProperty nameProp = ksfoEntity.getProperty("Name");
         assertNotNull(nameProp);
         assertEquals("San Francisco International Airport", nameProp.getValue().toString());
+
+        // should be reflection free
+        long counter = context.adapt(ExtendedCamelContext.class).getBeanIntrospection().getInvokedCounter();
+        assertEquals(0, counter);
     }
 
     /**

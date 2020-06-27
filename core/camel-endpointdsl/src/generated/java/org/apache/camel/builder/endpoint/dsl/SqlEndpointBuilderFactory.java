@@ -745,27 +745,32 @@ public interface SqlEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default SqlEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default SqlEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default SqlEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -1147,26 +1152,31 @@ public interface SqlEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSqlEndpointConsumerBuilder templateOptions(
-                Map<String, Object> templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("templateOptions", "template." + key, value);
             return this;
         }
         /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSqlEndpointConsumerBuilder templateOptions(
-                String templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+        default AdvancedSqlEndpointConsumerBuilder templateOptions(Map values) {
+            doSetMultiValueProperties("templateOptions", "template.", values);
             return this;
         }
         /**
@@ -1684,26 +1694,31 @@ public interface SqlEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSqlEndpointProducerBuilder templateOptions(
-                Map<String, Object> templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("templateOptions", "template." + key, value);
             return this;
         }
         /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSqlEndpointProducerBuilder templateOptions(
-                String templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+        default AdvancedSqlEndpointProducerBuilder templateOptions(Map values) {
+            doSetMultiValueProperties("templateOptions", "template.", values);
             return this;
         }
         /**
@@ -2095,26 +2110,31 @@ public interface SqlEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSqlEndpointBuilder templateOptions(
-                Map<String, Object> templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("templateOptions", "template." + key, value);
             return this;
         }
         /**
          * Configures the Spring JdbcTemplate with the key/values from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * templateOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSqlEndpointBuilder templateOptions(
-                String templateOptions) {
-            doSetProperty("templateOptions", templateOptions);
+        default AdvancedSqlEndpointBuilder templateOptions(Map values) {
+            doSetMultiValueProperties("templateOptions", "template.", values);
             return this;
         }
         /**

@@ -34,7 +34,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
      * Debezium MongoDB Connector (camel-debezium-mongodb)
      * Capture changes from a MongoDB database.
      * 
-     * Category: database,nosql,mongodb
+     * Category: database,nosql
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-debezium-mongodb
      */
@@ -152,7 +152,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 5000
+         * Default: 5s
          * Group: consumer
          */
         default DebeziumMongodbComponentBuilder offsetCommitTimeoutMs(
@@ -165,7 +165,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 60000
+         * Default: 60s
          * Group: consumer
          */
         default DebeziumMongodbComponentBuilder offsetFlushIntervalMs(
@@ -285,7 +285,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 1000
+         * Default: 1s
          * Group: mongodb
          */
         default DebeziumMongodbComponentBuilder connectBackoffInitialDelayMs(
@@ -300,7 +300,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 120000
+         * Default: 2m
          * Group: mongodb
          */
         default DebeziumMongodbComponentBuilder connectBackoffMaxDelayMs(
@@ -395,7 +395,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbComponentBuilder heartbeatIntervalMs(
@@ -558,7 +558,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 500
+         * Default: 500ms
          * Group: mongodb
          */
         default DebeziumMongodbComponentBuilder pollIntervalMs(
@@ -585,7 +585,7 @@ public interface DebeziumMongodbComponentBuilderFactory {
          * 
          * The option is a: <code>long</code> type.
          * 
-         * Default: 0
+         * Default: 0ms
          * Group: mongodb
          */
         default DebeziumMongodbComponentBuilder snapshotDelayMs(

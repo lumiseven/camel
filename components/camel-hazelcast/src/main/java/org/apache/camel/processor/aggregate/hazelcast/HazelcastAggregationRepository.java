@@ -56,21 +56,23 @@ import org.slf4j.LoggerFactory;
 public class HazelcastAggregationRepository extends ServiceSupport
                                                   implements RecoverableAggregationRepository,
                                                              OptimisticLockingAggregationRepository {
+
+    protected static final String COMPLETED_SUFFIX = "-completed";
+
     private static final Logger LOG = LoggerFactory.getLogger(HazelcastAggregationRepository.class.getName());
-    private static final String COMPLETED_SUFFIX = "-completed";
-    
-    private boolean optimistic;
-    private boolean useLocalHzInstance;
-    private boolean useRecovery = true;
-    private IMap<String, DefaultExchangeHolder> cache;
-    private IMap<String, DefaultExchangeHolder> persistedCache;
-    private HazelcastInstance hzInstance;
-    private String mapName;
-    private String persistenceMapName;
-    private String deadLetterChannel;
-    private long recoveryInterval = 5000;
-    private int maximumRedeliveries = 3;
-    private boolean allowSerializedHeaders;
+
+    protected boolean optimistic;
+    protected boolean useLocalHzInstance;
+    protected boolean useRecovery = true;
+    protected IMap<String, DefaultExchangeHolder> cache;
+    protected IMap<String, DefaultExchangeHolder> persistedCache;
+    protected HazelcastInstance hzInstance;
+    protected String mapName;
+    protected String persistenceMapName;
+    protected String deadLetterChannel;
+    protected long recoveryInterval = 5000;
+    protected int maximumRedeliveries = 3;
+    protected boolean allowSerializedHeaders;
 
     /**
      * Creates new {@link HazelcastAggregationRepository} that defaults to non-optimistic locking

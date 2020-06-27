@@ -8,13 +8,15 @@
 :since: 2.23
 :supportLevel: Stable
 :component-header: Both producer and consumer are supported
+//Manually maintained attributes
+:group: Kubernetes
 
 *Since Camel {since}*
 
 *{component-header}*
 
 The Kubernetes Job component is one of xref:kubernetes-summary.adoc[Kubernetes Components] which
-provides a producer to execute kubernetes job operations.
+provides a producer to execute kubernetes Job operations and a consumer to consume events related to Job objects.
  
 
 

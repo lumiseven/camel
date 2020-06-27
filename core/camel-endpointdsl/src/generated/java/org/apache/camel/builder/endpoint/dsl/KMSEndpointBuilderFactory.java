@@ -31,7 +31,7 @@ public interface KMSEndpointBuilderFactory {
 
 
     /**
-     * Builder for endpoint for the AWS KMS component.
+     * Builder for endpoint for the AWS Key Management Service (KMS) component.
      */
     public interface KMSEndpointBuilder extends EndpointProducerBuilder {
         default AdvancedKMSEndpointBuilder advanced() {
@@ -224,7 +224,8 @@ public interface KMSEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint for the AWS KMS component.
+     * Advanced builder for endpoint for the AWS Key Management Service (KMS)
+     * component.
      */
     public interface AdvancedKMSEndpointBuilder
             extends
@@ -311,10 +312,10 @@ public interface KMSEndpointBuilderFactory {
 
     public interface KMSBuilders {
         /**
-         * AWS KMS (camel-aws-kms)
+         * AWS Key Management Service (KMS) (camel-aws-kms)
          * Manage keys stored in AWS KMS instances.
          * 
-         * Category: cloud,management
+         * Category: cloud,messaging
          * Since: 2.21
          * Maven coordinates: org.apache.camel:camel-aws-kms
          * 
@@ -329,10 +330,10 @@ public interface KMSEndpointBuilderFactory {
             return KMSEndpointBuilderFactory.endpointBuilder("aws-kms", path);
         }
         /**
-         * AWS KMS (camel-aws-kms)
+         * AWS Key Management Service (KMS) (camel-aws-kms)
          * Manage keys stored in AWS KMS instances.
          * 
-         * Category: cloud,management
+         * Category: cloud,messaging
          * Since: 2.21
          * Maven coordinates: org.apache.camel:camel-aws-kms
          * 

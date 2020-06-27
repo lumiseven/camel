@@ -33,6 +33,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.Envelope;
 import com.rabbitmq.client.ExceptionHandler;
 import org.apache.camel.AsyncEndpoint;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
@@ -52,7 +53,7 @@ import static org.apache.camel.component.rabbitmq.RabbitMQComponent.QUEUE_ARG_PR
 /**
  * Send and receive messages from <a href="http://www.rabbitmq.com/">RabbitMQ</a> instances.
  */
-@UriEndpoint(firstVersion = "2.12.0", scheme = "rabbitmq", title = "RabbitMQ", syntax = "rabbitmq:exchangeName", label = "messaging")
+@UriEndpoint(firstVersion = "2.12.0", scheme = "rabbitmq", title = "RabbitMQ", syntax = "rabbitmq:exchangeName", category = {Category.MESSAGING})
 public class RabbitMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     // header to indicate that the message body needs to be de-serialized
     public static final String SERIALIZE_HEADER = "CamelSerialize";
@@ -381,9 +382,9 @@ public class RabbitMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     }
 
     /**
-     * The exchange name determines which exchange produced messages will sent
-     * to. In the case of consumers, the exchange name determines which exchange
-     * the queue will bind to.
+     * The exchange name determines the exchange to which the produced 
+     * messages will be sent to. In the case of consumers, the exchange name determines 
+     * the exchange the queue will be bound to.
      */
     public void setExchangeName(String exchangeName) {
         this.exchangeName = exchangeName;
@@ -821,15 +822,15 @@ public class RabbitMQEndpoint extends DefaultEndpoint implements AsyncEndpoint {
     }
 
     public Map<String, Object> getExchangeArgs() {
-        return PropertiesHelper.extractProperties(args, EXCHANGE_ARG_PREFIX);
+        return PropertiesHelper.extractProperties(args, EXCHANGE_ARG_PREFIX, false);
     }
 
     public Map<String, Object> getQueueArgs() {
-        return PropertiesHelper.extractProperties(args, QUEUE_ARG_PREFIX);
+        return PropertiesHelper.extractProperties(args, QUEUE_ARG_PREFIX, false);
     }
 
     public Map<String, Object> getBindingArgs() {
-        return PropertiesHelper.extractProperties(args, BINDING_ARG_PREFIX);
+        return PropertiesHelper.extractProperties(args, BINDING_ARG_PREFIX, false);
     }
 
     /**

@@ -8,12 +8,14 @@
 :since: 3.2
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
 *{component-header}*
 
-The Kinesis Firehose component supports sending messages to Amazon Kinesis Firehose service.
+The AWS2 Kinesis Firehose component supports sending messages to Amazon Kinesis Firehose service (Batch not supported).
 
 Prerequisites
 

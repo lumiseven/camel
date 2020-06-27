@@ -22,7 +22,7 @@
     <parent>
         <artifactId>components</artifactId>
         <groupId>org.apache.camel</groupId>
-        <version>3.3.0-SNAPSHOT</version>
+        <version>3.5.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>camel-djl</artifactId>
@@ -49,21 +49,69 @@
             <version>${djl-version}</version>
         </dependency>
 
-        <!-- MxNet Engine -->
+        <!-- MxNet Engine-->
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-model-zoo</artifactId>
             <version>${djl-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-engine</artifactId>
             <version>${djl-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ai.djl.mxnet</groupId>
             <artifactId>mxnet-native-auto</artifactId>
             <version>${djl-mxnet-native-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Pytorch Engine -->
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-model-zoo</artifactId>
+            <version>${djl-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-engine</artifactId>
+            <version>${djl-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.pytorch</groupId>
+            <artifactId>pytorch-native-auto</artifactId>
+            <version>${djl-pytorch-native-version}</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- Tensorflow Engine -->
+        <dependency>
+            <groupId>ai.djl.tensorflow</groupId>
+            <artifactId>tensorflow-model-zoo</artifactId>
+            <version>${djl-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.tensorflow</groupId>
+            <artifactId>tensorflow-engine</artifactId>
+            <version>${djl-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.tensorflow</groupId>
+            <artifactId>tensorflow-api</artifactId>
+            <version>${djl-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>ai.djl.tensorflow</groupId>
+            <artifactId>tensorflow-native-auto</artifactId>
+            <version>${djl-tensorflow-native-version}</version>
             <scope>runtime</scope>
         </dependency>
 
@@ -77,7 +125,7 @@
         <!-- testing -->
         <dependency>
             <groupId>org.apache.camel</groupId>
-            <artifactId>camel-test</artifactId>
+            <artifactId>camel-test-junit5</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

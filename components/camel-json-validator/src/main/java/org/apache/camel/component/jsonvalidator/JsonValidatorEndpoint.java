@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.networknt.schema.JsonSchema;
 import com.networknt.schema.ValidationMessage;
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
@@ -38,7 +39,7 @@ import org.apache.camel.spi.UriParam;
  */
 @ManagedResource(description = "Managed JsonValidatorEndpoint")
 @UriEndpoint(scheme = "json-validator", firstVersion = "2.20.0", title = "JSON Schema Validator", syntax = "json-validator:resourceUri",
-    producerOnly = true, label = "validation")
+    producerOnly = true, category = {Category.VALIDATION})
 public class JsonValidatorEndpoint extends ResourceEndpoint {
 
     private volatile JsonSchema schema;
@@ -115,10 +116,10 @@ public class JsonValidatorEndpoint extends ResourceEndpoint {
                 Set<ValidationMessage> errors = localSchema.validate(node);
 
                 if (errors.size() > 0) {
-                    this.log.debug("Validated JSon has {} errors", errors.size());
+                    this.log.debug("Validated JSON has {} errors", errors.size());
                     this.errorHandler.handleErrors(exchange, schema, errors);
                 } else {
-                    this.log.debug("Validated JSon success");
+                    this.log.debug("Validated JSON success");
                 }
             }
         } catch (Exception e) {

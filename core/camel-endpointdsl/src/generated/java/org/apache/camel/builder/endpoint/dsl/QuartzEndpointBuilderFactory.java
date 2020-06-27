@@ -461,25 +461,31 @@ public interface QuartzEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the jobParameters(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
         default AdvancedQuartzEndpointBuilder jobParameters(
-                Map<String, Object> jobParameters) {
-            doSetProperty("jobParameters", jobParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("jobParameters", "job." + key, value);
             return this;
         }
         /**
          * To configure additional options on the job.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the jobParameters(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: advanced
          */
-        default AdvancedQuartzEndpointBuilder jobParameters(String jobParameters) {
-            doSetProperty("jobParameters", jobParameters);
+        default AdvancedQuartzEndpointBuilder jobParameters(Map values) {
+            doSetMultiValueProperties("jobParameters", "job.", values);
             return this;
         }
         /**
@@ -539,26 +545,31 @@ public interface QuartzEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * triggerParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedQuartzEndpointBuilder triggerParameters(
-                Map<String, Object> triggerParameters) {
-            doSetProperty("triggerParameters", triggerParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("triggerParameters", "trigger." + key, value);
             return this;
         }
         /**
          * To configure additional options on the trigger.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * triggerParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedQuartzEndpointBuilder triggerParameters(
-                String triggerParameters) {
-            doSetProperty("triggerParameters", triggerParameters);
+        default AdvancedQuartzEndpointBuilder triggerParameters(Map values) {
+            doSetMultiValueProperties("triggerParameters", "trigger.", values);
             return this;
         }
         /**
@@ -607,13 +618,13 @@ public interface QuartzEndpointBuilderFactory {
          * Syntax: <code>quartz:groupName/triggerName</code>
          * 
          * Path parameter: groupName
-         * The quartz group name to use. The combination of group name and timer
-         * name should be unique.
+         * The quartz group name to use. The combination of group name and
+         * trigger name should be unique.
          * Default value: Camel
          * 
          * Path parameter: triggerName (required)
-         * The quartz timer name to use. The combination of group name and timer
-         * name should be unique.
+         * The quartz trigger name to use. The combination of group name and
+         * trigger name should be unique.
          * 
          * @param path groupName/triggerName
          */
@@ -631,13 +642,13 @@ public interface QuartzEndpointBuilderFactory {
          * Syntax: <code>quartz:groupName/triggerName</code>
          * 
          * Path parameter: groupName
-         * The quartz group name to use. The combination of group name and timer
-         * name should be unique.
+         * The quartz group name to use. The combination of group name and
+         * trigger name should be unique.
          * Default value: Camel
          * 
          * Path parameter: triggerName (required)
-         * The quartz timer name to use. The combination of group name and timer
-         * name should be unique.
+         * The quartz trigger name to use. The combination of group name and
+         * trigger name should be unique.
          * 
          * @param componentName to use a custom component name for the endpoint
          * instead of the default name

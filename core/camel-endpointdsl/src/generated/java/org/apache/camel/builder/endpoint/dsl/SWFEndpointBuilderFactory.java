@@ -34,7 +34,8 @@ public interface SWFEndpointBuilderFactory {
 
 
     /**
-     * Builder for endpoint consumers for the AWS Simple Workflow component.
+     * Builder for endpoint consumers for the AWS Simple Workflow (SWF)
+     * component.
      */
     public interface SWFEndpointConsumerBuilder
             extends
@@ -331,7 +332,7 @@ public interface SWFEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint consumers for the AWS Simple Workflow
+     * Advanced builder for endpoint consumers for the AWS Simple Workflow (SWF)
      * component.
      */
     public interface AdvancedSWFEndpointConsumerBuilder
@@ -431,27 +432,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointConsumerBuilder clientConfigurationParameters(
-                Map<String, Object> clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigurationParameters", "clientConfiguration." + key, value);
             return this;
         }
         /**
          * To configure the ClientConfiguration using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointConsumerBuilder clientConfigurationParameters(
-                String clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                Map values) {
+            doSetMultiValueProperties("clientConfigurationParameters", "clientConfiguration.", values);
             return this;
         }
         /**
@@ -460,27 +467,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointConsumerBuilder startWorkflowOptionsParameters(
-                Map<String, Object> startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("startWorkflowOptionsParameters", "startWorkflowOptions." + key, value);
             return this;
         }
         /**
          * To configure the StartWorkflowOptions using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointConsumerBuilder startWorkflowOptionsParameters(
-                String startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                Map values) {
+            doSetMultiValueProperties("startWorkflowOptionsParameters", "startWorkflowOptions.", values);
             return this;
         }
         /**
@@ -489,27 +502,32 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointConsumerBuilder sWClientParameters(
-                Map<String, Object> sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("sWClientParameters", "sWClient." + key, value);
             return this;
         }
         /**
          * To configure the AmazonSimpleWorkflowClient using the key/values from
          * the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSWFEndpointConsumerBuilder sWClientParameters(
-                String sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+        default AdvancedSWFEndpointConsumerBuilder sWClientParameters(Map values) {
+            doSetMultiValueProperties("sWClientParameters", "sWClient.", values);
             return this;
         }
         /**
@@ -543,7 +561,8 @@ public interface SWFEndpointBuilderFactory {
     }
 
     /**
-     * Builder for endpoint producers for the AWS Simple Workflow component.
+     * Builder for endpoint producers for the AWS Simple Workflow (SWF)
+     * component.
      */
     public interface SWFEndpointProducerBuilder
             extends
@@ -840,7 +859,7 @@ public interface SWFEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint producers for the AWS Simple Workflow
+     * Advanced builder for endpoint producers for the AWS Simple Workflow (SWF)
      * component.
      */
     public interface AdvancedSWFEndpointProducerBuilder
@@ -883,27 +902,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointProducerBuilder clientConfigurationParameters(
-                Map<String, Object> clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigurationParameters", "clientConfiguration." + key, value);
             return this;
         }
         /**
          * To configure the ClientConfiguration using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointProducerBuilder clientConfigurationParameters(
-                String clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                Map values) {
+            doSetMultiValueProperties("clientConfigurationParameters", "clientConfiguration.", values);
             return this;
         }
         /**
@@ -912,27 +937,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointProducerBuilder startWorkflowOptionsParameters(
-                Map<String, Object> startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("startWorkflowOptionsParameters", "startWorkflowOptions." + key, value);
             return this;
         }
         /**
          * To configure the StartWorkflowOptions using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointProducerBuilder startWorkflowOptionsParameters(
-                String startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                Map values) {
+            doSetMultiValueProperties("startWorkflowOptionsParameters", "startWorkflowOptions.", values);
             return this;
         }
         /**
@@ -941,27 +972,32 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointProducerBuilder sWClientParameters(
-                Map<String, Object> sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("sWClientParameters", "sWClient." + key, value);
             return this;
         }
         /**
          * To configure the AmazonSimpleWorkflowClient using the key/values from
          * the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSWFEndpointProducerBuilder sWClientParameters(
-                String sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+        default AdvancedSWFEndpointProducerBuilder sWClientParameters(Map values) {
+            doSetMultiValueProperties("sWClientParameters", "sWClient.", values);
             return this;
         }
         /**
@@ -995,7 +1031,7 @@ public interface SWFEndpointBuilderFactory {
     }
 
     /**
-     * Builder for endpoint for the AWS Simple Workflow component.
+     * Builder for endpoint for the AWS Simple Workflow (SWF) component.
      */
     public interface SWFEndpointBuilder
             extends
@@ -1129,7 +1165,8 @@ public interface SWFEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint for the AWS Simple Workflow component.
+     * Advanced builder for endpoint for the AWS Simple Workflow (SWF)
+     * component.
      */
     public interface AdvancedSWFEndpointBuilder
             extends
@@ -1172,27 +1209,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointBuilder clientConfigurationParameters(
-                Map<String, Object> clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigurationParameters", "clientConfiguration." + key, value);
             return this;
         }
         /**
          * To configure the ClientConfiguration using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigurationParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointBuilder clientConfigurationParameters(
-                String clientConfigurationParameters) {
-            doSetProperty("clientConfigurationParameters", clientConfigurationParameters);
+                Map values) {
+            doSetMultiValueProperties("clientConfigurationParameters", "clientConfiguration.", values);
             return this;
         }
         /**
@@ -1201,27 +1244,33 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointBuilder startWorkflowOptionsParameters(
-                Map<String, Object> startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("startWorkflowOptionsParameters", "startWorkflowOptions." + key, value);
             return this;
         }
         /**
          * To configure the StartWorkflowOptions using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * startWorkflowOptionsParameters(String, Object) method to add a value
+         * (call the method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointBuilder startWorkflowOptionsParameters(
-                String startWorkflowOptionsParameters) {
-            doSetProperty("startWorkflowOptionsParameters", startWorkflowOptionsParameters);
+                Map values) {
+            doSetMultiValueProperties("startWorkflowOptionsParameters", "startWorkflowOptions.", values);
             return this;
         }
         /**
@@ -1230,27 +1279,32 @@ public interface SWFEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedSWFEndpointBuilder sWClientParameters(
-                Map<String, Object> sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("sWClientParameters", "sWClient." + key, value);
             return this;
         }
         /**
          * To configure the AmazonSimpleWorkflowClient using the key/values from
          * the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * sWClientParameters(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedSWFEndpointBuilder sWClientParameters(
-                String sWClientParameters) {
-            doSetProperty("sWClientParameters", sWClientParameters);
+        default AdvancedSWFEndpointBuilder sWClientParameters(Map values) {
+            doSetMultiValueProperties("sWClientParameters", "sWClient.", values);
             return this;
         }
         /**
@@ -1283,7 +1337,7 @@ public interface SWFEndpointBuilderFactory {
 
     public interface SWFBuilders {
         /**
-         * AWS Simple Workflow (camel-aws-swf)
+         * AWS Simple Workflow (SWF) (camel-aws-swf)
          * Manage workflows in the AWS Simple Workflow service.
          * 
          * Category: cloud,workflow
@@ -1302,7 +1356,7 @@ public interface SWFEndpointBuilderFactory {
             return SWFEndpointBuilderFactory.endpointBuilder("aws-swf", path);
         }
         /**
-         * AWS Simple Workflow (camel-aws-swf)
+         * AWS Simple Workflow (SWF) (camel-aws-swf)
          * Manage workflows in the AWS Simple Workflow service.
          * 
          * Category: cloud,workflow

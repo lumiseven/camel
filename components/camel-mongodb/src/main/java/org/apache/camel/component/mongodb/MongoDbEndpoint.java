@@ -29,6 +29,7 @@ import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -58,7 +59,7 @@ import static org.apache.camel.component.mongodb.MongoDbOutputType.MongoIterable
  * Perform operations on MongoDB documents and collections.
  */
 @UriEndpoint(firstVersion = "2.19.0", scheme = "mongodb", title = "MongoDB", syntax = "mongodb:connectionBean",
-        label = "database,nosql")
+        category = {Category.DATABASE, Category.NOSQL})
 public class MongoDbEndpoint extends DefaultEndpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbEndpoint.class);
@@ -92,7 +93,7 @@ public class MongoDbEndpoint extends DefaultEndpoint {
     private boolean writeResultAsHeader;
     @UriParam(label = "consumer")
     private String consumerType;
-    @UriParam(label = "advanced", defaultValue = "1000")
+    @UriParam(label = "advanced", defaultValue = "1000", javaType = "java.time.Duration")
     private long cursorRegenerationDelay = 1000L;
     @UriParam(label = "tail")
     private String tailTrackIncreasingField;
@@ -234,7 +235,8 @@ public class MongoDbEndpoint extends DefaultEndpoint {
         }
         if (collection != null) {
             if (!createCollection && !databaseContainsCollection(collection)) {
-                throw new CamelMongoDbException("Could not initialise MongoDbComponent. Collection " + collection + " and createCollection is false.");
+                throw new CamelMongoDbException("Could not initialise MongoDbComponent. Collection "
+                    + collection + " does not exist on the database and createCollection is false.");
             }
             mongoCollection = mongoDatabase.getCollection(collection, Document.class);
 

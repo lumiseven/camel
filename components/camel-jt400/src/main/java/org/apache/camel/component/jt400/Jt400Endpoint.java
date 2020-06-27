@@ -24,6 +24,7 @@ import javax.naming.OperationNotSupportedException;
 import com.ibm.as400.access.AS400;
 import com.ibm.as400.access.AS400ConnectionPool;
 import org.apache.camel.CamelException;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.MultipleConsumersSupport;
 import org.apache.camel.Processor;
@@ -35,19 +36,19 @@ import org.apache.camel.util.ObjectHelper;
 import org.apache.camel.util.URISupport;
 
 /**
- * Exchanges messages with an AS/400 system using data queues or program call.
+ * Exchanges messages with an IBM i system using data queues, message queues, or program call. IBM i is the replacement for AS/400 and iSeries servers.
  */
-@UriEndpoint(firstVersion = "1.5.0", scheme = "jt400", title = "JT400", syntax = "jt400:userID:password/systemName/objectPath.type", label = "messaging")
+@UriEndpoint(firstVersion = "1.5.0", scheme = "jt400", title = "JT400", syntax = "jt400:userID:password/systemName/objectPath.type", category = {Category.MESSAGING})
 public class Jt400Endpoint extends ScheduledPollEndpoint implements MultipleConsumersSupport {
 
-    public static final String KEY = "KEY";
-    public static final String SENDER_INFORMATION = "SENDER_INFORMATION";
+    public static final String KEY = Jt400Constants.KEY;
+    public static final String SENDER_INFORMATION = Jt400Constants.SENDER_INFORMATION;
 
     @UriParam
     private final Jt400Configuration configuration;
 
     /**
-     * Creates a new AS/400 data queue endpoint using a default connection pool
+     * Creates a new IBM i data queue endpoint using a default connection pool
      * provided by the component.
      *
      * @throws NullPointerException if {@code component} is null
@@ -57,7 +58,7 @@ public class Jt400Endpoint extends ScheduledPollEndpoint implements MultipleCons
     }
 
     /**
-     * Creates a new AS/400 data queue endpoint using the specified connection
+     * Creates a new IBM i data queue endpoint using the specified connection
      * pool.
      */
     protected Jt400Endpoint(String endpointUri, Jt400Component component, AS400ConnectionPool connectionPool) throws CamelException {
@@ -78,6 +79,8 @@ public class Jt400Endpoint extends ScheduledPollEndpoint implements MultipleCons
     public Producer createProducer() throws Exception {
         if (Jt400Type.DTAQ == configuration.getType()) {
             return new Jt400DataQueueProducer(this);
+        } else if (Jt400Type.MSGQ == configuration.getType()) {
+            return new Jt400MsgQueueProducer(this);
         } else {
             return new Jt400PgmProducer(this);
         }
@@ -87,6 +90,10 @@ public class Jt400Endpoint extends ScheduledPollEndpoint implements MultipleCons
     public Consumer createConsumer(Processor processor) throws Exception {
         if (Jt400Type.DTAQ == configuration.getType()) {
             Consumer consumer = new Jt400DataQueueConsumer(this, processor);
+            configureConsumer(consumer);
+            return consumer;
+        } else if (Jt400Type.MSGQ == configuration.getType()) {
+            Consumer consumer = new Jt400MsgQueueConsumer(this, processor);
             configureConsumer(consumer);
             return consumer;
         } else {
@@ -267,6 +274,14 @@ public class Jt400Endpoint extends ScheduledPollEndpoint implements MultipleCons
 
     public String getProcedureName() {
         return configuration.getProcedureName();
+    }
+
+    public void setMessageAction(Jt400Configuration.MessageAction messageAction) {
+        configuration.setMessageAction(messageAction);
+    }
+
+    public Jt400Configuration.MessageAction getMessageAction() {
+        return configuration.getMessageAction();
     }
 
     @Override

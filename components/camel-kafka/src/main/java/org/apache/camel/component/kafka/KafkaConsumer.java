@@ -355,7 +355,7 @@ public class KafkaConsumer extends DefaultConsumer {
                                         // we are failing and we should break
                                         // out
                                         LOG.warn("Error during processing {} from topic: {}. Will seek consumer to offset: {} and re-connect and start polling again.", exchange,
-                                                 topicName, partitionLastOffset);
+                                                 topicName, partitionLastOffset, exchange.getException());
                                         // force commit so we resume on next
                                         // poll where we failed
                                         commitOffset(offsetRepository, partition, partitionLastOffset, true);
@@ -460,8 +460,15 @@ public class KafkaConsumer extends DefaultConsumer {
                     offset = -1L;
                 }
                 LOG.debug("Saving offset repository state {} from offsetKey {} with offset: {}", threadId, offsetKey, offset);
-                commitOffset(offsetRepository, partition, offset, true);
-                lastProcessedOffset.remove(offsetKey);
+                try {
+                    commitOffset(offsetRepository, partition, offset, true);
+                } catch (java.lang.Exception e) {
+                    LOG.error("Error saving offset repository state {} from offsetKey {} with offset: {}", threadId, offsetKey, offset);
+                    throw e;
+                } finally {
+                    lastProcessedOffset.remove(offsetKey);
+                }
+
             }
         }
 
@@ -493,7 +500,7 @@ public class KafkaConsumer extends DefaultConsumer {
     }
 
     private boolean shouldBeFiltered(Header header, Exchange exchange, HeaderFilterStrategy headerFilterStrategy) {
-        return !headerFilterStrategy.applyFilterToCamelHeaders(header.key(), header.value(), exchange);
+        return !headerFilterStrategy.applyFilterToExternalHeaders(header.key(), header.value(), exchange);
     }
 
     private boolean isAutoCommitEnabled() {

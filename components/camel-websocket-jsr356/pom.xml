@@ -21,7 +21,7 @@
     <parent>
         <artifactId>components</artifactId>
         <groupId>org.apache.camel</groupId>
-        <version>3.3.0-SNAPSHOT</version>
+        <version>3.5.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -30,7 +30,7 @@
     <description>Camel WebSocket using JSR356 (javax)</description>
 
     <properties>
-        <tomcat.version>9.0.31</tomcat.version>
+        <tomcat.version>9.0.35</tomcat.version>
 
         <camel.osgi.import.pkg>
             !org.apache.camel.component.websocket.jsr356.*,

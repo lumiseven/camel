@@ -24,6 +24,7 @@ import java.io.StringWriter;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.camel.Category;
 import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
@@ -44,7 +45,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Transform messages using a Velocity template.
  */
-@UriEndpoint(firstVersion = "1.2.0", scheme = "velocity", title = "Velocity", syntax = "velocity:resourceUri", producerOnly = true, label = "transformation")
+@UriEndpoint(firstVersion = "1.2.0", scheme = "velocity", title = "Velocity", syntax = "velocity:resourceUri", producerOnly = true, category = {Category.TRANSFORMATION})
 public class VelocityEndpoint extends ResourceEndpoint {
 
     private VelocityEngine velocityEngine;
@@ -86,8 +87,8 @@ public class VelocityEndpoint extends ResourceEndpoint {
             Properties properties = new Properties();
             properties.setProperty(RuntimeConstants.FILE_RESOURCE_LOADER_CACHE, isLoaderCache() ? "true" : "false");
             properties.setProperty(RuntimeConstants.RESOURCE_LOADER, "file, class");
-            properties.setProperty("class.resource.loader.description", "Camel Velocity Classpath Resource Loader");
-            properties.setProperty("class.resource.loader.class", CamelVelocityClasspathResourceLoader.class.getName());
+            properties.setProperty("resource.loader.class.description", "Camel Velocity Classpath Resource Loader");
+            properties.setProperty("resource.loader.class.class", CamelVelocityClasspathResourceLoader.class.getName());
             final Logger velocityLogger = LoggerFactory.getLogger("org.apache.camel.maven.Velocity");
             properties.setProperty(RuntimeConstants.RUNTIME_LOG_NAME, velocityLogger.getName());
 

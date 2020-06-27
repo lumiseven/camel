@@ -46,6 +46,7 @@ import io.swagger.models.parameters.QueryParameter;
 import io.swagger.parser.SwaggerParser;
 import io.swagger.util.Json;
 import org.apache.camel.CamelContext;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Endpoint;
 import org.apache.camel.ExchangePattern;
@@ -80,16 +81,13 @@ import static org.apache.camel.util.StringHelper.*;
  * RestProducerFactory interface.
  */
 @UriEndpoint(firstVersion = "2.19.0", scheme = "rest-swagger", title = "REST Swagger",
-    syntax = "rest-swagger:specificationUri#operationId", label = "rest,swagger,http", producerOnly = true)
+    syntax = "rest-swagger:specificationUri#operationId", category = {Category.REST, Category.SWAGGER, Category.HTTP}, producerOnly = true)
 public final class RestSwaggerEndpoint extends DefaultEndpoint {
 
     /**
      * Remaining parameters specified in the Endpoint URI.
      */
     Map<String, Object> parameters = Collections.emptyMap();
-
-    /** The name of the Camel component, be it `rest-swagger` or `petstore` */
-    private String assignedComponentName;
 
     @UriParam(
         description = "API basePath, for example \"`/v2`\". Default is unset, if set overrides the value present in"
@@ -152,8 +150,6 @@ public final class RestSwaggerEndpoint extends DefaultEndpoint {
         final Map<String, Object> parameters) {
         super(notEmpty(uri, "uri"), notNull(component, "component"));
         this.parameters = parameters;
-
-        assignedComponentName = before(uri, ":");
 
         final URI componentSpecificationUri = component.getSpecificationUri();
 
@@ -332,7 +328,7 @@ public final class RestSwaggerEndpoint extends DefaultEndpoint {
         }
 
         final CamelContext camelContext = getCamelContext();
-        final RestConfiguration restConfiguration = CamelContextHelper.getRestConfiguration(camelContext, assignedComponentName);
+        final RestConfiguration restConfiguration = CamelContextHelper.getRestConfiguration(camelContext, null, determineComponentName());
         final String restConfigurationBasePath = restConfiguration.getContextPath();
 
         if (isNotEmpty(restConfigurationBasePath)) {
@@ -427,7 +423,7 @@ public final class RestSwaggerEndpoint extends DefaultEndpoint {
         }
 
         final CamelContext camelContext = getCamelContext();
-        final RestConfiguration globalRestConfiguration = CamelContextHelper.getRestConfiguration(camelContext, assignedComponentName);
+        final RestConfiguration globalRestConfiguration = CamelContextHelper.getRestConfiguration(camelContext, null, determineComponentName());
         final String globalConfigurationHost = hostFrom(globalRestConfiguration);
 
         if (globalConfigurationHost != null) {
@@ -444,12 +440,10 @@ public final class RestSwaggerEndpoint extends DefaultEndpoint {
             }
         }
 
-        final boolean areTheSame = "rest-swagger".equals(assignedComponentName);
-
         throw new IllegalStateException("Unable to determine destination host for requests. The Swagger specification"
             + " does not specify `scheme` and `host` parameters, the specification URI is not absolute with `http` or"
             + " `https` scheme, and no RestConfigurations configured with `scheme`, `host` and `port` were found for `"
-            + (areTheSame ? "rest-swagger` component" : assignedComponentName + "` or `rest-swagger` components")
+            + (determineComponentName() != null ? determineComponentName() : "default" + "` component")
             + " and there is no global RestConfiguration with those properties");
     }
 

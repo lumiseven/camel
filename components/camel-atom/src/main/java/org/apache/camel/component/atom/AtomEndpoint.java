@@ -19,6 +19,7 @@ package org.apache.camel.component.atom;
 import java.util.Date;
 
 import org.apache.abdera.model.Feed;
+import org.apache.camel.Category;
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;
 import org.apache.camel.component.feed.FeedComponent;
@@ -30,7 +31,7 @@ import org.apache.camel.spi.UriEndpoint;
  * Poll Atom RSS feeds.
  */
 @UriEndpoint(firstVersion = "1.2.0", scheme = "atom", title = "Atom", syntax = "atom:feedUri", consumerOnly = true,
-        label = "rss", lenientProperties = true)
+        category = {Category.RSS}, lenientProperties = true)
 public class AtomEndpoint extends FeedEndpoint {
 
     public AtomEndpoint() {

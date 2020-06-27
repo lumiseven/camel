@@ -30,7 +30,6 @@ import org.apache.camel.cloud.ServiceRegistry;
 import org.apache.camel.cluster.CamelClusterService;
 import org.apache.camel.health.HealthCheckRegistry;
 import org.apache.camel.health.HealthCheckRepository;
-import org.apache.camel.health.HealthCheckService;
 import org.apache.camel.model.Model;
 import org.apache.camel.processor.interceptor.BacklogTracer;
 import org.apache.camel.spi.AsyncProcessorAwaitManager;
@@ -208,6 +207,10 @@ public final class DefaultConfigurationConfigurer {
             if (config.getRouteControllerBackOffMultiplier() > 0) {
                 src.setBackOffMultiplier(config.getRouteControllerBackOffMultiplier());
             }
+            src.setUnhealthyOnExhausted(config.isRouteControllerUnhealthyOnExhausted());
+        }
+        if (config.getRouteControllerRouteStartupLoggingLevel() != null) {
+            camelContext.getRouteController().setRouteStartupLoggingLevel(config.getRouteControllerRouteStartupLoggingLevel());
         }
     }
 
@@ -218,7 +221,7 @@ public final class DefaultConfigurationConfigurer {
      * Similar code in camel-core-xml module in class org.apache.camel.core.xml.AbstractCamelContextFactoryBean
      * or in camel-spring-boot module in class org.apache.camel.spring.boot.CamelAutoConfiguration.
      */
-    public static void afterPropertiesSet(final CamelContext camelContext) throws Exception {
+    public static void afterConfigure(final CamelContext camelContext) throws Exception {
         final Registry registry = camelContext.getRegistry();
         final ManagementStrategy managementStrategy = camelContext.getManagementStrategy();
         final ExtendedCamelContext ecc = camelContext.adapt(ExtendedCamelContext.class);
@@ -367,31 +370,28 @@ public final class DefaultConfigurationConfigurer {
             LOG.info("Using HealthCheckRegistry: {}", healthCheckRegistry);
             camelContext.setExtension(HealthCheckRegistry.class, healthCheckRegistry);
         } else {
+            // okay attempt to inject this camel context into existing health check (if any)
             healthCheckRegistry = HealthCheckRegistry.get(camelContext);
-            healthCheckRegistry.setCamelContext(camelContext);
+            if (healthCheckRegistry != null) {
+                healthCheckRegistry.setCamelContext(camelContext);
+            }
         }
-        Set<HealthCheckRepository> hcrs = registry.findByType(HealthCheckRepository.class);
-        if (!hcrs.isEmpty()) {
-            hcrs.forEach(healthCheckRegistry::addRepository);
-        }
-
-        HealthCheckService hcs = getSingleBeanOfType(registry, HealthCheckService.class);
-        if (hcs != null) {
-            camelContext.addService(hcs);
+        if (healthCheckRegistry != null) {
+            // Health check repository
+            Set<HealthCheckRepository> repositories = registry.findByType(HealthCheckRepository.class);
+            if (org.apache.camel.util.ObjectHelper.isNotEmpty(repositories)) {
+                for (HealthCheckRepository repository : repositories) {
+                    healthCheckRegistry.register(repository);
+                }
+            }
         }
 
         // set the default thread pool profile if defined
         initThreadPoolProfiles(registry, camelContext);
     }
 
-    private static <T> void registerPropertyForBeanType(final Registry registry, final Class<T> beanType, final Consumer<T> propertySetter) {
-        T propertyBean = getSingleBeanOfType(registry, beanType);
-        if (propertyBean == null) {
-            return;
-        }
-
-        LOG.info("Using custom {}: {}", beanType.getSimpleName(), propertyBean);
-        propertySetter.accept(propertyBean);
+    public static void afterPropertiesSet(final CamelContext camelContext) throws Exception {
+        // additional configuration
     }
 
     private static <T> T getSingleBeanOfType(Registry registry, Class<T> type) {
@@ -401,10 +401,6 @@ public final class DefaultConfigurationConfigurer {
         } else {
             return null;
         }
-    }
-
-    private static <T> void registerPropertiesForBeanTypes(final Registry registry, final Class<T> beanType, final Consumer<T> propertySetter) {
-        registerPropertiesForBeanTypesWithCondition(registry, beanType, b -> true, propertySetter);
     }
 
     private static <T> void registerPropertiesForBeanTypesWithCondition(final Registry registry, final Class<T> beanType, final Predicate<T> condition,

@@ -24,6 +24,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import org.apache.camel.Category;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
 import org.apache.camel.Producer;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Interact with MongoDB GridFS.
  */
-@UriEndpoint(firstVersion = "2.18.0", scheme = "mongodb-gridfs", title = "MongoDB GridFS", syntax = "mongodb-gridfs:connectionBean", label = "database,nosql")
+@UriEndpoint(firstVersion = "2.18.0", scheme = "mongodb-gridfs", title = "MongoDB GridFS", syntax = "mongodb-gridfs:connectionBean", category = {Category.DATABASE, Category.NOSQL})
 public class GridFsEndpoint extends DefaultEndpoint {
 
     public static final String GRIDFS_OPERATION = "gridfs.operation";
@@ -68,9 +69,9 @@ public class GridFsEndpoint extends DefaultEndpoint {
 
     @UriParam(label = "consumer")
     private String query;
-    @UriParam(label = "consumer", defaultValue = "1000")
+    @UriParam(label = "consumer", defaultValue = "1000", javaType = "java.time.Duration")
     private long initialDelay = 1000;
-    @UriParam(label = "consumer", defaultValue = "500")
+    @UriParam(label = "consumer", defaultValue = "500", javaType = "java.time.Duration")
     private long delay = 500;
     @UriParam(label = "consumer", defaultValue = "TimeStamp")
     private QueryStrategy queryStrategy = QueryStrategy.TimeStamp;

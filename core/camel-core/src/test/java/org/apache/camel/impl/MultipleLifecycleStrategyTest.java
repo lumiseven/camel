@@ -23,7 +23,9 @@ import org.apache.camel.CamelContext;
 import org.apache.camel.Component;
 import org.apache.camel.TestSupport;
 import org.apache.camel.component.log.LogComponent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class MultipleLifecycleStrategyTest extends TestSupport {
 
@@ -49,12 +51,12 @@ public class MultipleLifecycleStrategyTest extends TestSupport {
         context.stop();
 
         List<String> expectedEvents = Arrays.asList(
-            "onServiceAdd", "onServiceAdd",
             "onServiceAdd", "onServiceAdd", "onServiceAdd", "onServiceAdd", "onServiceAdd",
-            "onServiceAdd", "onServiceAdd", "onServiceAdd", "onServiceAdd",
+            "onServiceAdd", "onServiceAdd", "onServiceAdd", "onServiceAdd", "onServiceAdd",
+            "onServiceAdd",
             "onContextStart",
             "onComponentAdd", "onEndpointAdd", "onComponentRemove", "onContextStop");
-        
+
         assertEquals(expectedEvents, dummy1.getEvents());
         assertEquals(expectedEvents, dummy2.getEvents());
     }

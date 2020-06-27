@@ -40,7 +40,7 @@ public interface Sqs2EndpointBuilderFactory {
 
 
     /**
-     * Builder for endpoint consumers for the AWS 2 Simple Queue Service
+     * Builder for endpoint consumers for the AWS 2 Simple Queue Service (SQS)
      * component.
      */
     public interface Sqs2EndpointConsumerBuilder
@@ -1003,27 +1003,32 @@ public interface Sqs2EndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default Sqs2EndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default Sqs2EndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default Sqs2EndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -1128,7 +1133,7 @@ public interface Sqs2EndpointBuilderFactory {
 
     /**
      * Advanced builder for endpoint consumers for the AWS 2 Simple Queue
-     * Service component.
+     * Service (SQS) component.
      */
     public interface AdvancedSqs2EndpointConsumerBuilder
             extends
@@ -1325,7 +1330,7 @@ public interface Sqs2EndpointBuilderFactory {
     }
 
     /**
-     * Builder for endpoint producers for the AWS 2 Simple Queue Service
+     * Builder for endpoint producers for the AWS 2 Simple Queue Service (SQS)
      * component.
      */
     public interface Sqs2EndpointProducerBuilder
@@ -1812,7 +1817,7 @@ public interface Sqs2EndpointBuilderFactory {
 
     /**
      * Advanced builder for endpoint producers for the AWS 2 Simple Queue
-     * Service component.
+     * Service (SQS) component.
      */
     public interface AdvancedSqs2EndpointProducerBuilder
             extends
@@ -1920,7 +1925,7 @@ public interface Sqs2EndpointBuilderFactory {
     }
 
     /**
-     * Builder for endpoint for the AWS 2 Simple Queue Service component.
+     * Builder for endpoint for the AWS 2 Simple Queue Service (SQS) component.
      */
     public interface Sqs2EndpointBuilder
             extends
@@ -2244,7 +2249,7 @@ public interface Sqs2EndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint for the AWS 2 Simple Queue Service
+     * Advanced builder for endpoint for the AWS 2 Simple Queue Service (SQS)
      * component.
      */
     public interface AdvancedSqs2EndpointBuilder
@@ -2370,7 +2375,7 @@ public interface Sqs2EndpointBuilderFactory {
 
     public interface Sqs2Builders {
         /**
-         * AWS 2 Simple Queue Service (camel-aws2-sqs)
+         * AWS 2 Simple Queue Service (SQS) (camel-aws2-sqs)
          * Sending and receive messages to/from AWS SQS service using AWS SDK
          * version 2.x.
          * 
@@ -2389,7 +2394,7 @@ public interface Sqs2EndpointBuilderFactory {
             return Sqs2EndpointBuilderFactory.endpointBuilder("aws2-sqs", path);
         }
         /**
-         * AWS 2 Simple Queue Service (camel-aws2-sqs)
+         * AWS 2 Simple Queue Service (SQS) (camel-aws2-sqs)
          * Sending and receive messages to/from AWS SQS service using AWS SDK
          * version 2.x.
          * 

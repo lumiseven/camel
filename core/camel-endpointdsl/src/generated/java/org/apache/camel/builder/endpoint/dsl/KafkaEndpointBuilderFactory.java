@@ -55,12 +55,16 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
         default KafkaEndpointConsumerBuilder additionalProperties(
-                Map<String, Object> additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("additionalProperties", "additionalProperties." + key, value);
             return this;
         }
         /**
@@ -71,15 +75,16 @@ public interface KafkaEndpointBuilderFactory {
          * additionalProperties.. E.g:
          * additionalProperties.transactional.id=12345&additionalProperties.schema.registry.url=http://localhost:8811/avro.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
-        default KafkaEndpointConsumerBuilder additionalProperties(
-                String additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+        default KafkaEndpointConsumerBuilder additionalProperties(Map values) {
+            doSetMultiValueProperties("additionalProperties", "additionalProperties.", values);
             return this;
         }
         /**
@@ -1224,6 +1229,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option is a:
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.
@@ -1238,6 +1246,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option will be converted to a
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.
@@ -1506,12 +1517,16 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
         default KafkaEndpointProducerBuilder additionalProperties(
-                Map<String, Object> additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("additionalProperties", "additionalProperties." + key, value);
             return this;
         }
         /**
@@ -1522,15 +1537,16 @@ public interface KafkaEndpointBuilderFactory {
          * additionalProperties.. E.g:
          * additionalProperties.transactional.id=12345&additionalProperties.schema.registry.url=http://localhost:8811/avro.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
-        default KafkaEndpointProducerBuilder additionalProperties(
-                String additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+        default KafkaEndpointProducerBuilder additionalProperties(Map values) {
+            doSetMultiValueProperties("additionalProperties", "additionalProperties.", values);
             return this;
         }
         /**
@@ -2837,6 +2853,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option is a:
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.
@@ -2851,6 +2870,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option will be converted to a
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.
@@ -3126,12 +3148,16 @@ public interface KafkaEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
         default KafkaEndpointBuilder additionalProperties(
-                Map<String, Object> additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("additionalProperties", "additionalProperties." + key, value);
             return this;
         }
         /**
@@ -3142,15 +3168,16 @@ public interface KafkaEndpointBuilderFactory {
          * additionalProperties.. E.g:
          * additionalProperties.transactional.id=12345&additionalProperties.schema.registry.url=http://localhost:8811/avro.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * additionalProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: common
          */
-        default KafkaEndpointBuilder additionalProperties(
-                String additionalProperties) {
-            doSetProperty("additionalProperties", additionalProperties);
+        default KafkaEndpointBuilder additionalProperties(Map values) {
+            doSetMultiValueProperties("additionalProperties", "additionalProperties.", values);
             return this;
         }
         /**
@@ -3488,6 +3515,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option is a:
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.
@@ -3502,6 +3532,9 @@ public interface KafkaEndpointBuilderFactory {
         /**
          * SSL configuration using a Camel SSLContextParameters object. If
          * configured it's applied before the other SSL endpoint parameters.
+         * NOTE: Kafka only supports loading keystore from file locations, so
+         * prefix the location with file: in the KeyStoreParameters.resource
+         * option.
          * 
          * The option will be converted to a
          * <code>org.apache.camel.support.jsse.SSLContextParameters</code> type.

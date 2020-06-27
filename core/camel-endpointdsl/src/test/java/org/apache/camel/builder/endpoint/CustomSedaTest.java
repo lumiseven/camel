@@ -20,7 +20,9 @@ import org.apache.camel.ContextTestSupport;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.apache.camel.component.seda.SedaComponent;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class CustomSedaTest extends ContextTestSupport {
 
@@ -47,9 +49,14 @@ public class CustomSedaTest extends ContextTestSupport {
                 SedaComponent seda2 = new SedaComponent();
                 context.addComponent("seda2", seda2);
 
-                from(seda("foo")).to(mock("result"));
-                from(seda("seda2", "foo")).to(mock("result"));
-                from("direct:foo").to(seda("seda2", "foo"));
+                from(seda("foo"))
+                    .to(mock("result"));
+
+                from(seda("seda2", "foo"))
+                    .to(mock("result"));
+
+                from(direct("foo"))
+                    .to(seda("seda2", "foo"));
             }
         };
     }

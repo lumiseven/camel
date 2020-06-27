@@ -134,12 +134,14 @@ public interface HBaseEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointConsumerBuilder rowMapping(
-                Map<String, Object> rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointConsumerBuilder rowMapping(String key, Object value) {
+            doSetMultiValueProperty("rowMapping", "row." + key, value);
             return this;
         }
         /**
@@ -154,14 +156,16 @@ public interface HBaseEndpointBuilderFactory {
          * value type. Supports a number suffix for referring to more than one
          * columns. Supported operations: CamelHBaseGet, and CamelHBaseScan.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointConsumerBuilder rowMapping(String rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointConsumerBuilder rowMapping(Map values) {
+            doSetMultiValueProperties("rowMapping", "row.", values);
             return this;
         }
         /**
@@ -573,12 +577,14 @@ public interface HBaseEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointProducerBuilder rowMapping(
-                Map<String, Object> rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointProducerBuilder rowMapping(String key, Object value) {
+            doSetMultiValueProperty("rowMapping", "row." + key, value);
             return this;
         }
         /**
@@ -593,14 +599,16 @@ public interface HBaseEndpointBuilderFactory {
          * value type. Supports a number suffix for referring to more than one
          * columns. Supported operations: CamelHBaseGet, and CamelHBaseScan.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointProducerBuilder rowMapping(String rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointProducerBuilder rowMapping(Map values) {
+            doSetMultiValueProperties("rowMapping", "row.", values);
             return this;
         }
         /**
@@ -891,11 +899,14 @@ public interface HBaseEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointBuilder rowMapping(Map<String, Object> rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointBuilder rowMapping(String key, Object value) {
+            doSetMultiValueProperty("rowMapping", "row." + key, value);
             return this;
         }
         /**
@@ -910,14 +921,16 @@ public interface HBaseEndpointBuilderFactory {
          * value type. Supports a number suffix for referring to more than one
          * columns. Supported operations: CamelHBaseGet, and CamelHBaseScan.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the rowMapping(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: common
          */
-        default HBaseEndpointBuilder rowMapping(String rowMapping) {
-            doSetProperty("rowMapping", rowMapping);
+        default HBaseEndpointBuilder rowMapping(Map values) {
+            doSetMultiValueProperties("rowMapping", "row.", values);
             return this;
         }
         /**
@@ -1045,7 +1058,7 @@ public interface HBaseEndpointBuilderFactory {
          * HBase (camel-hbase)
          * Reading and write from/to an HBase store (Hadoop database).
          * 
-         * Category: hadoop
+         * Category: bigdata,database,hadoop
          * Since: 2.10
          * Maven coordinates: org.apache.camel:camel-hbase
          * 
@@ -1063,7 +1076,7 @@ public interface HBaseEndpointBuilderFactory {
          * HBase (camel-hbase)
          * Reading and write from/to an HBase store (Hadoop database).
          * 
-         * Category: hadoop
+         * Category: bigdata,database,hadoop
          * Since: 2.10
          * Maven coordinates: org.apache.camel:camel-hbase
          * 

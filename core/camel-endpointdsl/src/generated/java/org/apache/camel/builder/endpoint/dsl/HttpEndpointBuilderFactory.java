@@ -1090,26 +1090,31 @@ public interface HttpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * httpClientOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedHttpEndpointBuilder httpClientOptions(
-                Map<String, Object> httpClientOptions) {
-            doSetProperty("httpClientOptions", httpClientOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("httpClientOptions", "httpClient." + key, value);
             return this;
         }
         /**
          * To configure the HttpClient using the key/values from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * httpClientOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedHttpEndpointBuilder httpClientOptions(
-                String httpClientOptions) {
-            doSetProperty("httpClientOptions", httpClientOptions);
+        default AdvancedHttpEndpointBuilder httpClientOptions(Map values) {
+            doSetMultiValueProperties("httpClientOptions", "httpClient.", values);
             return this;
         }
         /**
@@ -1377,26 +1382,6 @@ public interface HttpEndpointBuilderFactory {
          */
         default HttpEndpointBuilder https(String path) {
             return HttpEndpointBuilderFactory.endpointBuilder("https", path);
-        }
-        /**
-         * HTTPS (Secure) (camel-http)
-         * Send requests to external HTTP servers using Apache HTTP Client 4.x.
-         * 
-         * Category: http
-         * Since: 2.3
-         * Maven coordinates: org.apache.camel:camel-http
-         * 
-         * Syntax: <code>https:httpUri</code>
-         * 
-         * Path parameter: httpUri (required)
-         * The url of the HTTP endpoint to call.
-         * 
-         * @param componentName to use a custom component name for the endpoint
-         * instead of the default name
-         * @param path httpUri
-         */
-        default HttpEndpointBuilder https(String componentName, String path) {
-            return HttpEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
     static HttpEndpointBuilder endpointBuilder(String componentName, String path) {

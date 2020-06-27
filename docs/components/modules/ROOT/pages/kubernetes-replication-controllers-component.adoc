@@ -8,14 +8,16 @@
 :since: 2.17
 :supportLevel: Stable
 :component-header: Both producer and consumer are supported
+//Manually maintained attributes
+:group: Kubernetes
 
 *Since Camel {since}*
 
 *{component-header}*
 
 The Kubernetes Replication Controller component is one of xref:kubernetes-summary.adoc[Kubernetes Components] which
-provides a producer to execute kubernetes replication controller operations and a consumer to
-consume kubernetes replication controller events.
+provides a producer to execute Kubernetes Replication controller operations and a consumer to
+consume events related to Replication Controller objects.
 
 
 

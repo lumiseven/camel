@@ -31,10 +31,10 @@ import org.apache.camel.component.aws.msk.MSKComponent;
 public interface AwsMskComponentBuilderFactory {
 
     /**
-     * AWS MSK (camel-aws-msk)
+     * AWS Managed Streaming for Apache Kafka (MSK) (camel-aws-msk)
      * Manage AWS MSK instances.
      * 
-     * Category: cloud,management
+     * Category: cloud,messaging
      * Since: 3.0
      * Maven coordinates: org.apache.camel:camel-aws-msk
      */
@@ -43,7 +43,7 @@ public interface AwsMskComponentBuilderFactory {
     }
 
     /**
-     * Builder for the AWS MSK component.
+     * Builder for the AWS Managed Streaming for Apache Kafka (MSK) component.
      */
     interface AwsMskComponentBuilder extends ComponentBuilder<MSKComponent> {
         /**

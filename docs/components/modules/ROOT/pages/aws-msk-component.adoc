@@ -1,13 +1,15 @@
 [[aws-msk-component]]
-= AWS MSK Component
+= AWS Managed Streaming for Apache Kafka (MSK) Component
 //THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws-msk/src/main/docs/aws-msk-component.adoc
-:docTitle: AWS MSK
+:docTitle: AWS Managed Streaming for Apache Kafka (MSK)
 :artifactId: camel-aws-msk
 :description: Manage AWS MSK instances.
 :since: 3.0
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS
 
 *Since Camel {since}*
 
@@ -36,7 +38,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS MSK component supports 11 options, which are listed below.
+The AWS Managed Streaming for Apache Kafka (MSK) component supports 11 options, which are listed below.
 
 
 
@@ -61,7 +63,7 @@ The AWS MSK component supports 11 options, which are listed below.
 
 
 // endpoint options: START
-The AWS MSK endpoint is configured using URI syntax:
+The AWS Managed Streaming for Apache Kafka (MSK) endpoint is configured using URI syntax:
 
 ----
 aws-msk:label

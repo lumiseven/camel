@@ -42,7 +42,9 @@ import org.apache.camel.language.simple.types.SimpleIllegalSyntaxException;
 import org.apache.camel.spi.Language;
 import org.apache.camel.spi.Registry;
 import org.apache.camel.util.InetAddressUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SimpleTest extends LanguageTestSupport {
 
@@ -560,10 +562,6 @@ public class SimpleTest extends LanguageTestSupport {
         inHeaderCalendar.set(1974, Calendar.APRIL, 20);
         exchange.getIn().setHeader("birthday", inHeaderCalendar.getTime());
 
-        Calendar outHeaderCalendar = Calendar.getInstance();
-        outHeaderCalendar.set(1975, Calendar.MAY, 21);
-        exchange.getOut().setHeader("birthday", outHeaderCalendar.getTime());
-
         Calendar propertyCalendar = Calendar.getInstance();
         propertyCalendar.set(1976, Calendar.JUNE, 22);
         exchange.setProperty("birthday", propertyCalendar.getTime());
@@ -572,10 +570,9 @@ public class SimpleTest extends LanguageTestSupport {
         assertExpression("${date:header.birthday:yyyyMMdd}", "19740420");
         assertExpression("${date:header.birthday+24h:yyyyMMdd}", "19740421");
 
-        assertExpression("${date:in.header.birthday}", inHeaderCalendar.getTime());
-        assertExpression("${date:in.header.birthday:yyyyMMdd}", "19740420");
-        assertExpression("${date:in.header.birthday+24h:yyyyMMdd}", "19740421");
-
+        // long
+        assertExpression("${date:exchangeProperty.birthday}", propertyCalendar.getTime().getTime());
+        // date
         assertExpression("${date:exchangeProperty.birthday}", propertyCalendar.getTime());
         assertExpression("${date:exchangeProperty.birthday:yyyyMMdd}", "19760622");
         assertExpression("${date:exchangeProperty.birthday+24h:yyyyMMdd}", "19760623");
@@ -614,6 +611,12 @@ public class SimpleTest extends LanguageTestSupport {
     @Test
     public void testDateNow() throws Exception {
         Object out = evaluateExpression("${date:now:hh:mm:ss a}", null);
+        assertNotNull(out);
+    }
+
+    @Test
+    public void testDateExchangeCreated() throws Exception {
+        Object out = evaluateExpression("${date:exchangeCreated:hh:mm:ss a}", "" + exchange.getCreated());
         assertNotNull(out);
     }
 
@@ -1406,7 +1409,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown exception");
         } catch (RuntimeBeanExpressionException e) {
             assertEquals("Failed to invoke method: .getFriend.getFriend.getName on org.apache.camel.language.simple.SimpleTest.Animal"
-                         + " due last method returned null and therefore cannot continue to invoke method .getName on a null instance", e.getMessage());
+                             + " due last method returned null and therefore cannot continue to invoke method .getName on a null instance", e.getMessage());
         }
     }
 
@@ -1433,7 +1436,7 @@ public class SimpleTest extends LanguageTestSupport {
             fail("Should have thrown exception");
         } catch (RuntimeBeanExpressionException e) {
             assertEquals("Failed to invoke method: .friend.friend.name on org.apache.camel.language.simple.SimpleTest.Animal"
-                         + " due last method returned null and therefore cannot continue to invoke method .name on a null instance", e.getMessage());
+                             + " due last method returned null and therefore cannot continue to invoke method .name on a null instance", e.getMessage());
         }
     }
 
@@ -1844,7 +1847,7 @@ public class SimpleTest extends LanguageTestSupport {
         exchange.getIn().setHeader("max", 20);
         Expression expression3 = SimpleLanguage.simple("${random(10,${header.max})}", Integer.class);
         int num = expression3.evaluate(exchange, Integer.class);
-        assertTrue("Should be 10..20", num >= 0 && num < 20);
+        assertTrue(num >= 0 && num < 20, "Should be 10..20");
     }
 
     @Test
@@ -1888,7 +1891,7 @@ public class SimpleTest extends LanguageTestSupport {
         Animal animal = exchange.getIn().getBody(Animal.class);
         assertEquals("tiger", animal.getName());
         assertEquals(13, animal.getAge());
-        assertNotNull("Should have a friend", animal.getFriend());
+        assertNotNull(animal.getFriend(), "Should have a friend");
         assertEquals("donkey", animal.getFriend().getName());
         assertEquals(4, animal.getFriend().getAge());
     }
@@ -1941,8 +1944,8 @@ public class SimpleTest extends LanguageTestSupport {
     protected void assertExpressionResultInstanceOf(String expressionText, Class<?> expectedType) {
         Language language = assertResolveLanguage(getLanguageName());
         Expression expression = language.createExpression(expressionText);
-        assertNotNull("Cannot assert type when no type is provided", expectedType);
-        assertNotNull("No Expression could be created for text: " + expressionText + " language: " + language, expression);
+        assertNotNull(expectedType, "Cannot assert type when no type is provided");
+        assertNotNull(expression, "No Expression could be created for text: " + expressionText + " language: " + language);
         Object answer = expression.evaluate(exchange, Object.class);
         assertIsInstanceOf(expectedType, answer);
     }

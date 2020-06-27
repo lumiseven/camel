@@ -1,22 +1,21 @@
 [[aws2-kms-component]]
-= AWS 2 KMS Component
+= AWS 2 Key Management Service (KMS) Component
 //THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-kms/src/main/docs/aws2-kms-component.adoc
-:docTitle: AWS 2 KMS
+:docTitle: AWS 2 Key Management Service (KMS)
 :artifactId: camel-aws2-kms
 :description: Manage keys stored in AWS KMS instances using AWS SDK version 2.x.
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
-*Since Camel 3.1*
-
-
 *{component-header}*
 
-The KMS component supports the ability to work with keys stored in
+The AWS2 KMS component supports the ability to work with keys stored in
 https://aws.amazon.com/kms/[AWS KMS] instances.
 
 Prerequisites
@@ -44,7 +43,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 KMS component supports 12 options, which are listed below.
+The AWS 2 Key Management Service (KMS) component supports 12 options, which are listed below.
 
 
 
@@ -70,7 +69,7 @@ The AWS 2 KMS component supports 12 options, which are listed below.
 
 
 // endpoint options: START
-The AWS 2 KMS endpoint is configured using URI syntax:
+The AWS 2 Key Management Service (KMS) endpoint is configured using URI syntax:
 
 ----
 aws2-kms:label

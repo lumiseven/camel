@@ -22,6 +22,7 @@ import javax.validation.TraversableResolver;
 import javax.validation.ValidationProviderResolver;
 import javax.validation.ValidatorFactory;
 
+import org.apache.camel.Category;
 import org.apache.camel.Component;
 import org.apache.camel.Consumer;
 import org.apache.camel.Processor;
@@ -40,7 +41,7 @@ import static org.apache.camel.component.bean.validator.ValidatorFactories.build
  *
  * Camel uses the reference implementation, which is Hibernate Validator.
  */
-@UriEndpoint(firstVersion = "2.3.0", scheme = "bean-validator", title = "Bean Validator", syntax = "bean-validator:label", producerOnly = true, label = "validation")
+@UriEndpoint(firstVersion = "2.3.0", scheme = "bean-validator", title = "Bean Validator", syntax = "bean-validator:label", producerOnly = true, category = {Category.VALIDATION})
 public class BeanValidatorEndpoint extends DefaultEndpoint {
 
     @UriPath(description = "Where label is an arbitrary text value describing the endpoint") @Metadata(required = true)
@@ -169,14 +170,14 @@ public class BeanValidatorEndpoint extends DefaultEndpoint {
         this.constraintValidatorFactory = constraintValidatorFactory;
     }
 
-    public ValidatorFactory getValidatorFactory() {
-        return validatorFactory;
-    }
-
     /**
      * To use a custom {@link ValidatorFactory}
      */
     public void setValidatorFactory(ValidatorFactory validatorFactory) {
         this.validatorFactory = validatorFactory;
+    }
+
+    public ValidatorFactory getValidatorFactory() {
+        return validatorFactory;
     }
 }

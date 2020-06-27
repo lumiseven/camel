@@ -364,25 +364,29 @@ public interface ServiceNowEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the models(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: producer
          */
-        default ServiceNowEndpointBuilder models(
-                Map<String, Class<Object>> models) {
-            doSetProperty("models", models);
+        default ServiceNowEndpointBuilder models(String key, Object value) {
+            doSetMultiValueProperty("models", "model." + key, value);
             return this;
         }
         /**
          * Defines both request and response models.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String,
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the models(String, Object)
+         * method to add a value (call the method multiple times to set more
+         * values).
          * 
          * Group: producer
          */
-        default ServiceNowEndpointBuilder models(String models) {
-            doSetProperty("models", models);
+        default ServiceNowEndpointBuilder models(Map values) {
+            doSetMultiValueProperties("models", "model.", values);
             return this;
         }
         /**
@@ -447,25 +451,29 @@ public interface ServiceNowEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the requestModels(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
-        default ServiceNowEndpointBuilder requestModels(
-                Map<String, Class<Object>> requestModels) {
-            doSetProperty("requestModels", requestModels);
+        default ServiceNowEndpointBuilder requestModels(String key, Object value) {
+            doSetMultiValueProperty("requestModels", "request-model." + key, value);
             return this;
         }
         /**
          * Defines the request model.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String,
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the requestModels(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
-        default ServiceNowEndpointBuilder requestModels(String requestModels) {
-            doSetProperty("requestModels", requestModels);
+        default ServiceNowEndpointBuilder requestModels(Map values) {
+            doSetMultiValueProperties("requestModels", "request-model.", values);
             return this;
         }
         /**
@@ -485,25 +493,31 @@ public interface ServiceNowEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the responseModels(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
         default ServiceNowEndpointBuilder responseModels(
-                Map<String, Class<Object>> responseModels) {
-            doSetProperty("responseModels", responseModels);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("responseModels", "response-model." + key, value);
             return this;
         }
         /**
          * Defines the response model.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String,
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Class&lt;java.lang.Object&gt;&gt;</code> type.
+         * The option is multivalued, and you can use the responseModels(String,
+         * Object) method to add a value (call the method multiple times to set
+         * more values).
          * 
          * Group: producer
          */
-        default ServiceNowEndpointBuilder responseModels(String responseModels) {
-            doSetProperty("responseModels", responseModels);
+        default ServiceNowEndpointBuilder responseModels(Map values) {
+            doSetMultiValueProperties("responseModels", "response-model.", values);
             return this;
         }
         /**

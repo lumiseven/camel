@@ -35,7 +35,8 @@ public interface WsEndpointBuilderFactory {
 
 
     /**
-     * Builder for endpoint consumers for the AHC Websocket component.
+     * Builder for endpoint consumers for the Async HTTP Client (AHC) Websocket
+     * component.
      */
     public interface WsEndpointConsumerBuilder
             extends
@@ -304,7 +305,8 @@ public interface WsEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint consumers for the AHC Websocket component.
+     * Advanced builder for endpoint consumers for the Async HTTP Client (AHC)
+     * Websocket component.
      */
     public interface AdvancedWsEndpointConsumerBuilder
             extends
@@ -457,27 +459,32 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedWsEndpointConsumerBuilder clientConfigOptions(
-                Map<String, Object> clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigOptions", "clientConfig." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedWsEndpointConsumerBuilder clientConfigOptions(
-                String clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+        default AdvancedWsEndpointConsumerBuilder clientConfigOptions(Map values) {
+            doSetMultiValueProperties("clientConfigOptions", "clientConfig.", values);
             return this;
         }
         /**
@@ -513,33 +520,40 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
         default AdvancedWsEndpointConsumerBuilder clientConfigRealmOptions(
-                Map<String, Object> clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigRealmOptions", "clientConfig.realm." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig Realm using the key/values
          * from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
         default AdvancedWsEndpointConsumerBuilder clientConfigRealmOptions(
-                String clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+                Map values) {
+            doSetMultiValueProperties("clientConfigRealmOptions", "clientConfig.realm.", values);
             return this;
         }
     }
 
     /**
-     * Builder for endpoint producers for the AHC Websocket component.
+     * Builder for endpoint producers for the Async HTTP Client (AHC) Websocket
+     * component.
      */
     public interface WsEndpointProducerBuilder
             extends
@@ -859,7 +873,8 @@ public interface WsEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint producers for the AHC Websocket component.
+     * Advanced builder for endpoint producers for the Async HTTP Client (AHC)
+     * Websocket component.
      */
     public interface AdvancedWsEndpointProducerBuilder
             extends
@@ -955,27 +970,32 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedWsEndpointProducerBuilder clientConfigOptions(
-                Map<String, Object> clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigOptions", "clientConfig." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedWsEndpointProducerBuilder clientConfigOptions(
-                String clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+        default AdvancedWsEndpointProducerBuilder clientConfigOptions(Map values) {
+            doSetMultiValueProperties("clientConfigOptions", "clientConfig.", values);
             return this;
         }
         /**
@@ -1011,33 +1031,39 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
         default AdvancedWsEndpointProducerBuilder clientConfigRealmOptions(
-                Map<String, Object> clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigRealmOptions", "clientConfig.realm." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig Realm using the key/values
          * from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
         default AdvancedWsEndpointProducerBuilder clientConfigRealmOptions(
-                String clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+                Map values) {
+            doSetMultiValueProperties("clientConfigRealmOptions", "clientConfig.realm.", values);
             return this;
         }
     }
 
     /**
-     * Builder for endpoint for the AHC Websocket component.
+     * Builder for endpoint for the Async HTTP Client (AHC) Websocket component.
      */
     public interface WsEndpointBuilder
             extends
@@ -1239,7 +1265,8 @@ public interface WsEndpointBuilderFactory {
     }
 
     /**
-     * Advanced builder for endpoint for the AHC Websocket component.
+     * Advanced builder for endpoint for the Async HTTP Client (AHC) Websocket
+     * component.
      */
     public interface AdvancedWsEndpointBuilder
             extends
@@ -1334,27 +1361,32 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
         default AdvancedWsEndpointBuilder clientConfigOptions(
-                Map<String, Object> clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigOptions", "clientConfig." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig using the key/values from the
          * Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigOptions(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: advanced
          */
-        default AdvancedWsEndpointBuilder clientConfigOptions(
-                String clientConfigOptions) {
-            doSetProperty("clientConfigOptions", clientConfigOptions);
+        default AdvancedWsEndpointBuilder clientConfigOptions(Map values) {
+            doSetMultiValueProperties("clientConfigOptions", "clientConfig.", values);
             return this;
         }
         /**
@@ -1389,34 +1421,39 @@ public interface WsEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
         default AdvancedWsEndpointBuilder clientConfigRealmOptions(
-                Map<String, Object> clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("clientConfigRealmOptions", "clientConfig.realm." + key, value);
             return this;
         }
         /**
          * To configure the AsyncHttpClientConfig Realm using the key/values
          * from the Map.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * clientConfigRealmOptions(String, Object) method to add a value (call
+         * the method multiple times to set more values).
          * 
          * Group: security
          */
-        default AdvancedWsEndpointBuilder clientConfigRealmOptions(
-                String clientConfigRealmOptions) {
-            doSetProperty("clientConfigRealmOptions", clientConfigRealmOptions);
+        default AdvancedWsEndpointBuilder clientConfigRealmOptions(Map values) {
+            doSetMultiValueProperties("clientConfigRealmOptions", "clientConfig.realm.", values);
             return this;
         }
     }
 
     public interface WsBuilders {
         /**
-         * AHC Websocket (camel-ahc-ws)
+         * Async HTTP Client (AHC) Websocket (camel-ahc-ws)
          * Exchange data with external Websocket servers using Async Http
          * Client.
          * 
@@ -1435,7 +1472,7 @@ public interface WsEndpointBuilderFactory {
             return WsEndpointBuilderFactory.endpointBuilder("ahc-ws", path);
         }
         /**
-         * AHC Websocket (camel-ahc-ws)
+         * Async HTTP Client (AHC) Websocket (camel-ahc-ws)
          * Exchange data with external Websocket servers using Async Http
          * Client.
          * 
@@ -1456,7 +1493,7 @@ public interface WsEndpointBuilderFactory {
             return WsEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
         /**
-         * AHC Secure Websocket (Secure) (camel-ahc-ws)
+         * Async HTTP Client (AHC) Secure Websocket (Secure) (camel-ahc-ws)
          * Exchange data with external Websocket servers using Async Http
          * Client.
          * 
@@ -1473,27 +1510,6 @@ public interface WsEndpointBuilderFactory {
          */
         default WsEndpointBuilder ahcWss(String path) {
             return WsEndpointBuilderFactory.endpointBuilder("ahc-wss", path);
-        }
-        /**
-         * AHC Secure Websocket (Secure) (camel-ahc-ws)
-         * Exchange data with external Websocket servers using Async Http
-         * Client.
-         * 
-         * Category: websocket
-         * Since: 2.14
-         * Maven coordinates: org.apache.camel:camel-ahc-ws
-         * 
-         * Syntax: <code>ahc-wss:httpUri</code>
-         * 
-         * Path parameter: httpUri (required)
-         * The URI to use such as http://hostname:port/path
-         * 
-         * @param componentName to use a custom component name for the endpoint
-         * instead of the default name
-         * @param path httpUri
-         */
-        default WsEndpointBuilder ahcWss(String componentName, String path) {
-            return WsEndpointBuilderFactory.endpointBuilder(componentName, path);
         }
     }
     static WsEndpointBuilder endpointBuilder(String componentName, String path) {

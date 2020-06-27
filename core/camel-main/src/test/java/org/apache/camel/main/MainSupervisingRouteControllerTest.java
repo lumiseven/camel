@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.camel.Consumer;
 import org.apache.camel.Endpoint;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
@@ -28,17 +29,20 @@ import org.apache.camel.component.seda.SedaComponent;
 import org.apache.camel.component.seda.SedaConsumer;
 import org.apache.camel.component.seda.SedaEndpoint;
 import org.apache.camel.spi.SupervisingRouteController;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class MainSupervisingRouteControllerTest extends Assert {
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+public class MainSupervisingRouteControllerTest {
 
     @Test
     public void testMain() throws Exception {
         // lets make a simple route
         Main main = new Main();
         main.configure().addRoutesBuilder(new MyRoute());
-        main.configure().withRouteControllerSuperviseEnabled(true)
+        main.configure().withRouteStartupLoggingLevel(LoggingLevel.OFF)
+                        .withRouteControllerSuperviseEnabled(true)
                         .withRouteControllerBackOffDelay(25)
                         .withRouteControllerBackOffMaxAttempts(3)
                         .withRouteControllerInitialDelay(100)

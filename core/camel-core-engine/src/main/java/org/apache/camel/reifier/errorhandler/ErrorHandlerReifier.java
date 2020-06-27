@@ -16,6 +16,7 @@
  */
 package org.apache.camel.reifier.errorhandler;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,7 @@ import org.apache.camel.processor.errorhandler.ExceptionPolicyKey;
 import org.apache.camel.processor.errorhandler.RedeliveryErrorHandler;
 import org.apache.camel.processor.errorhandler.RedeliveryPolicy;
 import org.apache.camel.reifier.AbstractReifier;
+import org.apache.camel.spi.Language;
 import org.apache.camel.support.CamelContextHelper;
 import org.apache.camel.util.ObjectHelper;
 
@@ -97,14 +99,8 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerBuilderSupport> 
         if (retryWhile == null && def.getRetryWhile() != null) {
             retryWhile = createPredicate(def.getRetryWhile());
         }
-        Processor onRedelivery = def.getOnRedelivery();
-        if (onRedelivery == null && def.getOnRedeliveryRef() != null) {
-            onRedelivery = mandatoryLookup(parseString(def.getOnRedeliveryRef()), Processor.class);
-        }
-        Processor onExceptionOccurred = def.getOnExceptionOccurred();
-        if (onExceptionOccurred == null && def.getOnExceptionOccurredRef() != null) {
-            onExceptionOccurred = mandatoryLookup(parseString(def.getOnExceptionOccurredRef()), Processor.class);
-        }
+        Processor onRedelivery = getBean(Processor.class, def.getOnRedelivery(), def.getOnRedeliveryRef());
+        Processor onExceptionOccurred = getBean(Processor.class, def.getOnExceptionOccurred(), def.getOnExceptionOccurredRef());
         return new ExceptionPolicy(def.getId(), CamelContextHelper.getRouteId(def),
                                    parseBoolean(def.getUseOriginalMessage(), false),
                                    parseBoolean(def.getUseOriginalBody(), false),
@@ -332,16 +328,17 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerBuilderSupport> 
                 answer.setMaximumRedeliveries(CamelContextHelper.parseInteger(context, definition.getMaximumRedeliveries()));
             }
             if (definition.getRedeliveryDelay() != null) {
-                answer.setRedeliveryDelay(CamelContextHelper.parseLong(context, definition.getRedeliveryDelay()));
+                Duration duration = CamelContextHelper.parseDuration(context, definition.getRedeliveryDelay());
+                answer.setRedeliveryDelay(duration.toMillis());
             }
             if (definition.getAsyncDelayedRedelivery() != null) {
                 answer.setAsyncDelayedRedelivery(CamelContextHelper.parseBoolean(context, definition.getAsyncDelayedRedelivery()));
             }
             if (definition.getRetriesExhaustedLogLevel() != null) {
-                answer.setRetriesExhaustedLogLevel(LoggingLevel.valueOf(definition.getRetriesExhaustedLogLevel()));
+                answer.setRetriesExhaustedLogLevel(CamelContextHelper.parse(context, LoggingLevel.class, definition.getRetriesExhaustedLogLevel()));
             }
             if (definition.getRetryAttemptedLogLevel() != null) {
-                answer.setRetryAttemptedLogLevel(LoggingLevel.valueOf(definition.getRetryAttemptedLogLevel()));
+                answer.setRetryAttemptedLogLevel(CamelContextHelper.parse(context, LoggingLevel.class, definition.getRetryAttemptedLogLevel()));
             }
             if (definition.getRetryAttemptedLogInterval() != null) {
                 answer.setRetryAttemptedLogInterval(CamelContextHelper.parseInteger(context, definition.getRetryAttemptedLogInterval()));
@@ -359,7 +356,8 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerBuilderSupport> 
                 answer.setUseCollisionAvoidance(CamelContextHelper.parseBoolean(context, definition.getUseCollisionAvoidance()));
             }
             if (definition.getMaximumRedeliveryDelay() != null) {
-                answer.setMaximumRedeliveryDelay(CamelContextHelper.parseLong(context, definition.getMaximumRedeliveryDelay()));
+                Duration duration = CamelContextHelper.parseDuration(context, definition.getMaximumRedeliveryDelay());
+                answer.setMaximumRedeliveryDelay(duration.toMillis());
             }
             if (definition.getLogStackTrace() != null) {
                 answer.setLogStackTrace(CamelContextHelper.parseBoolean(context, definition.getLogStackTrace()));
@@ -407,6 +405,22 @@ public abstract class ErrorHandlerReifier<T extends ErrorHandlerBuilderSupport> 
         }
 
         return answer;
+    }
+
+    protected Predicate getPredicate(Predicate pred, String ref) {
+        if (pred == null && ref != null) {
+            // its a bean expression
+            Language bean = camelContext.resolveLanguage("bean");
+            pred = bean.createPredicate(ref);
+        }
+        return pred;
+    }
+
+    protected <T> T getBean(Class<T> clazz, T bean, String ref) {
+        if (bean == null && ref != null) {
+            bean = lookup(ref, clazz);
+        }
+        return bean;
     }
 
 }

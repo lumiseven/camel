@@ -1,22 +1,21 @@
 [[aws2-eks-component]]
-= AWS 2 EKS Component
+= AWS 2 Elastic Kubernetes Service (EKS) Component
 //THIS FILE IS COPIED: EDIT THE SOURCE FILE:
 :page-source: components/camel-aws2-eks/src/main/docs/aws2-eks-component.adoc
-:docTitle: AWS 2 EKS
+:docTitle: AWS 2 Elastic Kubernetes Service (EKS)
 :artifactId: camel-aws2-eks
 :description: Manage AWS EKS cluster instances using AWS SDK version 2.x.
 :since: 3.1
 :supportLevel: Stable
 :component-header: Only producer is supported
+//Manually maintained attributes
+:group: AWS 2
 
 *Since Camel {since}*
 
-*Since Camel 3.1*
-
-
 *{component-header}*
 
-The EKS component supports create, delete, describe and list
+The AWS2 EKS component supports create, delete, describe and list clusters
 https://aws.amazon.com/eks/[AWS EKS] clusters instances.
 
 Prerequisites
@@ -44,7 +43,7 @@ You can append query options to the URI in the following format,
 
 
 // component options: START
-The AWS 2 EKS component supports 12 options, which are listed below.
+The AWS 2 Elastic Kubernetes Service (EKS) component supports 12 options, which are listed below.
 
 
 
@@ -70,7 +69,7 @@ The AWS 2 EKS component supports 12 options, which are listed below.
 
 
 // endpoint options: START
-The AWS 2 EKS endpoint is configured using URI syntax:
+The AWS 2 Elastic Kubernetes Service (EKS) endpoint is configured using URI syntax:
 
 ----
 aws2-eks:label

@@ -1787,27 +1787,32 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>java.util.Map&lt;java.lang.String,
          * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
         default SftpEndpointConsumerBuilder schedulerProperties(
-                Map<String, Object> schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+                String key,
+                Object value) {
+            doSetMultiValueProperty("schedulerProperties", "scheduler." + key, value);
             return this;
         }
         /**
          * To configure additional properties when using a custom scheduler or
          * any of the Quartz, Spring based scheduler.
          * 
-         * The option will be converted to a
-         * <code>java.util.Map&lt;java.lang.String, java.lang.Object&gt;</code>
-         * type.
+         * The option is a: <code>java.util.Map&lt;java.lang.String,
+         * java.lang.Object&gt;</code> type.
+         * The option is multivalued, and you can use the
+         * schedulerProperties(String, Object) method to add a value (call the
+         * method multiple times to set more values).
          * 
          * Group: scheduler
          */
-        default SftpEndpointConsumerBuilder schedulerProperties(
-                String schedulerProperties) {
-            doSetProperty("schedulerProperties", schedulerProperties);
+        default SftpEndpointConsumerBuilder schedulerProperties(Map values) {
+            doSetMultiValueProperties("schedulerProperties", "scheduler.", values);
             return this;
         }
         /**
@@ -2882,7 +2887,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointConsumerBuilder soTimeout(int soTimeout) {
@@ -2898,7 +2903,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointConsumerBuilder soTimeout(String soTimeout) {
@@ -3006,7 +3011,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointConsumerBuilder timeout(int timeout) {
@@ -3018,7 +3023,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointConsumerBuilder timeout(String timeout) {
@@ -4362,7 +4367,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointProducerBuilder soTimeout(int soTimeout) {
@@ -4378,7 +4383,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointProducerBuilder soTimeout(String soTimeout) {
@@ -4486,7 +4491,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointProducerBuilder timeout(int timeout) {
@@ -4498,7 +4503,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointProducerBuilder timeout(String timeout) {
@@ -5352,7 +5357,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointBuilder soTimeout(int soTimeout) {
@@ -5368,7 +5373,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 300000
+         * Default: 5m
          * Group: advanced
          */
         default AdvancedSftpEndpointBuilder soTimeout(String soTimeout) {
@@ -5474,7 +5479,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option is a: <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointBuilder timeout(int timeout) {
@@ -5486,7 +5491,7 @@ public interface SftpEndpointBuilderFactory {
          * 
          * The option will be converted to a <code>int</code> type.
          * 
-         * Default: 30000
+         * Default: 30s
          * Group: advanced
          */
         default AdvancedSftpEndpointBuilder timeout(String timeout) {

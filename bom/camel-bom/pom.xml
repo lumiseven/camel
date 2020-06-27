@@ -22,7 +22,7 @@
   <parent>
     <groupId>org.apache.camel</groupId>
     <artifactId>camel</artifactId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.5.0-SNAPSHOT</version>
     <relativePath>../../</relativePath>
   </parent>
   <artifactId>camel-bom</artifactId>
@@ -219,6 +219,11 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-aws-xray</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-aws2-athena</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -859,6 +864,11 @@
       </dependency>
       <dependency>
         <groupId>org.apache.camel</groupId>
+        <artifactId>camel-health</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
         <artifactId>camel-hipchat</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -1065,6 +1075,11 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-jt400</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-jta</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -1431,6 +1446,11 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-rest-swagger</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-resteasy</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>

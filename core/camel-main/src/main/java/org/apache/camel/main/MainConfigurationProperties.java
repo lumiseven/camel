@@ -37,7 +37,6 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     private boolean autowireComponentPropertiesNonNullOnly;
     private boolean autowireComponentPropertiesAllowPrivateSetter = true;
     private int durationHitExitCode;
-    private boolean hangupInterceptorEnabled = true;
     private String packageScanRouteBuilders;
 
     private String routesBuilderClasses;
@@ -47,6 +46,9 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     private List<Object> configurations = new ArrayList<>();
 
     // extended configuration
+    private final HealthConfigurationProperties healthConfigurationProperties = new HealthConfigurationProperties(this);
+    private final LraConfigurationProperties lraConfigurationProperties = new LraConfigurationProperties(this);
+    private final ThreadPoolConfigurationProperties threadPool = new ThreadPoolConfigurationProperties(this);
     private final HystrixConfigurationProperties hystrixConfigurationProperties = new HystrixConfigurationProperties(this);
     private final Resilience4jConfigurationProperties resilience4jConfigurationProperties = new Resilience4jConfigurationProperties(this);
     private final FaultToleranceConfigurationProperties faultToleranceConfigurationProperties = new FaultToleranceConfigurationProperties(this);
@@ -56,8 +58,30 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
     // --------------------------------------------------------------
 
     /**
+     * To configure Health Check
+     */
+    public HealthConfigurationProperties health() {
+        return healthConfigurationProperties;
+    }
+
+    /**
+     * To configure Saga LRA
+     */
+    public LraConfigurationProperties lra() {
+        return lraConfigurationProperties;
+    }
+
+    /**
+     * To configure thread pools
+     */
+    public ThreadPoolConfigurationProperties threadPool() {
+        return threadPool;
+    }
+
+    /**
      * To configure Circuit Breaker EIP with Hystrix
      */
+    @Deprecated
     public HystrixConfigurationProperties hystrix() {
         return hystrixConfigurationProperties;
     }
@@ -209,17 +233,6 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
      */
     public void setAutowireComponentPropertiesAllowPrivateSetter(boolean autowireComponentPropertiesAllowPrivateSetter) {
         this.autowireComponentPropertiesAllowPrivateSetter = autowireComponentPropertiesAllowPrivateSetter;
-    }
-
-    public boolean isHangupInterceptorEnabled() {
-        return hangupInterceptorEnabled;
-    }
-
-    /**
-     * Whether to use graceful hangup when Camel is stopping or when the JVM terminates.
-     */
-    public void setHangupInterceptorEnabled(boolean hangupInterceptorEnabled) {
-        this.hangupInterceptorEnabled = hangupInterceptorEnabled;
     }
 
     public String getPackageScanRouteBuilders() {
@@ -452,14 +465,6 @@ public class MainConfigurationProperties extends DefaultConfigurationProperties<
      */
     public MainConfigurationProperties withAutowireComponentPropertiesAllowPrivateSetter(boolean autowireComponentPropertiesAllowPrivateSetter) {
         this.autowireComponentPropertiesAllowPrivateSetter = autowireComponentPropertiesAllowPrivateSetter;
-        return this;
-    }
-
-    /**
-     * Whether to use graceful hangup when Camel is stopping or when the JVM terminates.
-     */
-    public MainConfigurationProperties withHangupInterceptorEnabled(boolean hangupInterceptorEnabled) {
-        this.hangupInterceptorEnabled = hangupInterceptorEnabled;
         return this;
     }
 

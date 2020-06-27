@@ -34,7 +34,7 @@ public interface FlinkComponentBuilderFactory {
      * Flink (camel-flink)
      * Send DataSet jobs to an Apache Flink cluster.
      * 
-     * Category: hadoop
+     * Category: transformation,bigdata,streams
      * Since: 2.18
      * Maven coordinates: org.apache.camel:camel-flink
      */
@@ -46,18 +46,6 @@ public interface FlinkComponentBuilderFactory {
      * Builder for the Flink component.
      */
     interface FlinkComponentBuilder extends ComponentBuilder<FlinkComponent> {
-        /**
-         * DataSet to compute against.
-         * 
-         * The option is a: <code>org.apache.flink.api.java.DataSet</code> type.
-         * 
-         * Group: producer
-         */
-        default FlinkComponentBuilder dataSet(
-                org.apache.flink.api.java.DataSet dataSet) {
-            doSetProperty("dataSet", dataSet);
-            return this;
-        }
         /**
          * Function performing action against a DataSet.
          * 
@@ -151,7 +139,6 @@ public interface FlinkComponentBuilderFactory {
                 String name,
                 Object value) {
             switch (name) {
-            case "dataSet": ((FlinkComponent) component).setDataSet((org.apache.flink.api.java.DataSet) value); return true;
             case "dataSetCallback": ((FlinkComponent) component).setDataSetCallback((org.apache.camel.component.flink.DataSetCallback) value); return true;
             case "dataStream": ((FlinkComponent) component).setDataStream((org.apache.flink.streaming.api.datastream.DataStream) value); return true;
             case "dataStreamCallback": ((FlinkComponent) component).setDataStreamCallback((org.apache.camel.component.flink.DataStreamCallback) value); return true;
